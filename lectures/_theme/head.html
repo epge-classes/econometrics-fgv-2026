@@ -1,0 +1,29 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Fira+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Math font: classic Computer Modern (MathJax 3's look), Raul's pick.
+     Quarto's RevealMath plugin overwrites window.MathJax, so trap the
+     first assignment, inject output.font, then step out of the way.
+     Built against Quarto 1.10.18; re-check math rendering after upgrading Quarto.
+     Alternatives: mathjax-newcm (MathJax 4 default, serif New CM),
+     mathjax-fira (sans, matches Fira Sans body text), mathjax-modern,
+     mathjax-stix2, mathjax-pagella. -->
+<script>
+(function () {
+  var FONT = 'mathjax-tex';
+  Object.defineProperty(window, 'MathJax', {
+    configurable: true,
+    get: function () { return undefined; },
+    set: function (v) {
+      var cfg = Object.assign({}, v || {});
+      // MathJax-2 leftovers the plugin injects; MathJax 4 does not use them
+      delete cfg.messageStyle; delete cfg.tex2jax;
+      delete cfg.skipStartupTypeset; delete cfg.config; delete cfg.mathjax;
+      cfg.output = Object.assign({ font: FONT }, cfg.output);
+      Object.defineProperty(window, 'MathJax', {
+        value: cfg, writable: true, configurable: true, enumerable: true
+      });
+    }
+  });
+})();
+</script>

@@ -1,0 +1,121 @@
+---
+title: "Lecture 0: Class Setup"
+talkdate: "October 2026"
+---
+
+## Course Information
+
+- **Course**: Econometrics I (Part I)
+- **Instructor**: [Raul Guarini Riva](https://rgriva.github.io) --- [raul.riva@fgv.br](mailto:raul.riva@fgv.br)
+- **Part II**: [Valdemar Pinho Neto](https://sites.google.com/view/valdemarneto/home) --- [valdemar.pinho@fgv.br](mailto:valdemar.pinho@fgv.br)
+- **Teaching Assistant**: Taric Latif --- [tariclatif@gmail.com](mailto:tariclatif@gmail.com)
+- **Class Schedule**: Wednesdays and Fridays, 9:00--11:00
+- **Office Hours**: Fridays, 17:00--18:00
+- **TA Session Schedule**: check with the TA
+- **GitHub repository**: <https://github.com/epge-classes/econometrics-fgv-2026>
+
+::: {.center .vfill}
+[We will use GitHub for course materials, assignments, and so on.]{.alert}
+:::
+
+## Why Should You Take This Class Seriously?
+
+- Most students will engage in empirical research across diverse fields of Economics:
+    - Labor, Development, Urban, Finance, Health, IO, even Macro...!
+    - Obviously important if you want to do Econometrics
+- So far, most of what you learned is about **cross-sectional data** and **OLS**
+- This class: **Time Series**, **Causal Inference**, and **Panel Data**
+- Time Series data is your bread and butter in Macro, Finance, and many other fields
+- Panel Data methods (fixed effects, diff-in-diff, ...) are everywhere in empirical research
+- Needless to say why Causal Inference is important, right? 👀
+- We will also cover a bit of non-parametric methods and bootstrap techniques
+
+## Learning Goals (by Week 5)
+
+After the first half of the course, you should be able to:
+
+1. Understand and implement non-parametric kernel-based methods
+2. Apply bootstrap methods for i.i.d. data
+3. Analyze time series data:
+    - Concepts: stationarity, ergodicity, persistence, autocorrelation, ...
+    - Estimation and forecasting with ARMA models
+    - Asymptotic distribution of the OLS estimator under autocorrelation
+4. Implement GMM estimation under heteroskedasticity and autocorrelation:
+    - Super relevant for Panel Data methods
+    - Also very useful to estimate structural models
+
+## [Tentative]{.underline} Weekly Topics {.sc86}
+
+- **Week 1:** Non-parametric estimation + Bootstrap for i.i.d. data
+- **Week 2:**
+    - The structure of time series data, stationarity, ergodicity, persistence, autocorrelation, ...
+    - The Lag Operator, AR and MA processes
+- **Week 3:**
+    - ARMA Models and Wold's Decomposition Theorem
+    - Estimation of ARMA Models
+- **Week 4:**
+    - LLN and CLTs for dependent data -- focus on using the results rather than proving every single little thing
+    - Intro to GMM
+- **Week 5:**
+    - GMM asymptotic theory + HAC estimation
+    - GMM and HAC estimation + numerical pitfalls
+
+*Note: subject to change.*
+
+## Books? Slides?
+
+- I will provide slides for the lectures
+- These slides will be mostly based on two books + a famous reference here and there:
+    - **Econometrics**, by Bruce Hansen (hello, old friend!)
+    - **Time Series Analysis**, by James Hamilton (very comprehensive, also very long)
+    - **Stochastic Limit Theory**, by James Davidson (seriously dark magic)
+- I will highlight the recommended readings, and reading the books is **mandatory**
+- Slides are not a substitute for reading the books
+- Slides available on GitHub just before class
+
+## Evaluation and Grades
+
+- Grades for the first and second half of the class are independent
+- Final grade = 0.5 $\times$ (Grade on Part I) + 0.5 $\times$ (Grade on Part II)
+- Problem sets are worth **10%** of my half of the course; exams are worth the remaining **90%**
+
+## Problem Sets
+
+- Groups of up to 3 students
+- Late solutions are not accepted
+- Both theoretical and empirical questions
+
+. . .
+
+- Solutions must be submitted in PDF format through GitHub
+- We will use **GitHub Classroom** to manage problem set submissions -- see `problem_sets`
+- There will be one private repository for each group and each problem set
+- Deliver both a report answering the questions and the code used to generate the results
+
+. . .
+
+- Feel free to use any _civilized_ programming language (Python, R, Julia, Matlab, ...)
+- No, you cannot use Stata or pre-packaged solutions -- be honest and sensible
+
+## Attendance
+
+- It is not mandatory at all -- you are adults
+- However, if you come, you have to be on time
+- 15-minute grace period -- after that, you will not be allowed to enter the classroom
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+Questions?
+:::
+
+## One more thing...
+
+::: {.center}
+[**This is really important!**]{.alert}
+:::
+
+- I need ongoing feedback
+- Is there something great/terrible about the class? Tell me!
+- Don't be shy -- negative feedback will never be punished in any way
+- If anything, on the contrary!

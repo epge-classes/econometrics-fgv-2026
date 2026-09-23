@@ -1,0 +1,45 @@
+# Shared configuration for every lecture deck.
+# Render one deck:   quarto render lecture0/lecture0.qmd   (run from lectures/)
+# Render all decks:  quarto render                          (run from lectures/)
+# A lecture's own front matter overrides anything set here.
+project:
+  type: default
+  render:
+    - "lecture*/lecture*.qmd"
+
+# Re-run code cells only when a lecture's source changes.
+execute:
+  freeze: auto
+
+# Title-slide fields (see _theme/title-slide.html); each lecture sets title and talkdate.
+presenter: "Raul Riva"
+affil: "FGV, Brazilian School of Economics and Finance ([FGV EPGE]{.fgv})"
+venue: "Econometrics I (Part I)"
+
+format:
+  revealjs:
+    theme: [default, _theme/custom.scss]
+    width: 1280
+    height: 720
+    margin: 0.04
+    min-scale: 0.2
+    max-scale: 2.0
+    center: false
+    slide-number: c/t
+    progress: true
+    history: true
+    hash-type: title
+    transition: none
+    background-transition: none
+    incremental: false
+    link-external-newwindow: true
+    html-math-method: mathjax
+    fig-format: svg
+    fig-align: center
+    highlight-style: github
+    template-partials:
+      - _theme/title-slide.html
+    include-in-header:
+      - _theme/head.html
+    include-before-body:
+      - _theme/macros.html
