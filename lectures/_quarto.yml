@@ -1,10 +1,12 @@
 # Shared configuration for every lecture deck.
 # Render one deck:   quarto render lecture00/lecture00.qmd   (run from lectures/)
-# Render all decks:  quarto render                          (run from lectures/)
+# Render everything: quarto render                          (run from lectures/)
+# index.qmd is the course landing page (plain HTML, not revealjs).
 # A lecture's own front matter overrides anything set here.
 project:
   type: default
   render:
+    - "index.qmd"
     - "lecture*/lecture*.qmd"
 
 # Re-run code cells only when a lecture's source changes.
