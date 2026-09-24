@@ -1,5 +1,5 @@
 # Shared configuration for every lecture deck.
-# Render one deck:   quarto render lecture0/lecture0.qmd   (run from lectures/)
+# Render one deck:   quarto render lecture00/lecture00.qmd   (run from lectures/)
 # Render all decks:  quarto render                          (run from lectures/)
 # A lecture's own front matter overrides anything set here.
 project:
