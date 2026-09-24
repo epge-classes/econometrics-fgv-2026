@@ -1,0 +1,49 @@
+---
+pagetitle: "Econometrics I (Part I) - FGV EPGE 2026"
+format:
+  html:
+    theme: [default, _theme/landing.scss]
+    include-in-header: _theme/fonts.html
+    page-layout: article
+    anchor-sections: false
+---
+
+<!-- Course landing page, published at the site root.
+     To release a lecture, replace its [coming soon]{.soon} with the links span
+     from lecture 00 and change the folder names. -->
+
+::: {.hero}
+# Econometrics I (Part I)
+
+[Raul Riva · [FGV EPGE]{.fgv} · 2026]{.sub}
+:::
+
+::: {.navlinks}
+[Course repository](https://github.com/epge-classes/econometrics-fgv-2026){.pill}
+[Syllabus](https://github.com/epge-classes/econometrics-fgv-2026#readme){.pill}
+[Problem sets](https://github.com/epge-classes/econometrics-fgv-2026/tree/main/problem_sets){.pill}
+:::
+
+## Lectures
+
+::: {.lectures}
+- [00]{.num} [Class Setup]{.ttl} [[Slides](lecture00/lecture00.html){.pill} [PDF](lecture00/lecture00.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
+- [01]{.num} [Non-Parametric Estimation]{.ttl} [coming soon]{.soon}
+- [02]{.num} [Bootstrap 101]{.ttl} [coming soon]{.soon}
+- [03]{.num} [Building Blocks for Time Series]{.ttl} [coming soon]{.soon}
+- [04]{.num} [Lag Operator, MA Models, and AR Models]{.ttl} [coming soon]{.soon}
+- [05]{.num} [ARMA Models and the Wold Decomposition]{.ttl} [coming soon]{.soon}
+- [06]{.num} [Estimation of ARMA Models]{.ttl} [coming soon]{.soon}
+- [07]{.num} [LLN and CLTs for Time Series]{.ttl} [coming soon]{.soon}
+- [08]{.num} [Unit Roots, AR-DL Models, and Granger Causality]{.ttl} [coming soon]{.soon}
+- [09]{.num} [The GMM Estimator - Part I]{.ttl} [coming soon]{.soon}
+- [10]{.num} [The GMM Estimator - Part II]{.ttl} [coming soon]{.soon}
+:::
+
+::: {.pdfnote}
+**PDF** opens a print-ready version of the slides. Use your browser's *Print → Save as PDF* (works best in Chrome).
+:::
+
+::: {.footer-note}
+Materials licensed under [CC BY 4.0](https://github.com/epge-classes/econometrics-fgv-2026/blob/main/LICENSE).
+:::

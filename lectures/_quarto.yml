@@ -42,6 +42,7 @@ format:
     template-partials:
       - _theme/title-slide.html
     include-in-header:
-      - _theme/head.html
+      - _theme/fonts.html
+      - _theme/mathjax-font.html
     include-before-body:
       - _theme/macros.html
