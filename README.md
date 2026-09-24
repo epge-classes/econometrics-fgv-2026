@@ -2,13 +2,13 @@
 
 Repository for the first half of Econometrics I, taught by [Raul Riva](https://rgriva.github.io). The second half is taught by [Valdemar Pinho Neto](https://sites.google.com/view/valdemarneto/home).
 
-| | |
-|---|---|
-| **Instructor** | Raul Guarini Riva ([raul.riva@fgv.br](mailto:raul.riva@fgv.br)) |
-| **Part II** | Valdemar Pinho Neto ([valdemar.pinho@fgv.br](mailto:valdemar.pinho@fgv.br)) |
-| **TA** | Taric Latif ([tariclatif@gmail.com](mailto:tariclatif@gmail.com)) |
-| **Classes** | Wednesdays and Fridays, 9:00-11:00 |
-| **Office hours** | Fridays, 17:00-18:00 (or email me to schedule another time) |
+<table>
+  <tr><td><b>Instructor</b></td><td>Raul Guarini Riva (<a href="mailto:raul.riva@fgv.br">raul.riva@fgv.br</a>)</td></tr>
+  <tr><td><b>Part II</b></td><td>Valdemar Pinho Neto (<a href="mailto:valdemar.pinho@fgv.br">valdemar.pinho@fgv.br</a>)</td></tr>
+  <tr><td><b>TA</b></td><td>Taric Latif (<a href="mailto:tariclatif@gmail.com">tariclatif@gmail.com</a>)</td></tr>
+  <tr><td><b>Classes</b></td><td>Wednesdays and Fridays, 9:00-11:00</td></tr>
+  <tr><td><b>Office hours</b></td><td>Fridays, 17:00-18:00 (or email me to schedule another time)</td></tr>
+</table>
 
 ## Learning Goals
 
