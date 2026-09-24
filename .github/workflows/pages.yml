@@ -1,0 +1,37 @@
+# Publish the lecture slides to GitHub Pages.
+# Decks are rendered locally and committed, so this only uploads lectures/ as-is:
+# no Quarto or Python on the runner.
+# lectures/lecture00/lecture00.html -> https://epge-classes.github.io/econometrics-fgv-2026/lecture00/lecture00.html
+name: Publish slides
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "lectures/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: lectures
+      - id: deployment
+        uses: actions/deploy-pages@v4
