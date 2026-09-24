@@ -130,8 +130,9 @@ $padx: 40px;
 // items on either side of a pause sit ~3x further apart than items within a
 // chunk. Drop the margin wherever a list continues into a fragment, so the gap
 // across a pause equals the ordinary li spacing.
+// The div case covers a list inside a previous fragment or a wrapper such as .signlist.
 .reveal :is(ul, ol):has(+ .fragment > :is(ul, ol):first-child),
-.reveal .fragment:has(+ .fragment > :is(ul, ol):first-child) > :is(ul, ol):last-child {
+.reveal div:has(+ .fragment > :is(ul, ol):first-child) > :is(ul, ol):last-child {
   margin-bottom: 0;
 }
 
@@ -143,7 +144,7 @@ $padx: 40px;
 // split: the last li's 0.2em bottom and the next li's 0.4em top would add up.
 // Keep the sum at 0.4em, the collapsed gap between items of one list.
 .reveal :is(ul, ol) + .fragment > :is(ul, ol):first-child > li:first-child,
-.reveal .fragment + .fragment > :is(ul, ol):first-child > li:first-child {
+.reveal div:has(> :is(ul, ol):last-child) + .fragment > :is(ul, ol):first-child > li:first-child {
   margin-top: 0.2em;
 }
 

@@ -48,13 +48,23 @@ Slides do not replace the books. **Reading them is mandatory.** Each lecture lis
 ## Problem Sets
 
 - Work in groups of **up to 3** people and keep the same group for all of Part I. Late submissions are not accepted.
-- Problem sets and data are posted under [`problem_sets`](problem_sets). Submissions go through **GitHub Classroom**, with one private repository per group and problem set. Create a [GitHub account](https://github.com/join) if you don't have one.
+- Problem sets and data are posted under [`problem_sets`](problem_sets). Submissions go through **GitHub Classroom**, with one private repository per group and problem set. Create a [GitHub account](https://github.com/join) if you don't have one yet.
 - Submit a PDF report answering both the theoretical and empirical parts, plus your code as separate files. Don't put code in the report.
 - Use any reasonable language (Python, R, Julia, Matlab, ...), but **no Stata and no pre-packaged routines** for the methods we study (e.g., no `gmm` package for a GMM question). Standard tools like numerical optimizers are fine.
 
+## AI Policy
+
+You can, and you should, use AI tools in this class. But you should be smart about it.
+
+- Use AI tools to **help you understand the material** and **to help you write code**. 
+- Do **not** use them to blindly **write your reports**. The written exam may ask questions about the empirical exercises.
+- You will have no AI help during the written exam, and that commands most of your grade.
+
+Some problems might explicitly ask you to use AI tools.
+
 ## Attendance
 
-Attendance is not mandatory. If you come, be on time: there is a 15-minute grace period, after which you may not enter unless you warned me in advance.
+Attendance is **not** mandatory. Coming to class will not directly impact your grades. But there is a catch. **If you come, you have to be be on time**: there is a 15-minute grace period, after which you may not enter unless you warned me in advance.
 
 ## Feedback
 

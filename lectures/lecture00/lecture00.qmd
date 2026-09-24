@@ -97,6 +97,23 @@ After the first half of the course, you should be able to:
 - Feel free to use any _civilized_ programming language (Python, R, Julia, Matlab, ...)
 - No, you cannot use Stata or pre-packaged solutions -- be honest and sensible
 
+## AI Policy
+
+::: {.center}
+[**You can, and you should, use AI tools in this class. But be smart about it.**]{.alert}
+:::
+
+::: {.signlist}
+- [●]{.good} Use AI to **understand the material** and to **help you write code**
+- [●]{.bad} Do **not** use it to blindly **write your reports**
+:::
+
+. . .
+
+- The written exam may ask questions about the empirical exercises
+- No AI help during the exam -- and exams are 90% of your grade
+- Some problems might explicitly ask you to use AI tools
+
 ## Attendance
 
 - It is not mandatory at all -- you are adults
