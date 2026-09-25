@@ -6,9 +6,10 @@
 
 // ---- Palette lifted from the Beamer deck ----
 $FGVBlue: #0072BC; // RGB(0,114,188)
-$slate: #384A72; // Deep navy, hsl(222, 34%, 33%). Sits 17 degrees off the figures'
-// matplotlib tab:blue (#1F77B4) so titles read as structure
-// rather than competing with the data. 8.78:1 on white.
+$slate: #2D3E50; // "slateblue" RGB(45,62,80) from the 2025 Beamer decks. Grayer and
+// darker than FGV blue, so titles read as structure rather than
+// competing with links or the data. 10.96:1 on white.
+// Keep in sync with $slate in landing.scss.
 $ink: #000000; // body text
 $alertOrange: #EB811B; // moloch/metropolis alert
 $good: #2E7D32;

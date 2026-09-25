@@ -45,5 +45,5 @@ format:
 :::
 
 ::: {.footer-note}
-Materials licensed under [CC BY 4.0](https://github.com/epge-classes/econometrics-fgv-2026/blob/main/LICENSE).
+Materials licensed under [CC BY 4.0](https://github.com/epge-classes/econometrics-fgv-2026/blob/main/LICENSE). You can freely use, share, and adapt them, provided you give appropriate credit.
 :::
