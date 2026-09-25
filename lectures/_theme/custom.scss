@@ -286,6 +286,13 @@ $padx: 40px;
   object-fit: contain;
 }
 
+// On phones (< 435px wide) Reveal switches to scroll view, where r-stretch
+// computes a 0x0 box and figures vanish. Fall back to natural sizing there.
+.reveal-scroll .reveal img.r-stretch {
+  width: 100% !important;
+  height: auto !important;
+}
+
 // Observable Inputs (sliders, radios) in {ojs} cells: wider label column so
 // "Bandwidth h" stays on one line, a longer slider, slightly smaller text.
 .reveal form[class^="oi-"] {
