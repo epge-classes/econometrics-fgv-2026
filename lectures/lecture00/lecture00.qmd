@@ -13,6 +13,7 @@ talkdate: "October 2026"
 - **Office Hours**: Fridays, 17:00--18:00
 - **TA Session Schedule**: check with the TA
 - **GitHub repository**: <https://github.com/epge-classes/econometrics-fgv-2026>
+- **Course website**: <https://epge-classes.github.io/econometrics-fgv-2026/>
 
 ::: {.center .vfill}
 [We will use GitHub for course materials, assignments, and so on.]{.alert}
