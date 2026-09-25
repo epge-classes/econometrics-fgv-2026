@@ -278,6 +278,23 @@ $padx: 40px;
   height: auto;
 }
 
+// Reveal's r-stretch sizes a lone figure from the full slide width and ignores
+// the slide padding, so wide plots ran past the right edge. Cap the box at the
+// content width and letterbox the image inside it.
+.reveal img.r-stretch {
+  max-width: 100%;
+  object-fit: contain;
+}
+
+// Observable Inputs (sliders, radios) in {ojs} cells: wider label column so
+// "Bandwidth h" stays on one line, a longer slider, slightly smaller text.
+.reveal form[class^="oi-"] {
+  --label-width: 190px;
+  --input-width: 480px;
+  font-size: 0.8em;
+  margin: 0.1em 0;
+}
+
 .reveal figcaption,
 .subcap {
   font-size: 0.62em;
