@@ -423,6 +423,8 @@ where $B(x) = m'(x)\frac{f'(x)}{f(x)} + \frac{1}{2}m''(x)$.
 Questions?
 :::
 
+# Implementation Matters {visibility="uncounted"}
+
 ## The Bias-Variance Trade-off
 
 - If $n$ is very large:
@@ -452,111 +454,6 @@ $$
 - A popular way to choose a bandwidth: leave-one-out cross-validation
 - Exactly what the Machine Learning literature does!
 - See Hansen's _Econometrics_ for details and the theory behind it
-
-## What About the Boundary?
-
-- Suppose $X_i$ comes from a bounded distribution
-- Say $X \sim U[0,10]$ and $Y|X = x \sim N(x, 1)$
-
-```{python}
-#| fig-align: center
-def nw_fit(X, Y, grid, h):
-    K = np.exp(-0.5 * ((X[None, :] - grid[:, None]) / h) ** 2)
-    return (K @ Y) / K.sum(axis=1)
-
-np.random.seed(7)
-n = 100
-X_b = np.random.uniform(0, 10, n)
-Y_b = X_b + np.random.normal(0, 1, n)
-grid = np.linspace(0, 10, 201)
-
-plt.figure(figsize=(8, 4))
-plt.scatter(X_b, Y_b, s=14, facecolors='none', edgecolors='black', label='Data')
-plt.plot(grid, grid, color='red', label=r'True $m(x)$')
-plt.plot(grid, nw_fit(X_b, Y_b, grid, 1), color='C0', ls='--', label='Nadaraya-Watson (h=1)')
-plt.plot(grid, nw_fit(X_b, Y_b, grid, 2), color='C1', ls='--', label='Nadaraya-Watson (h=2)')
-plt.legend(fontsize=9)
-plt.grid(alpha=0.3)
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.tight_layout()
-```
-
-## The Local Linear Estimator
-
-- The Nadaraya-Watson estimator also solves
-
-$$
-\hat{m}(x) = \arg\min_{c \in \R} \sum_{i=1}^{n}K\left(\frac{X_i - x}{h}\right)\cdot (Y_i-c)^2
-$$
-
-- That's why it's also called the local-constant estimator
-
-. . .
-
-- What is stopping us from fitting a linear function here?
-
-::: {.thm}
-::: {.thmhead}
-Definition (Local-Linear Estimator)
-:::
-For each $x$, solve
-$$
-\left(\hat{\beta}_0(x), \hat{\beta}_1(x)\right) = \arg \min_{(b_0, b_1)} \sum_{i=1}^n K\left(\frac{X_i - x}{h}\right)(Y_i - b_0 - b_1(X_i - x))^2
-$$
-The local-linear estimator of $m(x)$, denoted $\hat{m}_{LL}(x)$, is the local intercept $\hat{\beta}_0(x)$.
-:::
-
-## How Do They Compare?
-
-- Deriving the asymptotic distribution requires similar tricks (see Hansen's _Econometrics_)
-- **Important**: both have the same asymptotic variance
-- **Also important**: the bias term of the local-linear estimator is $h^2 \kappa_2 \frac{m''(x)}{2}$
-
-$$
-\sqrt{nh} \left( \hat{m}_{LL}(x) - m(x) - h^2 \kappa_2 \frac{m''(x)}{2} \right) \xrightarrow{d} N\left(0, \frac{\sigma^2(x) R(K)}{f(x)} \right)
-$$
-
-- What does this imply if $m(\cdot)$ is, in fact, linear?
-- The local-linear estimator is much better close to the boundary! Why?
-
-## &nbsp; {.standout background-color="var(--slate)"}
-
-::: {.standout-body}
-Questions?
-:::
-
-## Curse of Dimensionality
-
-- So far, $x$ was a scalar. What if $X_i \in \R^p$ with $p >1$?
-- Use multivariate kernels and measure "distances" to $x = (x_1, \dots, x_p)$ as
-$$
-K\left(\frac{X_{i1} - x_1}{h_1}\right)\cdot K\left(\frac{X_{i2} - x_2}{h_2}\right) \cdots K\left(\frac{X_{ip} - x_p}{h_p}\right)
-$$
-where $(h_1, \dots, h_p)$ are potentially different bandwidths
-- The math gets more involved, but we get the same type of results
-
-. . .
-
-- Super important caveat: convergence happens at rate $\sqrt{n\cdot h_1\cdot h_2 \cdots h_p}$
-- With a common $h$, we need $nh^p \rightarrow \infty$. This is **very** slow
-- In practice, if $p > 4$ you are screwed $\implies$ open the Machine Learning toolbox
-
-## Confidence Bands
-
-- You did all the math to get the distribution, so you might want to make inference about $m(x)$...
-- Keep in mind: any confidence band you draw is **pointwise**
-- Usually, we cheat and compute the 95% confidence interval as
-
-$$
-\hat{m}(x) \pm 1.96 \cdot \sqrt{\frac{\hat{\sigma}^2(x) R(K)}{nh\, f_n(x)}}
-$$
-
-where $\hat{\sigma}^2(x)$ comes from the residuals of your fit, smoothed with the same kernel
-
-- Why is this cheating?
-
-# Example {visibility="uncounted"}
 
 ## Different Bandwidths
 
@@ -651,6 +548,163 @@ Plot.plot({
   ]
 })
 ```
+
+## What About the Boundary?
+
+- Suppose $X_i$ comes from a bounded distribution
+- Say $X \sim U[0,10]$ and $Y|X = x \sim N(x, 1)$
+
+```{python}
+#| fig-align: center
+def nw_fit(X, Y, grid, h):
+    K = np.exp(-0.5 * ((X[None, :] - grid[:, None]) / h) ** 2)
+    return (K @ Y) / K.sum(axis=1)
+
+np.random.seed(7)
+n = 100
+X_b = np.random.uniform(0, 10, n)
+Y_b = X_b + np.random.normal(0, 1, n)
+grid = np.linspace(0, 10, 201)
+
+plt.figure(figsize=(8, 4))
+plt.scatter(X_b, Y_b, s=14, facecolors='none', edgecolors='black', label='Data')
+plt.plot(grid, grid, color='red', label=r'True $m(x)$')
+plt.plot(grid, nw_fit(X_b, Y_b, grid, 1), color='C0', ls='--', label='Nadaraya-Watson (h=1)')
+plt.plot(grid, nw_fit(X_b, Y_b, grid, 2), color='C1', ls='--', label='Nadaraya-Watson (h=2)')
+plt.legend(fontsize=9)
+plt.grid(alpha=0.3)
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.tight_layout()
+```
+
+## The Local Linear Estimator
+
+- The Nadaraya-Watson estimator also solves
+
+$$
+\hat{m}(x) = \arg\min_{c \in \R} \sum_{i=1}^{n}K\left(\frac{X_i - x}{h}\right)\cdot (Y_i-c)^2
+$$
+
+- That's why it's also called the local-constant estimator
+
+. . .
+
+- What is stopping us from fitting a linear function here?
+
+::: {.thm}
+::: {.thmhead}
+Definition (Local-Linear Estimator)
+:::
+For each $x$, solve
+$$
+\left(\hat{\beta}_0(x), \hat{\beta}_1(x)\right) = \arg \min_{(b_0, b_1)} \sum_{i=1}^n K\left(\frac{X_i - x}{h}\right)(Y_i - b_0 - b_1(X_i - x))^2
+$$
+The local-linear estimator of $m(x)$, denoted $\hat{m}_{LL}(x)$, is the local intercept $\hat{\beta}_0(x)$.
+:::
+
+## How Do They Compare?
+
+- Deriving the asymptotic distribution requires similar tricks (see Hansen's _Econometrics_)
+- **Important**: both have the same asymptotic variance
+- **Also important**: the bias term of the local-linear estimator is $h^2 \kappa_2 \frac{m''(x)}{2}$
+
+$$
+\sqrt{nh} \left( \hat{m}_{LL}(x) - m(x) - h^2 \kappa_2 \frac{m''(x)}{2} \right) \xrightarrow{d} N\left(0, \frac{\sigma^2(x) R(K)}{f(x)} \right)
+$$
+
+- What does this imply if $m(\cdot)$ is, in fact, linear?
+- The local-linear estimator is much better close to the boundary! Why?
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+Questions?
+:::
+
+## Curse of Dimensionality
+
+- So far, $x$ was a scalar. What if $X_i \in \R^p$ with $p >1$?
+- Use multivariate kernels and measure "distances" to $x = (x_1, \dots, x_p)$ as
+$$
+K\left(\frac{X_{i1} - x_1}{h_1}\right)\cdot K\left(\frac{X_{i2} - x_2}{h_2}\right) \cdots K\left(\frac{X_{ip} - x_p}{h_p}\right)
+$$
+where $(h_1, \dots, h_p)$ are potentially different bandwidths
+- The math gets more involved, but we get the same type of results
+
+. . .
+
+- Super important caveat: convergence happens at rate $\sqrt{n\cdot h_1\cdot h_2 \cdots h_p}$
+- With a common $h$, we need $nh^p \rightarrow \infty$. This is **very** slow
+- In practice, if $p > 4$ you are screwed $\implies$ open the Machine Learning toolbox
+
+## How Fast Does the Neighborhood Empty Out?
+
+$X \sim U[0,1]^p$, window of half-width $h = 0.1$: it covers a share $0.2^p$ of the cube
+
+```{python}
+#| fig-align: center
+from matplotlib.ticker import FuncFormatter
+
+p_grid = np.arange(1, 11)
+share = (2 * 0.1) ** p_grid           # share of the cube inside the window
+n_fixed = 1000
+local_obs = n_fixed * share           # expected observations in the window
+n_needed = 100 / share                # sample size that keeps 100 in the window
+
+def human(v):
+    if v >= 1e9: return f'{v / 1e9:.3g}B'
+    if v >= 1e6: return f'{v / 1e6:.3g}M'
+    if v >= 1e4: return f'{v / 1e3:.3g}k'
+    if v >= 1: return f'{v:,.0f}' if abs(v - round(v)) < 1e-6 * v else f'{v:.2g}'
+    return f'{v:.2g}'
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 5))
+
+ax1.plot(p_grid, local_obs, 'o-', color='#0072BC', lw=2)
+ax1.axhline(1, color='#C62828', ls='--', lw=1.5)
+ax1.text(10, 1.3, 'one observation', color='#C62828', ha='right', va='bottom', fontsize=13)
+for x, v in zip(p_grid, local_obs):
+    ax1.annotate(human(v), (x, v), textcoords='offset points', xytext=(7, 5),
+                 ha='left', fontsize=13)
+ax1.set_yscale('log')
+ax1.set_ylim(5e-5, 2e3)
+ax1.set_xlim(0.5, 11.3)
+ax1.yaxis.set_major_formatter(FuncFormatter(lambda v, _: human(v)))
+ax1.set_title(f'Expected observations in the window ($n = {n_fixed:,}$)')
+
+ax2.plot(p_grid, n_needed, 'o-', color='#EB811B', lw=2)
+ax2.axhline(203e6, color='#2D3E50', ls='--', lw=1.5)
+ax2.text(0.4, 203e6 * 1.4, "Brazil's population (2022 Census)", color='#2D3E50', va='bottom', fontsize=13)
+for x, v in zip(p_grid, n_needed):
+    ax2.annotate(human(v), (x, v), textcoords='offset points', xytext=(-7, 5),
+                 ha='right', fontsize=13)
+ax2.set_yscale('log')
+ax2.set_ylim(100, 1e10)
+ax2.set_xlim(-0.5, 10.5)
+ax2.yaxis.set_major_formatter(FuncFormatter(lambda v, _: human(v)))
+ax2.set_title('Sample size needed to keep 100 in the window')
+
+for ax in (ax1, ax2):
+    ax.set_xlabel('Number of regressors $p$')
+    ax.set_xticks(p_grid)
+    ax.grid(alpha=0.3)
+plt.tight_layout()
+```
+
+## Confidence Bands
+
+- You did all the math to get the distribution, so you might want to make inference about $m(x)$...
+- Keep in mind: any confidence band you draw is **pointwise**
+- Usually, we cheat and compute the 95% confidence interval as
+
+$$
+\hat{m}(x) \pm 1.96 \cdot \sqrt{\frac{\hat{\sigma}^2(x) R(K)}{nh\, f_n(x)}}
+$$
+
+where $\hat{\sigma}^2(x)$ comes from the residuals of your fit, smoothed with the same kernel
+
+- Why is this cheating?
 
 ## &nbsp; {.standout background-color="var(--slate)"}
 
