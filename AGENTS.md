@@ -74,7 +74,7 @@ Pages is set to "GitHub Actions" mode. Don't switch it to branch mode.
 - **Font names containing a digit** (e.g. "Source Sans 3") must be written `unquote("\"Name\"")` in SCSS. Quarto's Sass strips the quotes, and the browser then drops the whole declaration.
 - **`mathjax-font.html` depends on Quarto internals** (tested on Quarto 1.10.18). After upgrading Quarto, check that math still renders.
 - **Reveal.js ignores `#/slide-id` inside an iframe.** It works in a normal tab.
-- **The repo lives in Dropbox, which leaves `* (… conflicted copy …)*` files.** This happens most often right after `rm -rf …_files` and a re-render. Always delete them (`find . -name "*conflicted copy*" -not -path "./.git/*" -delete`), and never rename, keep or commit them. Afterwards, check that every figure the HTML references exists. If one is missing, wait a few seconds and re-render that deck.
+- **The repo lives in Dropbox, which leaves `* (… conflicted copy …)*` files.** This happens most often right after `rm -rf …_files` and an immediate re-render, and Dropbox can also restore stale figures from the deleted folder. So wait ~15 s after the `rm -rf` before rendering. Always delete conflicted copies (`find . -name "*conflicted copy*" -not -path "./.git/*" -delete`), and never rename, keep or commit them. Afterwards, check that every figure the HTML references exists. If one is missing, wait a few seconds and re-render that deck.
 - **Spacing across `. . .` pauses is already fixed** in `custom.scss` ("Stitch lists split by . . ."). Don't add per-slide spacing hacks.
 
 ## Guardrails
