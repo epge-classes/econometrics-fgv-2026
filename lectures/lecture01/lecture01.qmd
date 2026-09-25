@@ -1,0 +1,664 @@
+---
+title: "Lecture 1: Non-Parametric Estimation"
+talkdate: "October 2026"
+jupyter: python3
+---
+
+# Introduction {visibility="uncounted"}
+
+## Parametric Models
+
+So far, you have concentrated on _parametric models_:
+$$
+Y_i = g(X_i, \theta) + u_i
+$$
+where $g$ is a **known** function and $\theta$ needs to be estimated.
+
+- Example: $g(X, \theta) = X'\theta$, good old OLS
+
+. . .
+
+- But what happens if you don't know $g$?
+- If you have a structural model, theory alone might give you $g$
+
+. . .
+
+- Just assume some $g$ that looks cute and call it a day?
+- We can do better $\implies$ non-parametric estimation
+
+## Motivation
+
+Our goal will be estimating
+$$
+m(x) = \E[Y|X = x]
+$$
+
+- Examples: expected wage given education, expected returns given exchange rates...
+- For now, both $Y$ and $X$ are scalars
+- The researcher has access to a random sample $\{(Y_i, X_i)\}_{i=1}^{n}$
+
+. . .
+
+- With OLS, you always assume that $m(\cdot)$ is an affine function
+- Importantly: in OLS, $\frac{\partial m(x)}{\partial x}$ is a constant
+
+## A Quick Simulation
+
+```{python}
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+plt.rcParams['font.sans-serif'] = ['Arial']
+
+# Create simulated data from a cosine wave and add noise
+np.random.seed(42)
+n = 100
+sigma = 0.2
+X = np.linspace(0, 2 * np.pi, n)
+m = 1/2 * np.cos(X)
+noise = np.random.normal(0, sigma, n)
+Y = m + noise
+
+# Fit OLS
+ols = sm.OLS(Y, sm.add_constant(X)).fit()
+slope, t_slope = ols.params[1], ols.tvalues[1]
+
+# Plot the data, the true function and the OLS fit
+plt.figure(figsize=(8, 4))
+plt.plot(X, Y, 'x', markersize=5, label='Data', color='black')
+plt.plot(X, m, color='red', label=r'True $m(x)$')
+plt.plot(X, ols.fittedvalues, color='C0', lw=2,
+         label=rf'OLS: $\hat\beta_1 = {slope:.3f}$ ($t = {t_slope:.2f}$)')
+plt.legend()
+plt.grid(alpha=0.3)
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title(r"$Y_i = \frac{1}{2}\cos(X_i) + \epsilon_i$, $\epsilon_i \sim N(0, 0.2^2)$")
+plt.tight_layout()
+```
+
+## What if $X$ is discrete?
+
+- Assume that $X \in \{x_1, x_2, \dots, x_l\}$ for some $l$. What's the natural estimator?
+
+. . .
+
+$$
+\hat{m}(x) = \frac{\sum_{i=1}^{n} I_{\{X_i = x\}}\cdot Y_i}{\sum_{i=1}^n I_{\{X_i = x\}}}
+$$
+
+- Example: binary $X$, a treatment
+- Exercise: show that this estimator is consistent under mild conditions
+- How would you describe this estimator in words?
+
+## What about the continuous case?
+
+- Now assume $X \in \R \implies$ the event $\{X_i = x\}$ has zero probability
+- Well... if $m(\cdot)$ is continuous, observing points in a neighborhood of $x$ might be good enough!
+- Problem: how large is a neighborhood?
+
+. . .
+
+Given $h>0$ (the _bandwidth_), the **binned estimator** is
+$$
+\hat{m}(x) =
+\frac{
+\displaystyle\sum_{i=1}^n I_{\left\{ |X_i - x| \leq h \right\}}\cdot Y_i
+}{
+\displaystyle\sum_{i=1}^n I_{\left\{ |X_i - x| \leq h \right\}}
+}
+$$
+
+- What role does $h$ play here? Small vs large $h$?
+
+## The Binned Estimator as a Weighted Average
+
+We can also write
+$$
+\hat{m}(x) = \sum_{i=1}^n w_i(x)\cdot Y_i, \qquad w_i(x) \equiv \frac{I_{\left\{ |X_i - x| \leq h \right\}}}{\sum_{j=1}^n I_{\left\{ |X_j - x| \leq h \right\}}}
+$$
+where the $w_i(x)$'s are weakly positive and $\sum_{i=1}^n w_i(x) = 1$.
+
+- This estimator is a weighted average of the $Y_i$'s, with $x$-dependent weights
+- True or false: can we interpret these weights as a _probability distribution_?
+
+. . .
+
+- How do these weights change with $h$? Smoothly? Sharply?
+
+. . .
+
+- One important drawback: the weights change discontinuously with $h$!
+- $\hat{m}(x)$ is always a step function, even if $m(\cdot)$ is continuous!
+
+# Kernels {visibility="uncounted"}
+
+## Kernels
+
+- Ideally: points close to $x$ should matter more for estimation, in a smooth way
+- We would like a "continuous way" of measuring distances
+- (Continuous) kernels are exactly what we need: they are fancy weights
+
+::: {.thm}
+::: {.thmhead}
+Definition (Second-Order Kernel)
+:::
+A second-order kernel function $K(u)$ satisfies:
+
+1. $0 \leq K(u) \leq \bar{K} < \infty$ $\implies$ the kernel is non-negative and bounded
+2. $K(u) = K(-u)$ $\implies$ the kernel is symmetric around zero
+3. $\int_{-\infty}^{\infty} K(u)\,du = 1$ $\implies$ like asking the weights to sum to 1
+4. $\int_{-\infty}^{\infty}|u|^r K(u)\,du < \infty$ for positive integers $r$ $\implies$ "not too fat tails"
+:::
+
+## Examples {.tightmath}
+
+| Kernel | Formula | $R(K)$ |
+|:-------|:----------------------------|:----:|
+| Rectangular | $\displaystyle K(u) = \begin{cases} \dfrac{1}{2\sqrt{3}} & \text{if } \lvert u\rvert < \sqrt{3} \\ 0 & \text{otherwise} \end{cases}$ | $\displaystyle \dfrac{1}{2\sqrt{3}}$ |
+| Gaussian | $\displaystyle K(u) = \frac{1}{\sqrt{2\pi}}\exp\left(-\frac{u^2}{2}\right)$ | $\displaystyle \frac{1}{2\sqrt{\pi}}$ |
+| Epanechnikov | $\displaystyle K(u) = \begin{cases} \dfrac{3}{4\sqrt{5}}\left(1-\dfrac{u^2}{5}\right) & \text{if } \lvert u\rvert < \sqrt{5} \\ 0 & \text{otherwise} \end{cases}$ | $\displaystyle \dfrac{3\sqrt{5}}{25}$ |
+| Triangular | $\displaystyle K(u) = \begin{cases} \dfrac{1}{\sqrt{6}}\left(1-\dfrac{\lvert u\rvert}{\sqrt{6}}\right) & \text{if } \lvert u\rvert < \sqrt{6} \\ 0 & \text{otherwise} \end{cases}$ | $\displaystyle \dfrac{\sqrt{6}}{9}$ |
+
+::: {.subcap}
+All four are scaled to have unit variance. $R(K) \equiv \int K(u)^2\,du$ is the kernel's _roughness_ (more on it later).
+:::
+
+## What Do They Look Like?
+
+```{python}
+#| fig-align: center
+u = np.linspace(-3, 3, 1201)
+kernels = {
+    'Rectangular': np.where(np.abs(u) < np.sqrt(3), 1 / (2 * np.sqrt(3)), 0),
+    'Gaussian': np.exp(-u**2 / 2) / np.sqrt(2 * np.pi),
+    'Epanechnikov': np.where(np.abs(u) < np.sqrt(5), 3 / (4 * np.sqrt(5)) * (1 - u**2 / 5), 0),
+    'Triangular': np.where(np.abs(u) < np.sqrt(6), (1 - np.abs(u) / np.sqrt(6)) / np.sqrt(6), 0),
+}
+
+plt.figure(figsize=(8, 4))
+for name, k in kernels.items():
+    plt.plot(u, k, label=name, lw=2)
+plt.legend()
+plt.grid(alpha=0.3)
+plt.xlabel('$u$')
+plt.ylabel('$K(u)$')
+plt.tight_layout()
+```
+
+## A More General Estimator
+
+For a given bandwidth $h>0$, the **Nadaraya-Watson (NW)** estimator is
+$$
+\hat{m}(x) = \frac{\sum_{i=1}^n K\left(\frac{X_i - x}{h}\right) \cdot Y_i}{\sum_{i=1}^n K\left(\frac{X_i - x}{h}\right)}
+$$
+
+- Common choices of kernel: Gaussian and Epanechnikov
+- Choosing the bandwidth matters more than choosing the kernel
+
+. . .
+
+- What happens when $h \rightarrow 0$? And when $h \rightarrow \infty$?
+
+. . .
+
+- Exercise: which kernel gives back the binned estimator?
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# Asymptotic Properties {visibility="uncounted"}
+
+## Does It Work?
+
+- Do we have any guarantees that this methodology works?
+- Yes, but flexibility comes with many caveats! Focus on the **intuition**
+
+. . .
+
+**Asymptotic setup:**
+
+- The sample size $n \rightarrow \infty$
+- We also need $h = h(n)$ to converge to zero $\implies h \rightarrow 0$
+- But not too fast $\implies n h \rightarrow \infty$
+- Is this intuitive? Why?
+
+. . .
+
+- The asymptotic theory is _pointwise_, i.e., for a fixed value of $x$
+- The asymptotic distribution of our estimator changes as $x$ changes
+- Very important: we work through the case of an **interior point** $x$
+
+## Asymptotic Theory {.tightmath}
+
+Write $Y_i = m(X_i) + U_i$, where $\E[U_i|X_i] = 0$ and $\sigma^2(x) \equiv \Var(U_i | X_i = x)$.
+
+Fix $x \in \R$ and write $Y_i = m(x) + \left(m(X_i) - m(x)\right) + U_i$.
+
+. . .
+
+Then:
+$$
+\begin{aligned}
+\frac{1}{nh} \sum_{i=1}^n K\left( \frac{X_i - x}{h} \right) Y_i
+&= \frac{1}{nh} \sum_{i=1}^n K\left( \frac{X_i - x}{h} \right) m(x) \\
+&\quad + \underbrace{\frac{1}{nh} \sum_{i=1}^n K\left( \frac{X_i - x}{h} \right) \left(m(X_i) - m(x)\right)}_{\equiv\, \hat{\Delta}_1(x)} \\
+&\quad + \underbrace{\frac{1}{nh} \sum_{i=1}^n K\left( \frac{X_i - x}{h} \right) U_i}_{\equiv\, \hat{\Delta}_2(x)}
+\end{aligned}
+$$
+
+## Asymptotic Theory
+
+- Assume $X$ has density $f(\cdot)$, with $f(x) > 0$
+- Let $f_n(x) \equiv \frac{1}{nh} \sum_{i=1}^n K\left( \frac{X_i - x}{h} \right)$
+- This is the non-parametric kernel density estimator: a fancy histogram
+- You will prove in the problem set that $f_n(x) \xrightarrow{p} f(x)$ as $n\rightarrow \infty$
+- For now, we take this result for granted
+
+. . .
+
+- Dividing the previous expression by $f_n(x)$:
+
+$$
+\hat{m}(x) - m(x) = \frac{1}{f_n(x)}\left[\hat{\Delta}_1(x) + \hat{\Delta}_2(x) \right]
+$$
+
+## Asymptotic Theory {.tightmath}
+
+[We will show that $\sqrt{nh}\cdot \hat{\Delta}_1(x)$ converges in probability and $\sqrt{nh}\cdot \hat{\Delta}_2(x)$ has a limiting distribution.]{.alert}
+
+. . .
+
+- First, $\hat{\Delta}_2(x)$. Notice that
+$$
+\E\left[ \frac{1}{nh} \sum_{i=1}^n K\left( \frac{X_i - x}{h} \right) U_i \right] = \frac{1}{h} \E\left[K\left( \frac{X_i - x}{h} \right) U_i\right] = 0
+$$
+
+. . .
+
+- We also see that
+$$
+\begin{aligned}
+\Var\left[ \hat{\Delta}_2(x) \right]
+&= \frac{1}{nh^2} \E \left[ \left( K\left( \frac{X_i - x}{h} \right) U_i \right)^2 \right]
+= \frac{1}{nh^2} \E \left[ K\left( \frac{X_i - x}{h} \right)^2 \sigma^2(X_i) \right] \\
+&= \frac{1}{nh^2} \int_{-\infty}^{\infty} K\left( \frac{z - x}{h} \right)^2 \sigma^2(z) f(z) \, dz
+\end{aligned}
+$$
+
+## Asymptotic Theory {.tightmath}
+
+- Change variables: $u = \frac{z-x}{h}$
+- We can only do this because $x$ is in the interior of its support
+- The last integral becomes
+
+$$
+\frac{1}{nh^2} \int_{-\infty}^{\infty} K\left( \frac{z - x}{h} \right)^2 \sigma^2(z) f(z) \, dz = \frac{1}{nh} \int_{-\infty}^{\infty} K(u)^2\, \sigma^2(x + hu)\, f(x + hu)\, du
+$$
+
+. . .
+
+- Assume that $\sigma^2(\cdot)$ and $f(\cdot)$ are continuous
+- For any continuous $g(\cdot)$ and fixed $u$: $g(x + hu) = g(x) + o(1)$ as $h\rightarrow 0$
+
+. . .
+
+$$
+\frac{1}{nh} \int_{-\infty}^{\infty} K(u)^2\, \sigma^2(x + hu)\, f(x + hu)\, du = \frac{\sigma^2(x)f(x)}{nh}\int_{-\infty}^{\infty}K(u)^2\,du + o\left(\frac{1}{nh}\right)
+$$
+
+## Asymptotic Theory {.tightmath}
+
+- Define $R(K)\equiv \int_{-\infty}^{\infty}K(u)^2\,du$, the _roughness_ of the kernel
+- We have shown that
+
+$$
+\Var\left[ \hat{\Delta}_2(x) \right] = \frac{\sigma^2(x)f(x)R(K)}{nh} + o\left(\frac{1}{nh}\right)
+$$
+
+- Important: the variance of this term only vanishes if $nh \rightarrow \infty$
+- Fast $h \rightarrow 0 \implies$ slow convergence of this variance to zero
+- By the Lindeberg-Feller CLT:
+
+$$
+\sqrt{nh}\,\hat{\Delta}_2(x) \xrightarrow{d} N\left(0, \sigma^2(x)f(x)R(K)\right)
+$$
+
+- Notice how the asymptotic variance depends on $x$!
+
+## Asymptotic Theory {.tightmath}
+
+Now the other guy, $\hat{\Delta}_1(x)$, using similar tricks:
+$$
+\begin{aligned}
+\E[\hat{\Delta}_1(x)]
+&= \frac{1}{h} \, \E \left[ K\left( \frac{X_i - x}{h} \right) \left( m(X_i) - m(x) \right) \right] \\
+&= \frac{1}{h} \int_{-\infty}^{\infty} K\left( \frac{z - x}{h} \right) \left( m(z) - m(x) \right) f(z) \, dz \\
+&= \int_{-\infty}^{\infty} K(u) \left( m(x + hu) - m(x) \right) f(x + hu) \, du
+\end{aligned}
+$$
+
+. . .
+
+Add the assumptions $f \in C^1$ and $m \in C^2$, and expand:
+$$
+\begin{gathered}
+m(x + hu) - m(x) = m'(x)hu + \tfrac{1}{2} m''(x) h^2 u^2 + o(h^2)\\
+f(x + hu) = f(x) + f'(x)hu + o(h)
+\end{gathered}
+$$
+
+## Asymptotic Theory {.tightmath}
+
+Distribute the terms:
+
+::: {.eqfit}
+$$
+(m(x + hu) - m(x)) \cdot f(x + hu) = m'(x)f(x)hu + m'(x)f'(x)h^2u^2 + \tfrac{1}{2}m''(x)f(x)h^2u^2 + o(h^2)
+$$
+:::
+
+. . .
+
+The term linear in $u$ integrates to zero (symmetric $K$), so:
+$$
+\begin{aligned}
+\E[\hat{\Delta}_1(x)] &= h^2 \left(\int_{-\infty}^{\infty}u^2K(u)\,du\right)\left(m'(x)f'(x) + \tfrac{1}{2}m''(x)f(x)\right) + o(h^2)\\
+& = h^2 \kappa_2 f(x) B(x) + o(h^2)
+\end{aligned}
+$$
+where $B(x) \equiv m'(x)\frac{f'(x)}{f(x)} + \frac{1}{2}m''(x)$ and $\kappa_2\equiv \int_{-\infty}^{\infty}u^2K(u)\,du$.
+
+. . .
+
+Questions: is $B(x)$ random? How does $h$ affect $\E[\hat{\Delta}_1(x)]$?
+
+## Asymptotic Theory
+
+- Computing $\Var(\hat{\Delta}_1(x))$ is boring
+- See Section 19.26 in Hansen's _Econometrics_. He shows that
+
+$$
+\Var(\hat{\Delta}_1(x)) = o\left(\frac{1}{nh}\right)
+$$
+
+. . .
+
+- This implies $\Var(\sqrt{nh}\,\hat{\Delta}_1(x)) = o(1)$
+- The main result is that
+
+$$
+\sqrt{nh}\left(\hat{\Delta}_1(x) - h^2 \kappa_2 f(x) B(x)\right) \xrightarrow{p} 0
+$$
+
+as long as $nh^5 = O(1)$ (why do we need this?)
+
+## Asymptotic Theory: Main Result
+
+See Chapter 19 of Hansen's _Econometrics_ for all the technical conditions.
+
+::: {.thm}
+::: {.thmhead}
+Theorem (Asymptotic Distribution of the NW Estimator)
+:::
+Under regularity conditions, for interior $x$,
+$$
+\sqrt{nh} \left( \hat{m}(x) - m(x) - h^2 \kappa_2 B(x) \right) \xrightarrow{d} N\left(0, \frac{\sigma^2(x) R(K)}{f(x)} \right)
+$$
+where $B(x) = m'(x)\frac{f'(x)}{f(x)} + \frac{1}{2}m''(x)$.
+:::
+
+. . .
+
+- Why is the convergence rate $\sqrt{nh}$ and not just $\sqrt{n}$?
+- True or false: is there always a finite-sample bias here?
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+Questions?
+:::
+
+## The Bias-Variance Trade-off
+
+- If $n$ is very large:
+
+$$
+\hat{m}(x) - m(x) \approx N\left(h^2 \kappa_2 B(x), \frac{\sigma^2(x)R(K)}{nh\cdot f(x)}\right)
+$$
+
+- What is the effect of $h$ on the mean and on the variance?
+
+. . .
+
+- Fundamental trade-off: we can reduce the bias at the expense of variance
+- Or you can get low variance... and a huge bias!
+
+. . .
+
+- The Epanechnikov kernel minimizes the mean squared error of this estimator across a large class of kernels
+- The efficiency loss from the Gaussian kernel is minimal
+- Honestly, let the Gaussian kernel be your default in empirical research
+
+## How to Pick the Bandwidth?
+
+- The optimal bandwidth depends on moments of the data and derivatives of $m$
+- Those are unknown in practice
+- Ideally, your results should be robust to different bandwidths (within reason)
+- A popular way to choose a bandwidth: leave-one-out cross-validation
+- Exactly what the Machine Learning literature does!
+- See Hansen's _Econometrics_ for details and the theory behind it
+
+## What About the Boundary?
+
+- Suppose $X_i$ comes from a bounded distribution
+- Say $X \sim U[0,10]$ and $Y|X = x \sim N(x, 1)$
+
+```{python}
+#| fig-align: center
+def nw_fit(X, Y, grid, h):
+    K = np.exp(-0.5 * ((X[None, :] - grid[:, None]) / h) ** 2)
+    return (K @ Y) / K.sum(axis=1)
+
+np.random.seed(7)
+n = 100
+X_b = np.random.uniform(0, 10, n)
+Y_b = X_b + np.random.normal(0, 1, n)
+grid = np.linspace(0, 10, 201)
+
+plt.figure(figsize=(8, 4))
+plt.scatter(X_b, Y_b, s=14, facecolors='none', edgecolors='black', label='Data')
+plt.plot(grid, grid, color='red', label=r'True $m(x)$')
+plt.plot(grid, nw_fit(X_b, Y_b, grid, 1), color='C0', ls='--', label='Nadaraya-Watson (h=1)')
+plt.plot(grid, nw_fit(X_b, Y_b, grid, 2), color='C1', ls='--', label='Nadaraya-Watson (h=2)')
+plt.legend(fontsize=9)
+plt.grid(alpha=0.3)
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.tight_layout()
+```
+
+## The Local Linear Estimator
+
+- The Nadaraya-Watson estimator also solves
+
+$$
+\hat{m}(x) = \arg\min_{c \in \R} \sum_{i=1}^{n}K\left(\frac{X_i - x}{h}\right)\cdot (Y_i-c)^2
+$$
+
+- That's why it's also called the local-constant estimator
+
+. . .
+
+- What is stopping us from fitting a linear function here?
+
+::: {.thm}
+::: {.thmhead}
+Definition (Local-Linear Estimator)
+:::
+For each $x$, solve
+$$
+\left(\hat{\beta}_0(x), \hat{\beta}_1(x)\right) = \arg \min_{(b_0, b_1)} \sum_{i=1}^n K\left(\frac{X_i - x}{h}\right)(Y_i - b_0 - b_1(X_i - x))^2
+$$
+The local-linear estimator of $m(x)$, denoted $\hat{m}_{LL}(x)$, is the local intercept $\hat{\beta}_0(x)$.
+:::
+
+## How Do They Compare?
+
+- Deriving the asymptotic distribution requires similar tricks (see Hansen's _Econometrics_)
+- **Important**: both have the same asymptotic variance
+- **Also important**: the bias term of the local-linear estimator is $h^2 \kappa_2 \frac{m''(x)}{2}$
+
+$$
+\sqrt{nh} \left( \hat{m}_{LL}(x) - m(x) - h^2 \kappa_2 \frac{m''(x)}{2} \right) \xrightarrow{d} N\left(0, \frac{\sigma^2(x) R(K)}{f(x)} \right)
+$$
+
+- What does this imply if $m(\cdot)$ is, in fact, linear?
+- The local-linear estimator is much better close to the boundary! Why?
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+Questions?
+:::
+
+## Curse of Dimensionality
+
+- So far, $x$ was a scalar. What if $X_i \in \R^p$ with $p >1$?
+- Use multivariate kernels and measure "distances" to $x = (x_1, \dots, x_p)$ as
+$$
+K\left(\frac{X_{i1} - x_1}{h_1}\right)\cdot K\left(\frac{X_{i2} - x_2}{h_2}\right) \cdots K\left(\frac{X_{ip} - x_p}{h_p}\right)
+$$
+where $(h_1, \dots, h_p)$ are potentially different bandwidths
+- The math gets more involved, but we get the same type of results
+
+. . .
+
+- Super important caveat: convergence happens at rate $\sqrt{n\cdot h_1\cdot h_2 \cdots h_p}$
+- With a common $h$, we need $nh^p \rightarrow \infty$. This is **very** slow
+- In practice, if $p > 4$ you are screwed $\implies$ open the Machine Learning toolbox
+
+## Confidence Bands
+
+- You did all the math to get the distribution, so you might want to make inference about $m(x)$...
+- Keep in mind: any confidence band you draw is **pointwise**
+- Usually, we cheat and compute the 95% confidence interval as
+
+$$
+\hat{m}(x) \pm 1.96 \cdot \sqrt{\frac{\hat{\sigma}^2(x) R(K)}{nh\, f_n(x)}}
+$$
+
+where $\hat{\sigma}^2(x)$ comes from the residuals of your fit, smoothed with the same kernel
+
+- Why is this cheating?
+
+# Example {visibility="uncounted"}
+
+## Different Bandwidths
+
+```{python}
+# Nadaraya-Watson with a Gaussian kernel
+def gaussian_kernel(u):
+    return np.exp(-0.5 * u ** 2) / np.sqrt(2 * np.pi)
+
+def nw_estimator(X, Y, x, h):
+    K = gaussian_kernel((X - x) / h)
+    return np.sum(K * Y) / np.sum(K)
+```
+
+```{python}
+# Compute the Nadaraya-Watson estimator for a range of x values
+h_high = 1
+h_medium = 0.2
+h_low = 0.04
+x_values = np.linspace(0, 2 * np.pi, 100)
+m_hat_high = np.array([nw_estimator(X, Y, x, h_high) for x in x_values])
+m_hat_medium = np.array([nw_estimator(X, Y, x, h_medium) for x in x_values])
+m_hat_low = np.array([nw_estimator(X, Y, x, h_low) for x in x_values])
+```
+
+```{python}
+#| fig-align: center
+plt.figure(figsize=(8, 4))
+plt.plot(X, Y, 'x', markersize=5, label='Data', color='black')
+plt.plot(X, m, color='red', label=r'True $m(x)$', ls='dashed')
+plt.plot(x_values, m_hat_high, color='blue', label=f'Nadaraya-Watson (h={h_high})')
+plt.plot(x_values, m_hat_medium, color='orange', label=f'Nadaraya-Watson (h={h_medium})')
+plt.plot(x_values, m_hat_low, color='green', label=f'Nadaraya-Watson (h={h_low})')
+plt.legend(fontsize=8)
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Nadaraya-Watson Estimator with Different Bandwidths')
+plt.grid(alpha=0.3)
+plt.tight_layout()
+```
+
+## Pick Your Own $h$ and $n$
+
+```{python}
+# Hand a pool of noise draws to the interactive (Observable JS) cells below.
+# Same seed as before: the first 100 draws are exactly the noise used above.
+np.random.seed(42)
+ojs_define(eps_pool=np.random.normal(0, sigma, 5000).tolist())
+```
+
+```{ojs}
+//| echo: false
+viewof h = Inputs.range([0.02, 3], {value: 0.3, step: 0.01, transform: Math.log, label: "Bandwidth h"})
+viewof n = Inputs.range([20, 5000], {value: 100, step: 1, transform: Math.log, label: "Sample size n"})
+viewof kernel = Inputs.radio(["Gaussian", "Epanechnikov"], {value: "Gaussian", label: "Kernel"})
+```
+
+```{ojs}
+//| echo: false
+// Same design as the simulation: X on an even grid over [0, 2pi], m(x) = cos(x)/2
+data = d3.range(n).map(i => {
+  const x = 2 * Math.PI * i / (n - 1)
+  const m = 0.5 * Math.cos(x)
+  return {x, m, y: m + eps_pool[i]}
+})
+
+// Unit-variance kernels, as in the table (normalizing constants cancel in NW)
+K = kernel === "Gaussian"
+  ? (u => Math.exp(-0.5 * u * u))
+  : (u => Math.abs(u) < Math.sqrt(5) ? 1 - u * u / 5 : 0)
+
+// Nadaraya-Watson on a grid; 0/0 (no data in the window) leaves a gap
+fit = d3.range(301).map(j => {
+  const x0 = 2 * Math.PI * j / 300
+  let num = 0, den = 0
+  for (const d of data) { const w = K((d.x - x0) / h); num += w * d.y; den += w }
+  return {x: x0, mhat: den > 0 ? num / den : NaN}
+})
+
+Plot.plot({
+  width: 1200, height: 430, marginLeft: 60, marginBottom: 50,
+  style: {fontSize: "21px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {label: "X", labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: [-1, 1], ticks: 5},
+  grid: true,
+  marks: [
+    Plot.dot(data, {x: "x", y: "y", symbol: "times", stroke: "black",
+             r: n <= 200 ? 4 : n <= 1000 ? 3 : 2, strokeOpacity: n <= 200 ? 1 : n <= 1000 ? 0.6 : 0.35}),
+    Plot.line(data, {x: "x", y: "m", stroke: "#C62828", strokeWidth: 2, strokeDasharray: "7,5"}),
+    Plot.line(fit, {x: "x", y: "mhat", stroke: "#0072BC", strokeWidth: 3}),
+    Plot.text([`NW fit, h = ${h.toFixed(2)}, n = ${n}`], {frameAnchor: "bottom-right", dx: -10, dy: -38, fill: "#0072BC", fontWeight: "bold", fontSize: 22, stroke: "white", strokeWidth: 6}),
+    Plot.text(["true m(x)"], {frameAnchor: "bottom-right", dx: -10, dy: -10, fill: "#C62828", fontSize: 22, stroke: "white", strokeWidth: 6})
+  ]
+})
+```
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+Questions?
+:::
+
+## References
+
+- Chapter 19 of _Econometrics_, by Bruce Hansen
+- Chapter 17 of _Probability and Statistics for Economists_, by Bruce Hansen
