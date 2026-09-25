@@ -89,7 +89,7 @@ $$
 $$
 
 - Example: binary $X$, a treatment
-- Exercise: show that this estimator is consistent under mild conditions
+- [Exercise: show that this estimator is consistent under mild conditions]{.alert}
 - How would you describe this estimator in words?
 
 ## What about the continuous case?
@@ -203,7 +203,7 @@ $$
 
 . . .
 
-- Exercise: which kernel gives back the binned estimator?
+- [Exercise: which kernel gives back the binned estimator?]{.alert}
 
 ## &nbsp; {.standout background-color="var(--slate)"}
 
@@ -256,7 +256,7 @@ $$
 - Assume $X$ has density $f(\cdot)$, with $f(x) > 0$
 - Let $f_n(x) \equiv \frac{1}{nh} \sum_{i=1}^n K\left( \frac{X_i - x}{h} \right)$
 - This is the non-parametric kernel density estimator: a fancy histogram
-- You will prove in the problem set that $f_n(x) \xrightarrow{p} f(x)$ as $n\rightarrow \infty$
+- [Exercise (problem set): show that $f_n(x) \xrightarrow{p} f(x)$ as $n\rightarrow \infty$]{.alert}
 - For now, we take this result for granted
 
 . . .
