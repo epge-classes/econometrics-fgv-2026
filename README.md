@@ -8,6 +8,7 @@ Repository for the first half of Econometrics I, taught by [Raul Riva](https://r
   <tr><td><b>TA</b></td><td>Taric Latif (<a href="mailto:tariclatif@gmail.com">tariclatif@gmail.com</a>)</td></tr>
   <tr><td><b>Classes</b></td><td>Wednesdays and Fridays, 9:00-11:00</td></tr>
   <tr><td><b>Office hours</b></td><td>Fridays, 17:00-18:00 (or email me to schedule another time)</td></tr>
+  <tr><td><b>Website</b></td><td><a href="https://epge-classes.github.io/econometrics-fgv-2026/">epge-classes.github.io/econometrics-fgv-2026</a></td></tr>
 </table>
 
 ## Learning Goals
@@ -31,7 +32,7 @@ By the end of Week 5, you should be able to:
 
 ## Materials
 
-Slides are posted under [`lectures`](lectures) just before class, as HTML files. Download the repository and open them in any browser.
+Slides are posted on the [course website](https://epge-classes.github.io/econometrics-fgv-2026/) just before class.
 
 Slides do not replace the books. **Reading them is mandatory.** Each lecture lists the relevant chapters from:
 
