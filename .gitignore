@@ -3,3 +3,6 @@ extra-stuff/
 
 # Quarto
 .quarto/
+# Never commit execution caches: code re-runs on every render.
+_freeze/
+.jupyter_cache/

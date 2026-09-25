@@ -9,9 +9,8 @@ project:
     - "index.qmd"
     - "lecture*/lecture*.qmd"
 
-# Re-run code cells only when a lecture's source changes.
-execute:
-  freeze: auto
+# No freeze: code cells re-run on every render. To cache a slow deck, opt in
+# with `execute: cache: true` in its own front matter (needs jupyter-cache).
 
 # Title-slide fields (see _theme/title-slide.html); each lecture sets title and talkdate.
 presenter: "Raul Riva"
