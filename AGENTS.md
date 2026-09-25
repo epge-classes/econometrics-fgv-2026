@@ -64,6 +64,7 @@ Pages is set to "GitHub Actions" mode. Don't switch it to branch mode.
 - **Colors:** structure `$slate` `#2D3E50` (the 2025 Beamer "slateblue"), accent/links `$FGVBlue` `#0072BC`, alerts `#EB811B`, good `#2E7D32`, bad `#C62828`. `$slate` is defined in **both** `custom.scss` and `landing.scss`, so keep them in sync.
 - **Fonts:** Arial for text, with Arimo loading only where Arial is missing; Fira Mono for code; Computer Modern for math. Arial has only regular and bold, so weight 600 renders bold.
 - **Slides:** 1280×720, no transitions. Slide text is terse, with no trailing semicolons on bullets.
+- **Exercises:** a problem posed to students on a slide reads `[Exercise: …]{.alert}`, so the whole prompt is bold orange.
 - **Landing page:** lists only the Part I instructor. It links to the repo, the syllabus and the problem sets on GitHub; none of those get their own page.
 - **`[text]{.todo}`** renders as a loud "TODO:" box for facts still to confirm. Never publish a deck that still has one.
 

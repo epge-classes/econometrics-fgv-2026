@@ -50,6 +50,7 @@ Revealjs output **silently discards** ```` ```{=latex} ```` blocks: there's no e
 | `\pause`, or itemize split by `\pause` | Markdown list with `. . .` between chunks. The theme already evens out the spacing. |
 | `\only` / `\onslide` | `::: {.fragment}` |
 | `\alert{x}` | `[x]{.alert}` |
+| An exercise for students ("Exercise: …", "You will prove…") | The whole bullet as `[Exercise: …]{.alert}` (bold orange) |
 | `\textcolor{FGVBlue}{x}` | `[x]{.fgv}` |
 | Green/red bullet items | `::: {.signlist}` with items `[●]{.good} …` / `[●]{.bad} …` |
 | `\underline{x}`, `\texttt{x}` | `[x]{.underline}`, `` `x` `` |
