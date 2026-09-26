@@ -13,9 +13,9 @@ format:
      from lecture 00 and change the folder names. -->
 
 ::: {.hero}
-# Econometrics I (Part I)
+# Econometrics I
 
-[Raul Riva · [FGV EPGE]{.fgv} · 2026]{.sub}
+[**Raul Riva** · Part I · [FGV EPGE]{.fgv} · 2026]{.sub}
 :::
 
 ::: {.navlinks}
