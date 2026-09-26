@@ -1,0 +1,626 @@
+---
+title: "Lecture 3: Building Blocks for Time Series"
+talkdate: "October 2026"
+jupyter: python3
+---
+
+# Introduction {visibility="uncounted"}
+
+## Types of Data
+
+Common data structures in Economics:
+
+- **Cross-sectional data:** many units, one time period
+    - Grades of several students in one exam, GDP growth of several countries in a given year
+- **Time series data:** one unit, many time periods
+    - Inflation over time in one country, rainfall in a given area, the price of a stock
+- **Panel data:** many units, many time periods for the same units
+    - GDP growth of several countries over several years, prices of several products over time
+- Text, spatial data, images, etc.
+
+## Where We Are
+
+- So far: mostly cross-sectional methods (everything about $Y_i$)
+- Next step: time series methods (everything about $Y_t$)
+- Next next step: panel data methods (everything about $Y_{i,t}$), probably the most prevalent type nowadays
+
+. . .
+
+- Next weeks: focus on understanding the challenges of time series data
+- This lecture: how is a time series different from cross-sectional data? $+$ important definitions
+- Main reference: [_Time Series Analysis_, by James Hamilton](https://www.amazon.com/Time-Analysis-James-Douglas-Hamilton/dp/0691042896)
+- Hansen's book provides a nice introduction, but it is too short on the topic
+
+## What Is a Time Series?
+
+- A _time series_ is a sequence of observations on a variable (or several variables) over time, at equally spaced intervals
+- Example: annual population of a country
+- Unlike cross-sectional data, time series data is **ordered**
+- In this course, time is discrete: we observe data at specific intervals (days, months, years...)
+- Continuous-time series (e.g., high-frequency financial data) are a more advanced topic, with a vast literature as well
+
+## Why Should You Care?
+
+1. Policy evaluation: every policy takes place over time
+    - What's the impact of a reform? Before vs after? Long-lasting effects? Fast die-outs?
+    - A very important building block for panel data methods
+2. Forecasting: what could the future look like?
+    - What will inflation be next month? How many students will enroll next semester?
+    - How much inventory should a firm hold? What's the likely path of deforestation in a given area?
+3. Nowcasting: high(er)-frequency monitoring of low-frequency variables
+    - What is the current state of the economy? How many people are unemployed right now?
+
+. . .
+
+4. It has [very]{.alert} elegant math behind it!
+
+## The Role of Dependence
+
+- In cross-sectional data, we typically assume that observations are i.i.d.
+- If we relabel observations, we have no problems
+
+. . .
+
+- In time series, independence is a rare exception
+- Their distribution might also change over time
+- If we relabel observations, we change the meaning of the data
+
+. . .
+
+Examples:
+
+- If inflation is high this month, it will likely be high next month
+- If a student is doing well on every exam, they will likely do well on the next one
+- The major difference w.r.t. cross-sectional data: the future might depend on the past
+
+# Building Blocks {visibility="uncounted"}
+
+## Random Variables
+
+Formally, the right way to think about a time series is as a **stochastic process**. First, what is a _random variable_?
+
+::: {.thm}
+::: {.thmhead}
+Definition (Random Variable)
+:::
+Given a probability space $(\Omega,\mathcal{F},\Pr)$, a random variable is a real function $Y:\Omega\rightarrow\R$ such that $\{\omega\in\Omega : Y(\omega)\leq c\}\in\mathcal{F}$ for all $c\in \R$.
+:::
+
+- $\Omega$ is a sample space. Example: the numbers on a die (1, 2, 3, 4, 5, 6)
+- $\mathcal{F}$ is a collection of events. Example: even numbers
+- $\Pr: \mathcal{F} \to [0,1]$ is a probability measure. Example: probability of rolling an even number
+
+. . .
+
+- Think about an i.i.d. sample as different realizations of $\omega$: $Y_1 = Y(\omega_1), Y_2 = Y(\omega_2), \dots$
+
+## Stochastic Processes
+
+::: {.thm}
+::: {.thmhead}
+Definition (Stochastic Process, a Bit Informal)
+:::
+A stochastic process is an ordered family of random variables $\{Y_t, t \in \mathcal{T}\}$ defined on a probability space $(\Omega, \mathcal{F}, \Pr)$, where $\mathcal{T}$ is an ordered set. For a fixed $\omega \in \Omega$, the path $\{Y_t(\omega), t \in \mathcal{T}\}$ is one realization of the process.
+:::
+
+Loosely speaking:
+
+- A **random variable** is a way to model an uncertain number
+- A **stochastic process** is a way to model an uncertain _path_
+- In reality, we observe one, and only one, realization of the stochastic process
+- Think about the history of the world: it is a single realization from $\Omega$
+- YOLO: you only live once!
+
+## YOLO
+
+```{python}
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+plt.rcParams['font.sans-serif'] = ['Arial']
+plt.rcParams['savefig.dpi'] = 200  # resolution of rasterized layers inside the SVGs
+
+blue, red, orange = '#0072BC', '#C62828', '#EB811B'
+
+# Simulate 500 random-walk paths of the same stochastic process
+n = 500
+T = 101
+paths = np.zeros((n, T))
+np.random.seed(2141)
+for i in range(n):
+    for t in range(1, T):
+        paths[i, t] = paths[i, t-1] + np.random.normal(0, 1)
+
+# The 499 faint paths are rasterized: as vectors they would make a 1.4 MB SVG
+def yolo_plot():
+    plt.figure(figsize=(8, 4))
+    for i in range(n - 1):
+        plt.plot(paths[i], alpha=0.1, color=blue, rasterized=True)
+    plt.plot(paths[-1], color=red, linewidth=2)
+    plt.title(f'{n} paths of the same stochastic process')
+    plt.xlabel('Periods')
+    plt.legend(handles=[
+        Line2D([0], [0], color=blue, lw=2, label='What could have happened'),
+        Line2D([0], [0], color=red, lw=2, label='What you actually saw'),
+    ])
+    plt.gca().set_axisbelow(True)
+    plt.grid(alpha=0.3)
+
+yolo_plot()
+plt.tight_layout()
+```
+
+## The Challenge Ahead
+
+- You only observe the red path, but the blue ones were equally likely to have happened
+- The main challenge: you see *one* path and want to make inference about the *whole process*
+
+. . .
+
+Example: inflation in Brazil in 1989
+
+- We know it was super high
+- But we have only one reading of inflation for 1989
+- When can we say something about the "inflation process" in Brazil given **only one** observation?
+
+. . .
+
+We will need to impose a lot of structure! Without structure, we are lost!
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# Stationarity and Ergodicity {visibility="uncounted"}
+
+## Weak Stationarity
+
+::: {.thm}
+::: {.thmhead}
+Definition (Weak Stationarity)
+:::
+A stochastic process $\{Y_t\}$ is _weakly stationary_ (or _second-order stationary_, or _covariance stationary_) if, and only if, its first two unconditional population moments exist and are constant over time:
+$$
+\begin{aligned}
+&\E[Y_t]=\mu, \quad |\mu|<\infty, \quad \forall\, t\in\mathcal{T}\\
+&\E[(Y_t-\mu)(Y_{t-h}-\mu)]=\gamma_h, \quad |\gamma_h|<\infty, \quad \forall\, t\in\mathcal{T}, \quad h=0,\pm 1,\pm 2, \ldots
+\end{aligned}
+$$
+:::
+
+. . .
+
+True or false?
+
+- $\gamma_0 = \Var(Y_t)$
+- $\gamma_h > \gamma_{-h}$ for $h \neq 0$
+- An i.i.d. process with finite variance is weakly stationary
+
+## What Process Has a Higher $\gamma_1$?
+
+```{python}
+#| fig-align: center
+# Two stationary processes with mean zero, variance one, and different persistence
+np.random.seed(2141)
+T_ar = 301
+rho1 = 0.001
+y1 = np.zeros(T_ar)
+for t in range(1, T_ar):
+    y1[t] = rho1 * y1[t-1] + np.random.normal(0, 1)
+rho2 = 0.95
+y2 = np.zeros(T_ar)
+for t in range(1, T_ar):
+    y2[t] = rho2 * y2[t-1] + np.sqrt(1 - rho2**2) * np.random.normal(0, 1)
+
+plt.figure(figsize=(8, 4))
+plt.plot(y1, lw=1.3)
+plt.plot(y2, lw=1.3)
+plt.axhline(0, color='black', linestyle='--', linewidth=1)
+plt.title('Two stationary processes with different autocovariance structures')
+plt.xlabel('Periods')
+plt.grid(alpha=0.3)
+plt.tight_layout()
+```
+
+## Dial the Persistence
+
+$Y_t = \rho\, Y_{t-1} + \sqrt{1-\rho^2}\,\varepsilon_t$ with $\varepsilon_t \iid N(0,1)$. The shocks stay fixed: only $\rho$ changes
+
+```{ojs}
+//| echo: false
+viewof rho = Inputs.range([-0.95, 0.99], {value: 0.5, step: 0.01, label: "Persistence ρ"})
+```
+
+```{ojs}
+//| echo: false
+// Fixed shocks: the slider changes rho only, never the draws
+shocks = {
+  const draw = d3.randomNormal.source(d3.randomLcg(2141))(0, 1)
+  return Float64Array.from({length: 1000}, draw)
+}
+
+// Y_0 comes from the stationary law N(0, 1), so the variance is 1 for every rho
+persistPath = {
+  const y = new Float64Array(shocks.length)
+  const s = Math.sqrt(1 - rho * rho)
+  y[0] = shocks[0]
+  for (let t = 1; t < y.length; t++) y[t] = rho * y[t - 1] + s * shocks[t]
+  return Array.from(y, (v, t) => ({t, y: v}))
+}
+
+Plot.plot({
+  width: 1200, height: 450, marginLeft: 50, marginBottom: 45,
+  style: {fontSize: "19px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {label: "Periods", labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: [-4, 4], ticks: 5},
+  grid: true,
+  marks: [
+    Plot.ruleY([0], {stroke: "black", strokeDasharray: "5,4"}),
+    Plot.line(persistPath, {x: "t", y: "y", stroke: "#0072BC", strokeWidth: 1.3, clip: true})
+  ]
+})
+```
+
+## Strong (or Strict) Stationarity
+
+::: {.thm}
+::: {.thmhead}
+Definition (Strong Stationarity)
+:::
+A stochastic process $\{Y_t\}$ is _strongly stationary_ (or _strictly stationary_) if, and only if, its joint distributions are invariant to time shifts: for every $n$, every $t_1, \dots, t_n$ and every $\tau$,
+$$
+F_{t_1,\ldots,t_n}(y_1,\ldots,y_n)=F_{t_1+\tau,\ldots,t_n+\tau}(y_1,\ldots,y_n) \quad \forall\, (y_1, \ldots, y_n)
+$$
+where $F_{t_1,\ldots,t_n}$ is the joint CDF of $(Y_{t_1},\ldots,Y_{t_n})$.
+:::
+
+. . .
+
+True or false?
+
+- If a process is weakly stationary, it is also strongly stationary
+- If a process is strongly stationary, it is also weakly stationary
+- An i.i.d. process with finite variance is strongly stationary
+
+## Ergodicity: Motivation
+
+- Let's call the mysterious process from the YOLO simulation $m_t$
+- Denote by $m_t^{(i)}$ the realization of $m$ at time $t$ for the $i$-th path
+- The paths are independent (because I chose so!)
+
+. . .
+
+- Let's say I want to estimate two (potentially different) quantities: $\E[m_{20}]$ and $\E[m_{80}]$
+- How can I do that?
+
+## Ergodicity: Motivation
+
+```{python}
+#| fig-align: center
+yolo_plot()
+for t0 in (20, 80):
+    plt.axvline(t0, color=orange, linestyle='--', linewidth=2)
+    plt.text(t0 + 1, 0.97, f't = {t0}', color=orange, fontsize=12,
+             transform=plt.gca().get_xaxis_transform(), va='top')
+plt.tight_layout()
+```
+
+## Ergodicity: Motivation
+
+```{python}
+#| fig-align: center
+import seaborn as sns
+
+plt.figure(figsize=(8, 4))
+sns.kdeplot(paths[:, 20], color=blue, label='t = 20', fill=True, alpha=0.3)
+sns.kdeplot(paths[:, 80], color=orange, label='t = 80', fill=True, alpha=0.3)
+plt.title('Kernel density estimator at t = 20 and t = 80 ;)')
+plt.xlim(-30, 30)
+plt.xlabel('Value')
+plt.ylabel('Density')
+plt.legend()
+plt.grid(alpha=0.3)
+plt.tight_layout()
+```
+
+## Ergodicity: Motivation
+
+**Proposal 1:** estimate $\E[m_{20}]$ by averaging the values at $t=20$ across all paths
+
+- Formally: $\hat{m}_{20} = \frac{1}{n} \sum_{i=1}^{n} m_{20}^{(i)}$, where $n$ is the number of paths. Same for $t=80$
+- Would this yield a consistent estimator?
+
+. . .
+
+- What's the main problem with this approach?
+
+. . .
+
+**Proposal 2:** I do not have access to the whole process, so I use the one path I have
+
+- Estimate $\E[m_{20}]$ by averaging across all time periods in the path: $\widetilde{m}_{20} = \frac{1}{T} \sum_{t=1}^{T} m_{t}^{(1)}$
+- Would I need stationarity for this to yield a consistent estimator?
+- Intuitively, would that be enough?
+
+## Ergodicity: Definition
+
+- Ergodicity is a property that some stochastic processes have
+- Intuitive definition (don't quote me on this):
+
+::: {.thm}
+::: {.thmhead}
+Definition (Ergodicity, Intuitive)
+:::
+A stochastic process $\{Y_t\}$ is _ergodic_ if its realized paths are "rich enough" with probability 1. By "rich enough", we mean that, with probability 1, it will neither get stuck in a subset of the state space nor fall into cyclic trajectories.
+:::
+
+. . .
+
+Said another way: if you observe a process for a long enough $T$, you will be able to learn everything about the process
+
+## Ergodicity vs Stationarity
+
+- There are ways to test whether a process is stationary. We will get there
+- There is no way to test for ergodicity! You have to assume it!
+
+. . .
+
+Important:
+
+- When a process is stationary, there are simple conditions that imply ergodicity
+- Under ergodicity and strict stationarity, $\widetilde{m}_{20}$ is consistent!
+- This result is called the **Ergodic Theorem** (Theorem 14.9 in Hansen's book)
+
+. . .
+
+Also important:
+
+- Stationarity does not imply ergodicity (next slide)
+- [Exercise (problem set): show that a stationary process is not ergodic]{.alert}
+
+## Time Averages vs. Ensemble Averages
+
+Two stationary processes, 50 paths each:
+
+- **Ergodic:** $Y_t = \varepsilon_t$, $\varepsilon_t \iid N(0,1)$
+- **Not ergodic:** $Y_t = X_t^2$, $X_t = S\,\varepsilon_t$, $S^2 \in \{0.5, 1.5\}$ drawn once per path (50/50)
+
+```{ojs}
+//| echo: false
+viewof Tmax = Inputs.range([10, 5000], {value: 1000, step: 1, transform: Math.log, label: "Sample size T"})
+```
+
+```{ojs}
+//| echo: false
+// 50 paths of i.i.d. N(0, 1) shocks; running averages of e and e^2 kept on ~300 log-spaced dates.
+ergo = {
+  const rng = d3.randomLcg(126)
+  const draw = d3.randomNormal.source(rng)(0, 1)
+  const T = 5000
+  const grid = Array.from(new Set(d3.range(301).map(j => Math.round(Math.exp(j * Math.log(T) / 300)))))
+  return d3.range(50).map(i => {
+    const S2 = rng() < 0.5 ? 0.5 : 1.5
+    let sum1 = 0, sum2 = 0, k = 0
+    const avgs = []
+    for (let t = 1; t <= T; t++) {
+      const e = draw()
+      sum1 += e
+      sum2 += e * e
+      if (t === grid[k]) { avgs.push({t, m1: sum1 / t, m2: sum2 / t}); k++ }
+    }
+    return {path: i, S2, avgs}
+  })
+}
+
+// Left: Y = e, so its time average is that of e. Right: Y = X^2 = S^2 e^2, so its time average is S^2 times that of e^2
+ergoRows = ergo.flatMap(p => p.avgs
+  .filter(d => d.t <= Tmax)
+  .map(d => ({path: p.path, t: d.t, m1: d.m1, m2: p.S2 * d.m2})))
+
+avgPanel = (key, target, domain, title) => html`<div>
+  <div style="text-align: center">${title}</div>
+  ${Plot.plot({
+    width: 590, height: 350, marginLeft: 50, marginBottom: 45,
+    style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
+    x: {type: "log", domain: [1, Tmax], label: "t (log scale)", labelAnchor: "center", labelArrow: "none"},
+    y: {label: null, domain, ticks: 5},
+    grid: true,
+    marks: [
+      Plot.ruleY([target], {stroke: "black", strokeDasharray: "7,5", strokeWidth: 1.5}),
+      Plot.line(ergoRows.filter(d => d.path > 0), {x: "t", y: key, z: "path", stroke: "#0072BC", strokeOpacity: 0.3, strokeWidth: 1.3, clip: true}),
+      Plot.line(ergoRows.filter(d => d.path === 0), {x: "t", y: key, stroke: "#C62828", strokeWidth: 3, clip: true}),
+      Plot.text([`the path you saw: ${ergoRows.filter(d => d.path === 0).at(-1)[key].toFixed(2)}`], {frameAnchor: "top-right", dx: -10, dy: 10, fill: "#C62828", fontWeight: "bold", fontSize: 20, stroke: "white", strokeWidth: 6})
+    ]
+  })}
+</div>`
+
+html`<div style="display: flex; gap: 20px; justify-content: center; font-size: 19px">
+${avgPanel("m1", 0, [-1.5, 1.5], html`Time average of ergodic <i>Y<sub>t</sub></i> (dashed: E[<i>Y<sub>t</sub></i>] = 0)`)}
+${avgPanel("m2", 1, [0, 3], html`Time average of non-ergodic <i>Y<sub>t</sub></i> (dashed: E[<i>Y<sub>t</sub></i>] = 1)`)}
+</div>`
+```
+
+# Formal Definition: Ergodicity (Time Allowing) {visibility="uncounted"}
+
+## Trivial Invariant Events
+
+- Let $G \subset \R^{\infty}$ and let $\tilde{Y}_t = (\dots, Y_{t-1}, Y_t, Y_{t+1}, \dots)$ be the history of the process
+- An event $A$ has the form $A = \{\omega \in \Omega : \tilde{Y}_t \in G\}$
+- The $l$-th time shift of $A$ is $A_l = \{\omega \in \Omega : \tilde{Y}_{t+l} \in G\}$
+
+. . .
+
+- An event $A$ is called **invariant** if $A_l = A$ for all $l \in \mathbb{Z}$
+- An event $A$ is called **trivial** if $\Pr(A) = 0$ or $\Pr(A) = 1$
+
+. . .
+
+::: {.thm}
+::: {.thmhead}
+Definition (Ergodicity)
+:::
+A process $Y_t$ is **ergodic** if every invariant event is trivial.
+:::
+
+## Example
+
+- Consider the event $A = \{\sup_{t \in \mathbb{Z}} Y_t \leq 0\}$
+- In words: the process never takes a positive value
+
+. . .
+
+- For any $l$, $A_l = \{\sup_{t \in \mathbb{Z}} Y_{t+l} \leq 0\}$
+- Is this event invariant?
+
+. . .
+
+- Suppose $Y_t = Z$ for all $t \in \mathbb{Z}$, where $Z \sim U[-1, 1]$
+- This means that the process is constant after $Z$ is drawn
+- What's $\Pr(A)$ here?
+
+. . .
+
+- Is this process ergodic?
+
+## One Useful Characterization of Ergodicity
+
+::: {.thm}
+::: {.thmhead}
+Theorem (Ergodicity, Characterization)
+:::
+A strictly stationary series $Y_t \in \R^{m}$ is ergodic if, and only if, for all events $A$ and $B$
+$$
+\lim_{n \rightarrow \infty} \frac{1}{n} \sum_{l=1}^{n} \Pr(A_l \cap B) = \Pr(A) \cdot \Pr(B)
+$$
+:::
+
+- Intuition: as we go back in time, on average, events become nearly independent
+
+# Two Useful Theorems {visibility="uncounted"}
+
+## Stationarity + Ergodicity = LLN
+
+- You will be interested in approximating means and second moments of a process
+- Stationarity + ergodicity is the "right set of assumptions" to do that
+
+::: {.thm}
+::: {.thmhead}
+Theorem (Hannan, 1970, Theorem 2, p. 203)
+:::
+If $Y_t$ is strictly stationary and ergodic with $\E|Y_t| < \infty$, then
+$$
+\bar{Y}_T = \frac{1}{T} \sum_{t=1}^{T} Y_t \xrightarrow{a.s.} \E[Y_t] \quad \text{as} \quad T \rightarrow \infty
+$$
+If, also, $\E[Y_t^2] < \infty$, then
+$$
+\hat{\gamma}_h = \frac{1}{T} \sum_{t=1}^{T-h} (Y_t - \bar{Y}_T)(Y_{t+h} - \bar{Y}_T) \xrightarrow{a.s.} \gamma_h \quad \text{as} \quad T \rightarrow \infty
+$$
+:::
+
+## What to Do in Practice?
+
+- The last theorem assumes something we cannot test. If we only care about estimation, there is an easier way out:
+
+::: {.thm}
+::: {.thmhead}
+Theorem (Hannan, 1970, Theorem 6, p. 210)
+:::
+If $Y_t$ is weakly stationary and $\sum_{h=1}^{\infty} |\gamma_h| < \infty$, then
+$$
+\bar{Y}_T = \frac{1}{T} \sum_{t=1}^{T} Y_t \xrightarrow{L_2} \E[Y_t] \quad \text{as} \quad T \rightarrow \infty
+$$
+If, in addition, $\E[Y_t^4] < \infty$ and the fourth-order cumulants of $Y_t$ are absolutely summable, then $\hat{\gamma}_h \xrightarrow{L_2} \gamma_h$ as $T \rightarrow \infty$.
+:::
+
+[Check the fourth-moment condition for $\hat{\gamma}_h$ against Hannan (1970), p. 210]{.todo}
+
+- Recall: $L_2$ convergence implies convergence in probability, but it neither implies nor is implied by a.s. convergence
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# White Noise and Martingale Difference Sequences {visibility="uncounted"}
+
+## White Noise
+
+- In the cross-section, it's common to write $y_i = \alpha + \beta x_i + u_i$ with $u_i$ i.i.d.
+- Now we need weaker notions of "error term": **white noise** processes and **martingale difference sequences**
+
+. . .
+
+::: {.thm}
+::: {.thmhead}
+Definition (White Noise Process)
+:::
+A sequence of random variables $(\varepsilon_t)_{t \in \mathbb{Z}}$ is a **white noise process** if:
+
+1. $\E[\varepsilon_t] = 0$ for all $t$
+2. $\Var(\varepsilon_t) = \sigma^2 < \infty$ for all $t$
+3. $\Cov(\varepsilon_t, \varepsilon_s) = 0$ for all $t \neq s$
+
+In words: uncorrelated random variables with mean zero and constant variance.
+:::
+
+. . .
+
+Any i.i.d. sequence of variables with mean zero and finite variance is a white noise process.
+
+## Information Sets
+
+- Conditioning on past information is common in economic models and in Econometrics
+- The correct mathematical objects here are $\sigma$-**fields** and **filtrations**. We will avoid the measure-theoretic formalism for now
+- Intuitively: the $\sigma$-field (or $\sigma$-algebra) generated by $(Y_t, Y_{t-1}, Y_{t-2}, \dots)$ is the collection of possible histories of this process up to $t$
+- We write $\mathcal{F}_t = \sigma(Y_t, Y_{t-1}, Y_{t-2}, \dots)$: all information available up to time $t$
+- In other areas of Economics, we typically call $\sigma$-fields _information sets_
+- Example: $\E[Y_t | \mathcal{F}_{t-1}]$ is our best guess for $Y_t$ given information from this process, and only that, up to $t-1$
+
+## Martingale Difference Sequences
+
+::: {.thm}
+::: {.thmhead}
+Definition (Martingale Difference Sequence)
+:::
+A sequence of random variables $(\varepsilon_t)_{t \in \mathbb{Z}}$ is a **martingale difference sequence** (MDS) with respect to the filtration $\{\mathcal{F}_t\}$ if:
+
+1. $\varepsilon_t$ is adapted to $\mathcal{F}_t$
+2. $\E|\varepsilon_t| < \infty$ for all $t$
+3. $\E[\varepsilon_t | \mathcal{F}_{t-1}] = 0$ almost surely for all $t$
+:::
+
+. . .
+
+True or false?
+
+- Every MDS has (unconditional) mean zero
+- $\Cov(\varepsilon_t, \varepsilon_{t+h}) = 0$ for all $h \neq 0$
+- $\E[\varepsilon_{t+h} | \mathcal{F}_{t}] = 0$ for all $h > 0$
+- $\E[\varepsilon_{t-h} | \mathcal{F}_{t}] = 0$ for all $h > 0$
+
+## Example
+
+- Let $u_t$ be an i.i.d. sequence with mean zero and variance $\sigma^2 < \infty$
+- Define $v_t = u_t \cdot u_{t-1}$
+    - Is this process i.i.d.? Is it an MDS with respect to its natural filtration? Is it white noise?
+
+. . .
+
+- Now define $m_t = u_t + u_{t-1}\cdot u_{t-2}$
+    - Is this process i.i.d.? Is it an MDS with respect to its natural filtration? Is it white noise?
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+The End
+:::
+
+## References
+
+- Hannan, E. J. (1970). _Multiple Time Series_. Wiley
+- Chapters 3 and 4 of _Time Series Analysis_, by James Hamilton. MDS are covered in Chapter 7
+- Chapter 14 of _Econometrics_, by Bruce Hansen
