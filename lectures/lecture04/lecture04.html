@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="lecture04_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lecture04_files/libs/quarto-html/tabby.min.js"></script>
+<script src="lecture04_files/libs/quarto-html/popper.min.js"></script>
+<script src="lecture04_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="lecture04_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lecture04_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="lecture04_files/libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.18">
+
+  <title>Lecture 4: Lag Operator, MA Models, and AR Models</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="lecture04_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="lecture04_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="lecture04_files/libs/revealjs/dist/theme/quarto-2e8f9a204b5badfa986f6549738efd1d.css">
+  <link href="lecture04_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="lecture04_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="lecture04_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="lecture04_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <!-- Text is set in Arial. Arimo (metric-compatible with Arial) downloads only as a
+       fallback where Arial is not installed; browsers skip it when Arial is present.
+       Arimo has no 300 weight, so do not request one: Google Fonts rejects the whole URL.
+       Fira Mono is the code font. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&amp;family=Fira+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <!-- Math font: classic Computer Modern (MathJax 3's look), Raul's pick.
+       Quarto's RevealMath plugin overwrites window.MathJax, so trap the
+       first assignment, inject output.font, then step out of the way.
+       Built against Quarto 1.10.18; re-check math rendering after upgrading Quarto.
+       Alternatives: mathjax-newcm (MathJax 4 default, serif New CM),
+       mathjax-fira (sans-serif math), mathjax-modern,
+       mathjax-stix2, mathjax-pagella. -->
+  <script>
+  (function () {
+    var FONT = 'mathjax-tex';
+    Object.defineProperty(window, 'MathJax', {
+      configurable: true,
+      get: function () { return undefined; },
+      set: function (v) {
+        var cfg = Object.assign({}, v || {});
+        // MathJax-2 leftovers the plugin injects; MathJax 4 does not use them
+        delete cfg.messageStyle; delete cfg.tex2jax;
+        delete cfg.skipStartupTypeset; delete cfg.config; delete cfg.mathjax;
+        cfg.output = Object.assign({ font: FONT }, cfg.output);
+        Object.defineProperty(window, 'MathJax', {
+          value: cfg, writable: true, configurable: true, enumerable: true
+        });
+      }
+    });
+  })();
+  </script>
+  <script type="module" src="lecture04_files/libs/quarto-ojs/quarto-ojs-runtime.js"></script>
+  <link href="lecture04_files/libs/quarto-ojs/quarto-ojs.css" rel="stylesheet">
+</head>
+<body class="quarto-light">
+<!-- Math macros shared by every lecture (MathJax reads them from this hidden block).
+     \symbf keeps the unicode-math spelling used throughout the 2025 Beamer lectures. -->
+<div style="position:absolute;visibility:hidden;height:0;overflow:hidden">
+$$
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\Pr}{\mathbb{P}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\Corr}{\mathrm{Corr}}
+\newcommand{\plim}{\operatorname*{plim}}
+\newcommand{\symbf}[1]{\boldsymbol{#1}}
+\newcommand{\iid}{\overset{\text{iid}}{\sim}}
+$$
+</div>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <div class="ttl">Lecture 4: Lag Operator, MA Models, and AR Models</div>
+  <div class="ttlrule"></div>
+  <div class="presenter">Raul Riva</div>
+  <div class="affil">FGV, Brazilian School of Economics and Finance (<span class="fgv">FGV EPGE</span>)</div>
+  <div class="talkdate">October 2026</div>
+  <div class="venue">Econometrics I (Part I)</div>
+</section>
+<section>
+<section id="introduction" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>Introduction</h1>
+
+</section>
+<section id="where-we-are" class="slide level2">
+<h2>Where We Are</h2>
+<ul>
+<li>We will start covering a very useful modeling tool: ARMA models</li>
+<li>They combine autoregressive (AR) and moving average (MA) components</li>
+<li>In a certain sense, they are the most fundamental models for <strong>stationary</strong> time series</li>
+<li>There will be a neat theorem about this: <strong>Wold’s decomposition theorem</strong> (next lecture)</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>But first we need to get acquainted with the <strong>lag operator</strong> <span class="math inline">\(L\)</span></li>
+<li>Never underestimate this guy!</li>
+</ul>
+</div>
+</section></section>
+<section>
+<section id="the-lag-operator" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>The Lag Operator</h1>
+
+</section>
+<section id="operators-on-sequences" class="slide level2">
+<h2>Operators on Sequences</h2>
+<ul>
+<li>An important vector space for us is the space of sequences</li>
+<li>Remember that time series are sequences of random variables</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>An <em>operator</em> for us is a mapping from sequences to sequences</li>
+<li>The <strong>lag operator</strong> <span class="math inline">\(L\)</span> generates a new sequence by lagging the original sequence by one period:</li>
+</ul>
+<p><span class="math display">\[
+L(y_t) = y_{t-1}
+\]</span></p>
+<ul>
+<li>This is an informal way of saying</li>
+</ul>
+<p><span class="math display">\[
+\{\cdots, y_{t-1}, y_t, y_{t+1}, \cdots\} \mapsto \{\cdots, y_{t-2}, y_{t-1}, y_t, \cdots\}
+\]</span></p>
+</div>
+</section>
+<section id="the-lag-operator-algebra" class="slide level2">
+<h2>The Lag Operator Algebra</h2>
+<p>Some useful tricks:</p>
+<ul>
+<li><span class="math inline">\(L(\alpha y_t) = \alpha y_{t-1} = \alpha L(y_t)\)</span> for all <span class="math inline">\(\alpha \in \R\)</span></li>
+<li><span class="math inline">\(L(y_t + z_t) = y_{t-1} + z_{t-1} = L(y_t) + L(z_t)\)</span></li>
+<li>It is a <em>linear operator</em> <span class="math inline">\(\implies\)</span> all the machinery from functional analysis applies!</li>
+</ul>
+<div class="fragment">
+<p>The most important property:</p>
+<ul>
+<li><span class="math inline">\(L^2(y_t) = L(L(y_t)) = L(y_{t-1}) = y_{t-2}\)</span></li>
+<li><span class="math inline">\(L^k(y_t) = y_{t-k}\)</span> for any integer <span class="math inline">\(k &gt; 0\)</span></li>
+<li><span class="math inline">\(L^0(y_t) = y_t = I(y_t)\)</span>, the identity operator</li>
+</ul>
+</div>
+<div class="fragment">
+<p>The polynomial operator <span class="math inline">\(\phi(L) = a_0 I + a_1 L + a_2 L^2 + \dots + a_p L^p\)</span> is such that <span class="math display">\[
+\phi(L)y_t = a_0 y_t + a_1 y_{t-1} + a_2 y_{t-2} + \dots + a_p y_{t-p}
+\]</span></p>
+</div>
+</section></section>
+<section>
+<section id="inverting-lag-polynomials" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>Inverting Lag Polynomials</h1>
+
+</section>
+<section id="can-we-invert-an-operator" class="slide level2">
+<h2>Can We Invert an Operator?</h2>
+<ul>
+<li>Question: for a given operator <span class="math inline">\(T\)</span>, can we find an operator <span class="math inline">\(S\)</span> such that <span class="math inline">\(ST = I\)</span>?</li>
+<li>In other words, if I see <span class="math inline">\(T(y_t)\)</span>, can I recover the original sequence <span class="math inline">\(y_t\)</span>?</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>As you can imagine, this depends on the operator…</li>
+<li>Yes, you can invert the lag operator: <span class="math inline">\(L^{-1}(y_t) = y_{t+1}\)</span></li>
+<li>But not this one (dumb example): <span class="math inline">\(T(y_t) = 0\)</span> <span class="math inline">\(\implies\)</span> obviously you cannot invert it</li>
+</ul>
+</div>
+<div class="fragment">
+<p>It will be very useful to study the invertibility of the polynomials <span class="math inline">\(\phi(L)\)</span>:</p>
+<ul>
+<li>Let’s start with baby steps: assume <span class="math inline">\(\phi(L) = I - aL\)</span> for some <span class="math inline">\(a \neq 0\)</span></li>
+<li>Challenge: can you invert this operator?</li>
+</ul>
+</div>
+</section>
+<section id="can-we-ever-invert-phil" class="slide level2">
+<h2>Can We Ever Invert <span class="math inline">\(\phi(L)\)</span>?</h2>
+<ul>
+<li>Inverting this operator means finding another operator <span class="math inline">\(\psi(L)\)</span> such that <span class="math inline">\(\psi(L) \phi(L) = I\)</span></li>
+<li>Focus on scalar sequences, abuse notation, and write “1” instead of <span class="math inline">\(I\)</span></li>
+<li>If <span class="math inline">\(L\)</span> were a number (<em>it is not a number!!!</em>), we would like to write <span class="math inline">\(\psi(L) = \frac{1}{1 - a L}\)</span></li>
+<li>If <span class="math inline">\(|aL| &lt; 1\)</span>, we would be able to write <span class="math inline">\(\psi(L) = 1 + aL + a^2 L^2 + a^3 L^3 + \dots\)</span></li>
+<li>The problem with this intuition is that <span class="math inline">\(L\)</span> is not a number!</li>
+<li>What does “<span class="math inline">\(|aL| &lt; 1\)</span>” even mean???</li>
+</ul>
+</section>
+<section id="truncating-the-series" class="slide level2">
+<h2>Truncating the Series</h2>
+<ul>
+<li>Let’s explore this intuition a bit more</li>
+<li>Consider <span class="math inline">\(\psi_n(L) = 1 + aL + a^2L^2 + \dots + a^n L^n\)</span>. Then</li>
+</ul>
+<p><span class="math display">\[
+\psi_n(L) \phi(L) = (1 + aL + a^2L^2 + \dots + a^n L^n)(1 - aL) = 1 - a^{n+1} L^{n+1}
+\]</span></p>
+<p>Hence, <span class="math inline">\(\psi_n(L) \phi(L) y_t = y_t - a^{n+1} L^{n+1} y_t = y_t - a^{n+1} y_{t-n-1}\)</span> for any sequence <span class="math inline">\(\{y_t\}_{t \in \mathbb{Z}}\)</span>.</p>
+<div class="fragment">
+<ul>
+<li>If <span class="math inline">\(|a| &lt; 1\)</span>, then <span class="math inline">\(a^n \to 0\)</span>, and <span class="math inline">\(a^{n+1} y_{t-n-1}\)</span> is probably very small</li>
+<li>Even if <span class="math inline">\(y_t\)</span> is stochastic, but stationary, <span class="math inline">\(a^{n+1} y_{t-n-1} \to 0\)</span> in mean square (and almost surely)</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>But if <span class="math inline">\(|a| \geq 1\)</span>, then <span class="math inline">\(a^{n+1} y_{t-n-1}\)</span> never dies out!</li>
+<li>So, it seems that the invertibility of <span class="math inline">\(\phi(L)\)</span> depends on the value of <span class="math inline">\(a\)</span>…</li>
+</ul>
+</div>
+</section>
+<section id="a-tool-from-functional-analysis" class="slide level2">
+<h2>A Tool from Functional Analysis</h2>
+<div class="thm">
+<div class="thmhead">
+<p>Theorem (Neumann Series; <a href="https://link.springer.com/book/10.1007/978-1-84800-005-6">Rynne and Youngson</a>, Theorem 4.40)</p>
+</div>
+<p>Let <span class="math inline">\(B\)</span> be a Banach space and, for <span class="math inline">\(A: B \to B\)</span>, let <span class="math inline">\(\|A\| \equiv \sup_{\|x\| \leq 1} \|Ax\|\)</span>. If <span class="math inline">\(T: B \to B\)</span> is a bounded linear operator and <span class="math inline">\(\|I - T\| &lt; 1\)</span>, then <span class="math inline">\(T\)</span> is invertible, with inverse <span class="math display">\[
+T^{-1} = \sum_{k=0}^{\infty} (I - T)^k
+\]</span></p>
+</div>
+<p><span class="todo">Confirm the theorem number: the link is the 2nd edition (2008), the 2025 slide cited 2000</span></p>
+<ul>
+<li>Our Banach space: random sequences <span class="math inline">\(\{y_t\}_{t \in \mathbb{Z}}\)</span> with <span class="math inline">\(\|y\| \equiv \sup_t \sqrt{\E[y_t^2]} &lt; \infty\)</span></li>
+<li>Every weakly stationary process lives in it: <span class="math inline">\(\|y\| = \sqrt{\gamma_0 + \mu^2}\)</span></li>
+<li><span class="math inline">\(L\)</span> is linear and bounded: <span class="math inline">\(\|Ly\| = \sup_t \sqrt{\E[y_{t-1}^2]} = \|y\|\)</span>, so <span class="math inline">\(\|L\| = 1\)</span></li>
+</ul>
+</section>
+<section id="in-our-example" class="slide level2">
+<h2>In Our Example</h2>
+<ul>
+<li><span class="math inline">\(\phi(L) = I - aL\)</span> is linear and bounded (why?)</li>
+<li><span class="math inline">\(\|I - \phi(L)\| = \|I - I + aL\| = |a| \cdot \|L\| = |a|\)</span></li>
+<li><span class="math inline">\(\|I - \phi(L)\| &lt; 1 \iff |a| &lt; 1\)</span></li>
+</ul>
+<div class="fragment">
+<p>Now we use the theorem to get exactly what our intuition hinted at before: <span class="math display">\[
+\psi(L) \equiv \phi(L)^{-1} = \sum_{k=0}^{\infty} (aL)^k = I + aL + a^2 L^2 + a^3 L^3 + \dots
+\]</span></p>
+</div>
+<div class="fragment">
+<p>In terms of notation, everything below is equivalent:</p>
+<ul>
+<li><span class="math inline">\(\phi(L)^{-1} \equiv \frac{1}{1 - aL} \equiv \frac{1}{\phi(L)}\)</span></li>
+<li>Given two polynomials <span class="math inline">\(\phi_1(L)\)</span> and <span class="math inline">\(\phi_2(L)\)</span>, the expression <span class="math inline">\(\frac{\phi_1(L)}{\phi_2(L)}\)</span> means <em>“first, apply the inverse of <span class="math inline">\(\phi_2(L)\)</span>, then apply <span class="math inline">\(\phi_1(L)\)</span>”</em></li>
+</ul>
+</div>
+</section>
+<section id="what-if-a-geq-1" class="slide level2">
+<h2>What If <span class="math inline">\(|a| \geq 1\)</span>?</h2>
+<ul>
+<li><span class="math inline">\(|a| &gt; 1\)</span>: <span class="math inline">\(I - aL\)</span> is still invertible! Write <span class="math inline">\(I - aL = -aL\,(I - a^{-1}L^{-1})\)</span> and use the theorem, since <span class="math inline">\(\|a^{-1}L^{-1}\| = 1/|a| &lt; 1\)</span></li>
+<li><span class="alert">Exercise: show that <span class="math inline">\((I - aL)^{-1} = -\sum_{k=1}^{\infty} a^{-k} L^{-k}\)</span> when <span class="math inline">\(|a| &gt; 1\)</span></span></li>
+<li>But this inverse uses the <strong>future</strong>: <span class="math inline">\(y_{t+1}, y_{t+2}, \dots\)</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li><span class="math inline">\(|a| = 1\)</span>: no inverse at all, since <span class="math inline">\(I - aL\)</span> sends the bounded sequence <span class="math inline">\(y_t = a^t\)</span> to zero</li>
+</ul>
+</div>
+<div class="fragment">
+<div class="thm takeaway">
+<div class="thmhead">
+<p>Convention</p>
+</div>
+<p>From now on, <span class="math inline">\(\phi(L)\)</span> is <strong>invertible</strong> if its inverse is a power series in <span class="math inline">\(L\)</span> only, so it only uses the past: <span class="math display">\[
+\phi(L)^{-1} = \sum_{k=0}^{\infty} \psi_k L^k
+\]</span></p>
+</div>
+</div>
+</section>
+<section id="section" class="slide level2 standout" data-background-color="var(--slate)">
+<h2>&nbsp;</h2>
+<div class="standout-body">
+<p>Questions?</p>
+</div>
+</section></section>
+<section>
+<section id="roots-and-the-unit-circle" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>Roots and the Unit Circle</h1>
+
+</section>
+<section id="a-more-complicated-example" class="slide level2">
+<h2>A More Complicated Example</h2>
+<p>Let’s study a more complicated polynomial of order 2. Assume that <span class="math display">\[
+\phi(L) = I - a_1 L - a_2 L^2
+\]</span> What conditions on the parameters would imply invertibility?</p>
+<p><em>Hint</em>: what does the Fundamental Theorem of Algebra say about a polynomial of order <span class="math inline">\(p\)</span>, in general?</p>
+<div class="fragment">
+<p><strong>Every polynomial of order <span class="math inline">\(p\)</span> has exactly <span class="math inline">\(p\)</span> (maybe complex!) roots</strong>, counting multiplicity. So you can write <span class="math display">\[
+\phi(L) = \alpha\left(L - \lambda_1 I \right)\left(L - \lambda_2 I \right) = \left(\alpha \lambda_1 \lambda_2\right) \underbrace{\left(I - \frac{1}{\lambda_1} L\right)}_{\equiv\, \phi_1(L)}\underbrace{\left(I - \frac{1}{\lambda_2} L\right)}_{\equiv\, \phi_2(L)}
+\]</span> for some (maybe complex) numbers <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\lambda_1\)</span>, and <span class="math inline">\(\lambda_2\)</span>.</p>
+</div>
+</section>
+<section id="roots-outside-the-unit-circle" class="slide level2">
+<h2>Roots Outside the Unit Circle</h2>
+<ul>
+<li><span class="math inline">\(\phi_1(L)\)</span> and <span class="math inline">\(\phi_2(L)\)</span> are both invertible if and only if <span class="math inline">\(|\lambda_1| &gt; 1\)</span> and <span class="math inline">\(|\lambda_2| &gt; 1\)</span>. Why?</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Now, let’s define <span class="math inline">\(\psi(L) \equiv \frac{1}{\alpha \lambda_1 \lambda_2} \phi_1(L)^{-1}\phi_2(L)^{-1}\)</span></li>
+<li>It’s clear that <span class="math inline">\(\psi(L) \phi(L) = I\)</span>. So, by definition, <span class="math inline">\(\psi(L) = \phi(L)^{-1}\)</span></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Conclusion: <span class="math inline">\(\phi(L)\)</span> is invertible if and only if all its roots are <em>outside the unit circle</em></li>
+<li>Just a fancy way of saying that the modulus of all roots must be strictly greater than 1</li>
+<li>This generalizes to polynomials of any order <span class="math inline">\(p\)</span></li>
+</ul>
+</div>
+</section>
+<section id="what-to-do-in-practice" class="slide level2">
+<h2>What to Do in Practice?</h2>
+<p>Given a polynomial <span class="math inline">\(\phi(L) = I - a_1 L - a_2 L^2 - \dots - a_p L^p\)</span>:</p>
+<ul>
+<li>Focus on its “sister polynomial” <span class="math inline">\(f(x) = 1 - a_1 x - a_2 x^2 - \dots - a_p x^p\)</span></li>
+<li>Find the roots of <span class="math inline">\(f\)</span> (numerically, of course)</li>
+<li>Check the modulus of all roots: if they are all greater than 1, then <span class="math inline">\(\phi(L)\)</span> is invertible</li>
+</ul>
+<div class="fragment">
+<p>In Python:</p>
+<ul>
+<li><code>np.roots</code> expects the coefficients from the <strong>highest</strong> power down: <code>[-ap, ..., -a1, 1]</code></li>
+<li><code>statsmodels</code>: <code>ArmaProcess(ar=[1, -a1, ..., -ap])</code> has <code>.arroots</code> and <code>.isstationary</code></li>
+</ul>
+</div>
+</section>
+<section id="section-1" class="slide level2 standout" data-background-color="var(--slate)">
+<h2>&nbsp;</h2>
+<div class="standout-body">
+<p>Questions?</p>
+</div>
+</section></section>
+<section>
+<section id="ma-models-finally" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>MA Models (Finally!)</h1>
+
+</section>
+<section id="the-maq-model" class="slide level2">
+<h2>The MA(q) Model</h2>
+<ul>
+<li>A very important building block is the <strong>Moving Average (MA) model</strong></li>
+<li>Let <span class="math inline">\(\varepsilon_t\)</span> be a white noise process with zero mean and variance <span class="math inline">\(\sigma^2\)</span></li>
+<li>The MA model of order <span class="math inline">\(q\)</span> is defined as</li>
+</ul>
+<p><span class="math display">\[
+y_t = \mu + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2} + \dots + \theta_q \varepsilon_{t-q} = \mu + \sum_{i=0}^{q} \theta_i \varepsilon_{t-i}
+\]</span> where <span class="math inline">\(\mu\)</span> is the mean of the process and the <span class="math inline">\(\theta_i\)</span>’s are the parameters of the model (<span class="math inline">\(\theta_0 \equiv 1\)</span>).</p>
+<ul>
+<li>This is a tool to model dependence that will <em>completely die</em> after <span class="math inline">\(q\)</span> periods!</li>
+</ul>
+<div class="fragment">
+<p>Notice we can write <span class="math inline">\(y_t = \mu + \theta(L) \varepsilon_t\)</span>, where <span class="math inline">\(\theta(L) = 1 + \theta_1 L + \theta_2 L^2 + \dots + \theta_q L^q\)</span>.</p>
+</div>
+</section>
+<section id="is-the-maq-stationary" class="slide level2">
+<h2>Is the MA(q) Stationary?</h2>
+<ul>
+<li>The mean: <span class="math inline">\(\E[y_t] = \mu + \E[\varepsilon_t] + \sum_{i=1}^{q} \theta_i \E[\varepsilon_{t-i}] = \mu\)</span></li>
+<li>The variance: <span class="math inline">\(\Var(y_t) = \Var(\varepsilon_t) + \sum_{i=1}^{q} \theta_i^2 \Var(\varepsilon_{t-i}) = \sigma^2\left(1 + \sum_{i=1}^{q} \theta_i^2\right)\)</span></li>
+<li>What about autocovariances? What should <span class="math inline">\(\gamma_h \equiv \Cov(y_t, y_{t-h})\)</span> be?</li>
+</ul>
+<div class="fragment">
+<p>There will be two cases. First, let <span class="math inline">\(h &gt; q\)</span>. Then <span class="math inline">\(\gamma_h = 0\)</span>. Why? What’s the intuition for this?</p>
+</div>
+<div class="fragment">
+<p>Now, what about <span class="math inline">\(h \leq q\)</span>?</p>
+</div>
+</section>
+<section id="lets-do-simple-cases" class="slide level2">
+<h2>Let’s Do Simple Cases</h2>
+<p>If <span class="math inline">\(q=1\)</span>, then <span class="math inline">\(y_t - \mu = \varepsilon_t + \theta_1 \varepsilon_{t-1}\)</span>. Hence <span class="math display">\[
+\gamma_1 = \E[(y_t - \mu)(y_{t-1} - \mu)] = \E[(\varepsilon_t + \theta_1 \varepsilon_{t-1})(\varepsilon_{t-1} + \theta_1 \varepsilon_{t-2})] = \sigma^2\theta_1
+\]</span></p>
+<div class="fragment">
+<p>If <span class="math inline">\(q=2\)</span>, then <span class="math inline">\(y_t - \mu = \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2}\)</span>. Hence <span class="math display">\[
+\gamma_1 = \E[(\varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2})(\varepsilon_{t-1} + \theta_1 \varepsilon_{t-2} + \theta_2 \varepsilon_{t-3})] = \sigma^2(\theta_1 + \theta_2\theta_1)
+\]</span> <strong>and, very importantly,</strong> <span class="math inline">\(\gamma_2 \neq 0\)</span> here as well: <span class="math display">\[
+\gamma_2 = \E[(\varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2})(\varepsilon_{t-2} + \theta_1 \varepsilon_{t-3} + \theta_2 \varepsilon_{t-4})] = \sigma^2\theta_2
+\]</span></p>
+</div>
+</section>
+<section id="general-case-for-gamma_h" class="slide level2">
+<h2>General Case for <span class="math inline">\(\gamma_h\)</span></h2>
+<ul>
+<li>If <span class="math inline">\(h \leq q\)</span>, then <span class="math inline">\(\gamma_h = \sigma^2\left(\theta_h + \theta_{h+1}\theta_1 + \theta_{h+2}\theta_2 + \dots + \theta_q\theta_{q-h}\right)\)</span></li>
+<li>If <span class="math inline">\(h &gt; q\)</span>, then <span class="math inline">\(\gamma_h = 0\)</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>True or false? “Any MA(q) is stationary”</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>The case <span class="math inline">\(q = \infty\)</span> is actually well-defined. In that case we write <span class="math inline">\(y_t = \mu + \sum_{i=0}^{\infty} \theta_i \varepsilon_{t-i}\)</span></li>
+<li>This is a stationary process as long as the variance of <span class="math inline">\(y_t\)</span> is finite</li>
+<li>This is ensured by the following condition: <span class="math inline">\(\sum_{i=0}^{\infty} \theta_i^2 &lt; \infty\)</span></li>
+<li>Under this condition, any MA(q) process, even with <span class="math inline">\(q=\infty\)</span>, is stationary!</li>
+<li>It’s also common to focus on autocorrelations, which are defined as <span class="math inline">\(\rho_h \equiv \gamma_h/\gamma_0\)</span></li>
+</ul>
+</div>
+</section>
+<section id="dial-the-ma-coefficients" class="slide level2">
+<h2>Dial the MA Coefficients</h2>
+<p><span class="math inline">\(y_t = \varepsilon_t + \sum_{i=1}^{4} \theta_i \varepsilon_{t-i}\)</span> with <span class="math inline">\(\varepsilon_t \iid N(0,1)\)</span>. The shocks stay fixed: only the <span class="math inline">\(\theta\)</span>’s change</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb1" data-startfrom="311" data-source-offset="0"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 310;"><span id="cb1-311"><a href="" aria-label="311"></a><span class="co">// Four sliders in a 2x2 grid. The theme's 190px label column is too wide</span></span>
+<span id="cb1-312"><a href="" aria-label="312"></a><span class="co">// for two columns, so each slider gets a narrow label and a shorter track.</span></span>
+<span id="cb1-313"><a href="" aria-label="313"></a>viewof theta <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">form</span>(</span>
+<span id="cb1-314"><a href="" aria-label="314"></a>  [<span class="op">-</span><span class="fl">0.8</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="op">-</span><span class="fl">0.2</span>]<span class="op">.</span><span class="fu">map</span>((v<span class="op">,</span> i) <span class="kw">=&gt;</span></span>
+<span id="cb1-315"><a href="" aria-label="315"></a>    Inputs<span class="op">.</span><span class="fu">range</span>([<span class="op">-</span><span class="fl">1.5</span><span class="op">,</span> <span class="fl">1.5</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> v<span class="op">,</span> <span class="dt">step</span><span class="op">:</span> <span class="fl">0.05</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> [<span class="st">"θ₁"</span><span class="op">,</span> <span class="st">"θ₂"</span><span class="op">,</span> <span class="st">"θ₃"</span><span class="op">,</span> <span class="st">"θ₄"</span>][i]<span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">400</span>}))<span class="op">,</span></span>
+<span id="cb1-316"><a href="" aria-label="316"></a>  {<span class="dt">template</span><span class="op">:</span> inputs <span class="kw">=&gt;</span> {</span>
+<span id="cb1-317"><a href="" aria-label="317"></a>    inputs<span class="op">.</span><span class="fu">forEach</span>(f <span class="kw">=&gt;</span> f<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="fu">setProperty</span>(<span class="st">"--label-width"</span><span class="op">,</span> <span class="st">"50px"</span>))</span>
+<span id="cb1-318"><a href="" aria-label="318"></a>    <span class="cf">return</span> <span class="fu">html</span><span class="vs">`&lt;div style="display: grid; grid-template-columns: auto auto; justify-content: center; column-gap: 60px"&gt;</span><span class="sc">${</span>inputs<span class="sc">}</span><span class="vs">&lt;/div&gt;`</span></span>
+<span id="cb1-319"><a href="" aria-label="319"></a>  }}</span>
+<span id="cb1-320"><a href="" aria-label="320"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb2" data-startfrom="328" data-source-offset="-114"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 327;"><span id="cb2-328"><a href="" aria-label="328"></a>maShocks <span class="op">=</span> {</span>
+<span id="cb2-329"><a href="" aria-label="329"></a>  <span class="kw">const</span> draw <span class="op">=</span> d3<span class="op">.</span><span class="at">randomNormal</span><span class="op">.</span><span class="fu">source</span>(d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="dv">2026</span>))(<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>)</span>
+<span id="cb2-330"><a href="" aria-label="330"></a>  <span class="cf">return</span> <span class="bu">Float64Array</span><span class="op">.</span><span class="fu">from</span>({<span class="dt">length</span><span class="op">:</span> <span class="dv">304</span>}<span class="op">,</span> draw)</span>
+<span id="cb2-331"><a href="" aria-label="331"></a>}</span>
+<span id="cb2-332"><a href="" aria-label="332"></a></span>
+<span id="cb2-333"><a href="" aria-label="333"></a><span class="co">// theta_0 = 1, then the four slider values</span></span>
+<span id="cb2-334"><a href="" aria-label="334"></a>maCoefs <span class="op">=</span> [<span class="dv">1</span><span class="op">,</span> <span class="op">...</span>theta]</span>
+<span id="cb2-335"><a href="" aria-label="335"></a></span>
+<span id="cb2-336"><a href="" aria-label="336"></a><span class="co">// y_t = sum_i theta_i e_{t-i}</span></span>
+<span id="cb2-337"><a href="" aria-label="337"></a>maPath <span class="op">=</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">4</span><span class="op">,</span> maShocks<span class="op">.</span><span class="at">length</span>)<span class="op">.</span><span class="fu">map</span>(t <span class="kw">=&gt;</span> ({</span>
+<span id="cb2-338"><a href="" aria-label="338"></a>  <span class="dt">t</span><span class="op">:</span> t <span class="op">-</span> <span class="dv">3</span><span class="op">,</span></span>
+<span id="cb2-339"><a href="" aria-label="339"></a>  <span class="dt">y</span><span class="op">:</span> d3<span class="op">.</span><span class="fu">sum</span>(maCoefs<span class="op">,</span> (c<span class="op">,</span> i) <span class="kw">=&gt;</span> c <span class="op">*</span> maShocks[t <span class="op">-</span> i])</span>
+<span id="cb2-340"><a href="" aria-label="340"></a>}))</span>
+<span id="cb2-341"><a href="" aria-label="341"></a></span>
+<span id="cb2-342"><a href="" aria-label="342"></a><span class="co">// gamma_h / sigma^2 = sum_i theta_i theta_{i+h}, which is zero for h &gt; 4</span></span>
+<span id="cb2-343"><a href="" aria-label="343"></a>maGamma <span class="op">=</span> h <span class="kw">=&gt;</span> d3<span class="op">.</span><span class="fu">sum</span>(maCoefs<span class="op">.</span><span class="fu">slice</span>(<span class="dv">0</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(maCoefs<span class="op">.</span><span class="at">length</span> <span class="op">-</span> h<span class="op">,</span> <span class="dv">0</span>))<span class="op">,</span> (c<span class="op">,</span> i) <span class="kw">=&gt;</span> c <span class="op">*</span> maCoefs[i <span class="op">+</span> h])</span>
+<span id="cb2-344"><a href="" aria-label="344"></a>maACF <span class="op">=</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">13</span>)<span class="op">.</span><span class="fu">map</span>(h <span class="kw">=&gt;</span> ({h<span class="op">,</span> <span class="dt">rho</span><span class="op">:</span> <span class="fu">maGamma</span>(h) <span class="op">/</span> <span class="fu">maGamma</span>(<span class="dv">0</span>)}))</span>
+<span id="cb2-345"><a href="" aria-label="345"></a></span>
+<span id="cb2-346"><a href="" aria-label="346"></a><span class="co">// q = index of the last nonzero theta (0 means white noise)</span></span>
+<span id="cb2-347"><a href="" aria-label="347"></a>maQ <span class="op">=</span> d3<span class="op">.</span><span class="fu">max</span>(maCoefs<span class="op">.</span><span class="fu">map</span>((c<span class="op">,</span> i) <span class="kw">=&gt;</span> (c <span class="op">!==</span> <span class="dv">0</span> <span class="op">?</span> i <span class="op">:</span> <span class="dv">0</span>)))</span>
+<span id="cb2-348"><a href="" aria-label="348"></a></span>
+<span id="cb2-349"><a href="" aria-label="349"></a>maPanel <span class="op">=</span> (title<span class="op">,</span> plot) <span class="kw">=&gt;</span> <span class="fu">html</span><span class="vs">`&lt;div&gt;</span></span>
+<span id="cb2-350"><a href="" aria-label="350"></a><span class="vs">  &lt;div style="text-align: center"&gt;</span><span class="sc">${</span>title<span class="sc">}</span><span class="vs">&lt;/div&gt;</span></span>
+<span id="cb2-351"><a href="" aria-label="351"></a><span class="vs">  </span><span class="sc">${</span>plot<span class="sc">}</span></span>
+<span id="cb2-352"><a href="" aria-label="352"></a><span class="vs">&lt;/div&gt;`</span></span>
+<span id="cb2-353"><a href="" aria-label="353"></a></span>
+<span id="cb2-354"><a href="" aria-label="354"></a><span class="fu">html</span><span class="vs">`&lt;div style="display: flex; gap: 20px; justify-content: center; font-size: 19px"&gt;</span></span>
+<span id="cb2-355"><a href="" aria-label="355"></a><span class="sc">${</span><span class="fu">maPanel</span>(<span class="fu">html</span><span class="vs">`One path, Var(&lt;i&gt;y&lt;sub&gt;t&lt;/sub&gt;&lt;/i&gt;) = </span><span class="sc">${</span><span class="fu">maGamma</span>(<span class="dv">0</span>)<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> Plot<span class="op">.</span><span class="fu">plot</span>({</span>
+<span id="cb2-356"><a href="" aria-label="356"></a>  <span class="dt">width</span><span class="op">:</span> <span class="dv">590</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">380</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">50</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
+<span id="cb2-357"><a href="" aria-label="357"></a>  <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"18px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
+<span id="cb2-358"><a href="" aria-label="358"></a>  <span class="dt">x</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"Periods"</span><span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
+<span id="cb2-359"><a href="" aria-label="359"></a>  <span class="dt">y</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="op">-</span><span class="dv">6</span><span class="op">,</span> <span class="dv">6</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> <span class="dv">5</span>}<span class="op">,</span></span>
+<span id="cb2-360"><a href="" aria-label="360"></a>  <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb2-361"><a href="" aria-label="361"></a>  <span class="dt">marks</span><span class="op">:</span> [</span>
+<span id="cb2-362"><a href="" aria-label="362"></a>    Plot<span class="op">.</span><span class="fu">ruleY</span>([<span class="dv">0</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"black"</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"5,4"</span>})<span class="op">,</span></span>
+<span id="cb2-363"><a href="" aria-label="363"></a>    Plot<span class="op">.</span><span class="fu">line</span>(maPath<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"t"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"y"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">1.3</span><span class="op">,</span> <span class="dt">clip</span><span class="op">:</span> <span class="kw">true</span>})</span>
+<span id="cb2-364"><a href="" aria-label="364"></a>  ]</span>
+<span id="cb2-365"><a href="" aria-label="365"></a>}))<span class="sc">}</span></span>
+<span id="cb2-366"><a href="" aria-label="366"></a><span class="sc">${</span><span class="fu">maPanel</span>(<span class="fu">html</span><span class="vs">`Autocorrelation &lt;i&gt;ρ&lt;sub&gt;h&lt;/sub&gt;&lt;/i&gt;, &lt;i&gt;ρ&lt;/i&gt;&lt;sub&gt;1&lt;/sub&gt; = </span><span class="sc">${</span>maACF[<span class="dv">1</span>]<span class="op">.</span><span class="at">rho</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> Plot<span class="op">.</span><span class="fu">plot</span>({</span>
+<span id="cb2-367"><a href="" aria-label="367"></a>  <span class="dt">width</span><span class="op">:</span> <span class="dv">590</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">380</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">50</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
+<span id="cb2-368"><a href="" aria-label="368"></a>  <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"18px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
+<span id="cb2-369"><a href="" aria-label="369"></a>  <span class="dt">x</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"Lag h"</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="op">-</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">12.5</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">0</span><span class="op">,</span> <span class="dv">13</span><span class="op">,</span> <span class="dv">2</span>)<span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
+<span id="cb2-370"><a href="" aria-label="370"></a>  <span class="dt">y</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="op">-</span><span class="dv">1</span><span class="op">,</span> <span class="dv">1</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> <span class="dv">5</span>}<span class="op">,</span></span>
+<span id="cb2-371"><a href="" aria-label="371"></a>  <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb2-372"><a href="" aria-label="372"></a>  <span class="dt">marks</span><span class="op">:</span> [</span>
+<span id="cb2-373"><a href="" aria-label="373"></a>    Plot<span class="op">.</span><span class="fu">ruleY</span>([<span class="dv">0</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"black"</span>})<span class="op">,</span></span>
+<span id="cb2-374"><a href="" aria-label="374"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([maQ <span class="op">+</span> <span class="fl">0.5</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"7,5"</span>})<span class="op">,</span></span>
+<span id="cb2-375"><a href="" aria-label="375"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>(maACF<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"h"</span><span class="op">,</span> <span class="dt">y1</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span> <span class="dt">y2</span><span class="op">:</span> <span class="st">"rho"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">2.5</span>})<span class="op">,</span></span>
+<span id="cb2-376"><a href="" aria-label="376"></a>    Plot<span class="op">.</span><span class="fu">dot</span>(maACF<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"h"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"rho"</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">r</span><span class="op">:</span> <span class="dv">5</span>})<span class="op">,</span></span>
+<span id="cb2-377"><a href="" aria-label="377"></a>    Plot<span class="op">.</span><span class="fu">text</span>([maQ <span class="op">===</span> <span class="dv">0</span> <span class="op">?</span> <span class="st">"white noise: ρ = 0 at every lag h ≥ 1"</span> <span class="op">:</span> <span class="vs">`ρ = 0 at every lag h &gt; q = </span><span class="sc">${</span>maQ<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">20</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})</span>
+<span id="cb2-378"><a href="" aria-label="378"></a>  ]</span>
+<span id="cb2-379"><a href="" aria-label="379"></a>}))<span class="sc">}</span></span>
+<span id="cb2-380"><a href="" aria-label="380"></a><span class="vs">&lt;/div&gt;`</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-6" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-7" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-8" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</div>
+</section></section>
+<section>
+<section id="ar-models" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>AR Models</h1>
+
+</section>
+<section id="the-arp-model" class="slide level2">
+<h2>The AR(p) Model</h2>
+<ul>
+<li>The MA-type dependence might not be suitable for all time series data</li>
+<li>Example: effects of shocks might be long-lasting and never completely die out</li>
+<li>In such cases, we can use <strong>Autoregressive (AR) models</strong></li>
+</ul>
+<div class="fragment">
+<p>An AR(<span class="math inline">\(p\)</span>) process satisfies the following dynamics: <span class="math display">\[
+y_t = \mu + \phi_1 y_{t-1} + \phi_2 y_{t-2} + \dots + \phi_p y_{t-p} + \varepsilon_t
+\]</span></p>
+</div>
+<div class="fragment">
+<p>In lag operator notation:</p>
+<div class="eqfit">
+<p><span class="math display">\[
+y_t = \mu + \sum_{i=1}^{p} \phi_i L^i y_t + \varepsilon_t \implies \left(1 - \sum_{i=1}^{p} \phi_i L^i\right) y_t = \mu + \varepsilon_t \implies \Phi(L) y_t = \mu + \varepsilon_t
+\]</span></p>
+</div>
+<p>where <span class="math inline">\(\Phi(L) \equiv I - \sum_{i=1}^{p} \phi_i L^i\)</span>.</p>
+</div>
+</section>
+<section id="is-the-arp-stationary" class="slide level2">
+<h2>Is the AR(p) Stationary?</h2>
+<ul>
+<li>At this point, we are already good friends with <span class="math inline">\(\Phi(L)\)</span></li>
+<li>This is the same type of polynomial we talked about!</li>
+<li>What are the conditions for the invertibility of <span class="math inline">\(\Phi(L)\)</span>?</li>
+</ul>
+<div class="fragment">
+<ul>
+<li><strong>The roots of <span class="math inline">\(f(x) = 1 - \phi_1 x - \phi_2 x^2 - \dots - \phi_p x^p\)</span> should lie outside the unit circle</strong></li>
+<li>If we can invert <span class="math inline">\(\Phi(L)\)</span>, we already know that <span class="math inline">\(\Phi(L)^{-1}\)</span> has infinitely many terms</li>
+<li>If <span class="math inline">\(\Phi(L)^{-1}\)</span> exists, we can write <span class="math inline">\(y_t = \Phi(L)^{-1}\mu + \Phi(L)^{-1}\varepsilon_t\)</span></li>
+</ul>
+</div>
+<div class="fragment">
+<p>But <span class="math inline">\(\Phi(L)^{-1}\mu\)</span> is just a number. And <span class="math inline">\(\Phi(L)^{-1}\varepsilon_t\)</span> is an MA(<span class="math inline">\(\infty\)</span>) process in past shocks!</p>
+<ul>
+<li><span class="alert">Exercise (problem set): show that this MA(<span class="math inline">\(\infty\)</span>) process is weakly stationary</span></li>
+<li>Roots on the unit circle: no stationary solution (<span class="math inline">\(\phi_1 = 1\)</span> is next). Roots inside: the solution depends on future shocks, which we rule out</li>
+</ul>
+</div>
+</section></section>
+<section>
+<section id="the-ar1-model" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>The AR(1) Model</h1>
+
+</section>
+<section id="ar1-mean-and-variance" class="slide level2">
+<h2>AR(1): Mean and Variance</h2>
+<p>Consider the AR(1) process <span class="math inline">\(y_t = \mu + \phi_1 y_{t-1} + \varepsilon_t\)</span> and assume <span class="math inline">\(|\phi_1|&lt;1\)</span>.</p>
+<ul>
+<li>First: is this guy stationary?</li>
+</ul>
+<div class="fragment">
+<p>Let’s compute its mean: <span class="math display">\[
+\E[y_t] = \mu + \phi_1 \E[y_{t-1}] + \E[\varepsilon_t] = \mu + \phi_1 \E[y_{t-1}]
+\]</span> Since <span class="math inline">\(\E[y_t] = \E[y_{t-1}]\)</span> (why?), we have that <span class="math inline">\(\E[y_t] = \frac{\mu}{1-\phi_1}\)</span>.</p>
+</div>
+<div class="fragment">
+<p>Now, we analyze the variance using a similar trick (why is <span class="math inline">\(\Cov(y_{t-1}, \varepsilon_t) = 0\)</span>?): <span class="math display">\[
+\begin{aligned}
+\Var(y_t) &amp;= \Var(\phi_1 y_{t-1} + \varepsilon_t) = \phi_1^2 \Var(y_{t-1}) + \Var(\varepsilon_t) = \phi_1^2 \Var(y_t) + \sigma^2 \\
+\implies \Var(y_t) &amp;= \frac{\sigma^2}{1-\phi_1^2}
+\end{aligned}
+\]</span></p>
+</div>
+</section>
+<section id="ar1-autocovariances" class="slide level2">
+<h2>AR(1): Autocovariances</h2>
+<ul>
+<li>The first autocovariance is</li>
+</ul>
+<p><span class="math display">\[
+\gamma_1 = \Cov(y_t, y_{t-1}) = \Cov(\mu + \phi_1 y_{t-1} + \varepsilon_t, y_{t-1}) = \phi_1 \Var(y_{t-1}) = \phi_1 \Var(y_t)
+\]</span></p>
+<div class="fragment">
+<ul>
+<li>The second autocovariance is</li>
+</ul>
+<p><span class="math display">\[
+\begin{aligned}
+\gamma_2 = \Cov(y_t, y_{t-2}) &amp;= \Cov(\mu + \phi_1 y_{t-1} + \varepsilon_t, y_{t-2}) \\
+&amp;= \phi_1 \Cov(y_{t-1}, y_{t-2}) = \phi_1 \gamma_1 = \phi_1^2 \Var(y_t)
+\end{aligned}
+\]</span></p>
+</div>
+<div class="fragment">
+<ul>
+<li>A similar argument establishes that, in general, <span class="math inline">\(\gamma_h = \phi_1 \gamma_{h-1} \implies \gamma_h = \phi_1^h \Var(y_t)\)</span></li>
+</ul>
+</div>
+<div class="fragment">
+<p>How is this different from the MA(1) case?</p>
+</div>
+</section>
+<section id="two-ar1-processes-same-shocks" class="slide level2">
+<h2>Two AR(1) Processes, Same Shocks</h2>
+
+<img data-src="lecture04_files/figure-revealjs/cell-2-output-1.svg" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="estimated-vs.-true-autocorrelations" class="slide level2">
+<h2>Estimated vs.&nbsp;True Autocorrelations</h2>
+
+<img data-src="lecture04_files/figure-revealjs/cell-3-output-1.svg" class="quarto-figure quarto-figure-center r-stretch"></section></section>
+<section>
+<section id="unit-roots-a-first-look" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>Unit Roots: A First Look</h1>
+
+</section>
+<section id="what-happens-when-phi_1-1" class="slide level2">
+<h2>What Happens When <span class="math inline">\(\phi_1 = 1\)</span>?</h2>
+
+<img data-src="lecture04_files/figure-revealjs/cell-4-output-1.svg" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="the-random-walk" class="slide level2">
+<h2>The Random Walk</h2>
+<ul>
+<li>With <span class="math inline">\(\phi_1 = 1\)</span> and <span class="math inline">\(\mu = 0\)</span>: <span class="math inline">\(y_t = y_{t-1} + \varepsilon_t = y_0 + \sum_{s=1}^{t} \varepsilon_s\)</span></li>
+<li><span class="math inline">\(\Var(y_t \mid y_0) = t\sigma^2\)</span> grows without bound: not stationary</li>
+<li>The root of <span class="math inline">\(f(x) = 1 - x\)</span> is <span class="math inline">\(x = 1\)</span>: right on the unit circle</li>
+<li>Shocks never die out: <span class="math inline">\(\partial y_t / \partial \varepsilon_s = 1\)</span> for every <span class="math inline">\(s \leq t\)</span></li>
+<li>Much more on unit roots in Lecture 8</li>
+</ul>
+</section></section>
+<section>
+<section id="back-to-the-general-arp" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>Back to the General AR(p)</h1>
+
+</section>
+<section id="the-general-arp-case" class="slide level2 tightmath">
+<h2>The General AR(p) Case</h2>
+<ul>
+<li>Consider the general AR(p) process <span class="math inline">\(y_t = \mu + \sum_{i=1}^{p} \phi_i y_{t-i} + \varepsilon_t\)</span></li>
+<li>Let’s assume it is stationary</li>
+<li>The mean is easy, it follows the same tricks as before: <span class="math inline">\(\E[y_t] = \frac{\mu}{1 - \phi_1 - \phi_2 - \dots - \phi_p}\)</span></li>
+</ul>
+<div class="fragment">
+<p>The variance is more involved: <span class="math display">\[
+\begin{aligned}
+\gamma_0 &amp;= \Cov(y_t, y_t) \\
+&amp;= \Cov(\mu + \phi_1 y_{t-1} + \dots + \phi_p y_{t-p} + \varepsilon_t, y_t) \\
+&amp;= \phi_1 \gamma_1 + \phi_2 \gamma_2 + \dots + \phi_p \gamma_p + \sigma^2
+\end{aligned}
+\]</span></p>
+</div>
+<div class="fragment">
+<p>In general, recalling that <span class="math inline">\(\gamma_h = \gamma_{-h}\)</span>, we get the <strong>Yule–Walker equations</strong>: <span class="math display">\[
+\gamma_h = \phi_1 \gamma_{h-1} + \phi_2 \gamma_{h-2} + \dots + \phi_p \gamma_{h-p}, \qquad h=1,2,3,\dots
+\]</span></p>
+<ul>
+<li>This generates a system of equations that can be solved recursively (a computer will do it)</li>
+<li><span class="alert">Exercise: derive the Yule–Walker equations</span></li>
+</ul>
+</div>
+</section>
+<section id="section-2" class="slide level2 standout" data-background-color="var(--slate)">
+<h2>&nbsp;</h2>
+<div class="standout-body">
+<p>Questions?</p>
+</div>
+</section>
+<section id="section-3" class="slide level2 standout" data-background-color="var(--slate)">
+<h2>&nbsp;</h2>
+<div class="standout-body">
+<p>The End</p>
+</div>
+</section>
+<section id="references" class="slide level2">
+<h2>References</h2>
+<ul>
+<li>Chapter 2 of <em>Time Series Analysis</em>, by James Hamilton, for the lag operator</li>
+<li>Chapter 3 of <em>Time Series Analysis</em>, by James Hamilton, for AR and MA models</li>
+<li>Chapter 14 of <em>Econometrics</em>, by Bruce Hansen</li>
+<li>Rynne, B. P. and M. A. Youngson (2008). <em>Linear Functional Analysis</em>, 2nd edition. Springer</li>
+</ul>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="lecture04_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="lecture04_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="lecture04_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="lecture04_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="lecture04_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="lecture04_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="lecture04_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="lecture04_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="lecture04_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="lecture04_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 4.0e-2,
+
+        // Bounds for smallest/largest possible scale to apply to content
+        minScale: 0.2,
+
+        maxScale: 2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script type="ojs-module-contents">
+    eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6Ii8vIEZvdXIgc2xpZGVycyBpbiBhIDJ4MiBncmlkLiBUaGUgdGhlbWUncyAxOTBweCBsYWJlbCBjb2x1bW4gaXMgdG9vIHdpZGVcbi8vIGZvciB0d28gY29sdW1ucywgc28gZWFjaCBzbGlkZXIgZ2V0cyBhIG5hcnJvdyBsYWJlbCBhbmQgYSBzaG9ydGVyIHRyYWNrLlxudmlld29mIHRoZXRhID0gSW5wdXRzLmZvcm0oXG4gIFstMC44LCAwLjUsIDAuMSwgLTAuMl0ubWFwKCh2LCBpKSA9PlxuICAgIElucHV0cy5yYW5nZShbLTEuNSwgMS41XSwge3ZhbHVlOiB2LCBzdGVwOiAwLjA1LCBsYWJlbDogW1wizrjigoFcIiwgXCLOuOKCglwiLCBcIs644oKDXCIsIFwizrjigoRcIl1baV0sIHdpZHRoOiA0MDB9KSksXG4gIHt0ZW1wbGF0ZTogaW5wdXRzID0+IHtcbiAgICBpbnB1dHMuZm9yRWFjaChmID0+IGYuc3R5bGUuc2V0UHJvcGVydHkoXCItLWxhYmVsLXdpZHRoXCIsIFwiNTBweFwiKSlcbiAgICByZXR1cm4gaHRtbGA8ZGl2IHN0eWxlPVwiZGlzcGxheTogZ3JpZDsgZ3JpZC10ZW1wbGF0ZS1jb2x1bW5zOiBhdXRvIGF1dG87IGp1c3RpZnktY29udGVudDogY2VudGVyOyBjb2x1bW4tZ2FwOiA2MHB4XCI+JHtpbnB1dHN9PC9kaXY+YFxuICB9fVxuKVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0yIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoiLy8gRml4ZWQgc2hvY2tzOiB0aGUgc2xpZGVycyBjaGFuZ2UgdGhlIHRoZXRhcyBvbmx5LCBuZXZlciB0aGUgZHJhd3MuXG4vLyBUaGUgZmlyc3QgNCBzaG9ja3MgYXJlIHByZXNhbXBsZSB2YWx1ZXMuXG5tYVNob2NrcyA9IHtcbiAgY29uc3QgZHJhdyA9IGQzLnJhbmRvbU5vcm1hbC5zb3VyY2UoZDMucmFuZG9tTGNnKDIwMjYpKSgwLCAxKVxuICByZXR1cm4gRmxvYXQ2NEFycmF5LmZyb20oe2xlbmd0aDogMzA0fSwgZHJhdylcbn1cblxuLy8gdGhldGFfMCA9IDEsIHRoZW4gdGhlIGZvdXIgc2xpZGVyIHZhbHVlc1xubWFDb2VmcyA9IFsxLCAuLi50aGV0YV1cblxuLy8geV90ID0gc3VtX2kgdGhldGFfaSBlX3t0LWl9XG5tYVBhdGggPSBkMy5yYW5nZSg0LCBtYVNob2Nrcy5sZW5ndGgpLm1hcCh0ID0+ICh7XG4gIHQ6IHQgLSAzLFxuICB5OiBkMy5zdW0obWFDb2VmcywgKGMsIGkpID0+IGMgKiBtYVNob2Nrc1t0IC0gaV0pXG59KSlcblxuLy8gZ2FtbWFfaCAvIHNpZ21hXjIgPSBzdW1faSB0aGV0YV9pIHRoZXRhX3tpK2h9LCB3aGljaCBpcyB6ZXJvIGZvciBoID4gNFxubWFHYW1tYSA9IGggPT4gZDMuc3VtKG1hQ29lZnMuc2xpY2UoMCwgTWF0aC5tYXgobWFDb2Vmcy5sZW5ndGggLSBoLCAwKSksIChjLCBpKSA9PiBjICogbWFDb2Vmc1tpICsgaF0pXG5tYUFDRiA9IGQzLnJhbmdlKDEzKS5tYXAoaCA9PiAoe2gsIHJobzogbWFHYW1tYShoKSAvIG1hR2FtbWEoMCl9KSlcblxuLy8gcSA9IGluZGV4IG9mIHRoZSBsYXN0IG5vbnplcm8gdGhldGEgKDAgbWVhbnMgd2hpdGUgbm9pc2UpXG5tYVEgPSBkMy5tYXgobWFDb2Vmcy5tYXAoKGMsIGkpID0+IChjICE9PSAwID8gaSA6IDApKSlcblxubWFQYW5lbCA9ICh0aXRsZSwgcGxvdCkgPT4gaHRtbGA8ZGl2PlxuICA8ZGl2IHN0eWxlPVwidGV4dC1hbGlnbjogY2VudGVyXCI+JHt0aXRsZX08L2Rpdj5cbiAgJHtwbG90fVxuPC9kaXY+YFxuXG5odG1sYDxkaXYgc3R5bGU9XCJkaXNwbGF5OiBmbGV4OyBnYXA6IDIwcHg7IGp1c3RpZnktY29udGVudDogY2VudGVyOyBmb250LXNpemU6IDE5cHhcIj5cbiR7bWFQYW5lbChodG1sYE9uZSBwYXRoLCBWYXIoPGk+eTxzdWI+dDwvc3ViPjwvaT4pID0gJHttYUdhbW1hKDApLnRvRml4ZWQoMil9YCwgUGxvdC5wbG90KHtcbiAgd2lkdGg6IDU5MCwgaGVpZ2h0OiAzODAsIG1hcmdpbkxlZnQ6IDUwLCBtYXJnaW5Cb3R0b206IDQ1LFxuICBzdHlsZToge2ZvbnRTaXplOiBcIjE4cHhcIiwgZm9udEZhbWlseTogXCJBcmlhbCwgQXJpbW8sIHNhbnMtc2VyaWZcIn0sXG4gIHg6IHtsYWJlbDogXCJQZXJpb2RzXCIsIGxhYmVsQW5jaG9yOiBcImNlbnRlclwiLCBsYWJlbEFycm93OiBcIm5vbmVcIn0sXG4gIHk6IHtsYWJlbDogbnVsbCwgZG9tYWluOiBbLTYsIDZdLCB0aWNrczogNX0sXG4gIGdyaWQ6IHRydWUsXG4gIG1hcmtzOiBbXG4gICAgUGxvdC5ydWxlWShbMF0sIHtzdHJva2U6IFwiYmxhY2tcIiwgc3Ryb2tlRGFzaGFycmF5OiBcIjUsNFwifSksXG4gICAgUGxvdC5saW5lKG1hUGF0aCwge3g6IFwidFwiLCB5OiBcInlcIiwgc3Ryb2tlOiBcIiMwMDcyQkNcIiwgc3Ryb2tlV2lkdGg6IDEuMywgY2xpcDogdHJ1ZX0pXG4gIF1cbn0pKX1cbiR7bWFQYW5lbChodG1sYEF1dG9jb3JyZWxhdGlvbiA8aT7PgTxzdWI+aDwvc3ViPjwvaT4sIDxpPs+BPC9pPjxzdWI+MTwvc3ViPiA9ICR7bWFBQ0ZbMV0ucmhvLnRvRml4ZWQoMil9YCwgUGxvdC5wbG90KHtcbiAgd2lkdGg6IDU5MCwgaGVpZ2h0OiAzODAsIG1hcmdpbkxlZnQ6IDUwLCBtYXJnaW5Cb3R0b206IDQ1LFxuICBzdHlsZToge2ZvbnRTaXplOiBcIjE4cHhcIiwgZm9udEZhbWlseTogXCJBcmlhbCwgQXJpbW8sIHNhbnMtc2VyaWZcIn0sXG4gIHg6IHtsYWJlbDogXCJMYWcgaFwiLCBkb21haW46IFstMC41LCAxMi41XSwgdGlja3M6IGQzLnJhbmdlKDAsIDEzLCAyKSwgbGFiZWxBbmNob3I6IFwiY2VudGVyXCIsIGxhYmVsQXJyb3c6IFwibm9uZVwifSxcbiAgeToge2xhYmVsOiBudWxsLCBkb21haW46IFstMSwgMV0sIHRpY2tzOiA1fSxcbiAgZ3JpZDogdHJ1ZSxcbiAgbWFya3M6IFtcbiAgICBQbG90LnJ1bGVZKFswXSwge3N0cm9rZTogXCJibGFja1wifSksXG4gICAgUGxvdC5ydWxlWChbbWFRICsgMC41XSwge3N0cm9rZTogXCIjRUI4MTFCXCIsIHN0cm9rZVdpZHRoOiAyLCBzdHJva2VEYXNoYXJyYXk6IFwiNyw1XCJ9KSxcbiAgICBQbG90LnJ1bGVYKG1hQUNGLCB7eDogXCJoXCIsIHkxOiAwLCB5MjogXCJyaG9cIiwgc3Ryb2tlOiBcIiMwMDcyQkNcIiwgc3Ryb2tlV2lkdGg6IDIuNX0pLFxuICAgIFBsb3QuZG90KG1hQUNGLCB7eDogXCJoXCIsIHk6IFwicmhvXCIsIGZpbGw6IFwiIzAwNzJCQ1wiLCByOiA1fSksXG4gICAgUGxvdC50ZXh0KFttYVEgPT09IDAgPyBcIndoaXRlIG5vaXNlOiDPgSA9IDAgYXQgZXZlcnkgbGFnIGgg4omlIDFcIiA6IGDPgSA9IDAgYXQgZXZlcnkgbGFnIGggPiBxID0gJHttYVF9YF0sIHtmcmFtZUFuY2hvcjogXCJ0b3AtcmlnaHRcIiwgZHg6IC0xMCwgZHk6IDEwLCBmaWxsOiBcIiNFQjgxMUJcIiwgZm9udFdlaWdodDogXCJib2xkXCIsIGZvbnRTaXplOiAyMCwgc3Ryb2tlOiBcIndoaXRlXCIsIHN0cm9rZVdpZHRoOiA2fSlcbiAgXVxufSkpfVxuPC9kaXY+YFxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0UXVpZXQiLCJzb3VyY2UiOiJzaGlueUlucHV0KCd0aGV0YScpIn1dfQ==
+    </script>
+    <script type="module">
+    if (window.location.protocol === "file:") { alert("The OJS runtime does not work with file:// URLs. Please use a web server to view this document."); }
+    window._ojs.paths.runtimeToDoc = "../../..";
+    window._ojs.paths.runtimeToRoot = "../../../..";
+    window._ojs.paths.docToRoot = "..";
+    window._ojs.selfContained = false;
+    window._ojs.runtime.interpretFromScriptTags();
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+                // target, if specified
+                link.setAttribute("target", "_blank");
+                if (link.getAttribute("rel") === null) {
+                  link.setAttribute("rel", "noopener");
+                }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
