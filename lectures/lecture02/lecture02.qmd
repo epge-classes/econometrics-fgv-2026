@@ -77,7 +77,7 @@ $$
 \quad\implies\quad
 \hat p \pm 1.96\sqrt{\frac{\hat p(1-\hat p)}{n}}
 $$
-- In our poll, $n = 2{,}000$ and $\hat p =$ `{python} pA_txt`: the "margem de erro" is $\pm$ `{python} moe_txt` p.p.
+- In our simulated poll, $n = 2{,}000$ and $\hat p =$ `{python} pA_txt`, so the interval is $\hat p \pm$ `{python} moe_txt` p.p.
 
 . . .
 
@@ -133,13 +133,15 @@ poll_plot()
 . . .
 
 - We want **one** statement about all 18 shares at once:
+ 
 $$
 P\left\{ p_{s,k} \in \left[\hat p_{s,k} - c\cdot \widehat{se}_{s,k},\ \hat p_{s,k} + c\cdot \widehat{se}_{s,k}\right] \text{ for every } s, k \right\} = 1 - \alpha
 $$
+
 - Same form as on TV: only the multiplier $c$ changes
 - $c = 1.96$ is too small. How large must $c$ be?
 
-## Why This Root?
+## From 18 Intervals to One Statistic
 
 Let $t_{s,k} \equiv (\hat p_{s,k} - p_{s,k})/\widehat{se}_{s,k}$, the usual t-statistic. Then
 $$
@@ -149,44 +151,43 @@ $$
 $$
 
 - So $c$ is the $1-\alpha$ quantile of $R_n$: the whole problem boils down to one number
+- Easy, right?
 
 . . .
 
-- Why divide by $\widehat{se}_{s,k}$? Shares in RS are much noisier than in SP
-- Without it, every interval gets the same width: $\hat p_{s,k} \pm c$
-- Then the noisy RS cells set $c$, and SP gets needlessly wide intervals
-- Studentizing puts all 18 on the same scale: each one gets a fair share of $\alpha$
+- . . . but what is the distribution of $R_n$?
 
 ## What Is the Distribution of $R_n$?
 
-- CLT + delta method: $(t_{s,k})_{s,k} \xrightarrow{d} Z \sim N(0, \Sigma(P))$, so $R_n \xrightarrow{d} \max_{s,k}|Z_{s,k}|$
+- $(t_{s,k})_{s,k} \xrightarrow{d} Z \sim N(0, \Sigma)$: CLT, delta method and Slutsky
+- $R_n \xrightarrow{d} \max_{s,k}|Z_{s,k}|$: continuous mapping theorem, since the max is continuous
 - Across states, the $Z$'s are independent. Within a state, candidates compete for voters:
 $$
 \Corr(Z_{s,j}, Z_{s,k}) = -\sqrt{\frac{p_{s,j}\, p_{s,k}}{(1-p_{s,j})(1-p_{s,k})}}, \qquad j \neq k
 $$
 - The maximum of 18 correlated normals has no closed-form quantile
-- And that quantile depends on the unknown shares $p_{s,k}$
+- And that quantile depends on the _unknown_ shares $p_{s,k}$
 
 . . .
 
 ::: {.thm .takeaway}
 ::: {.thmhead}
-What we really want
+[What we really want]{.underline}
 :::
 The distribution of $R_n$ **at our sample size**, without having to derive its limit.
 :::
 
 ## The Idea in Words
 
-- If we knew $P$, we would simulate many polls from $P$ and compute $R_n$ in each one
-- The $95\%$ quantile of the simulated $R_n$'s would be our $c$. But we don't know $P$...
+- If we knew how everyone votes, we would simulate many polls and compute $R_n$ in each
+- The $95\%$ quantile of the simulated $R_n$'s would be our $c$. But we don't know that...
 
 . . .
 
-- We do know $\hat P_n$: the empirical distribution of our 2,000 respondents
-- **Bootstrap**: simulate polls from $\hat P_n$ instead of $P$
-- Simulating from $\hat P_n$ = drawing 2,000 respondents **with replacement** from our sample
-- Efron (1979): you _pull yourself up by your bootstraps_
+- What we do have: our 2,000 respondents, a miniature of the electorate
+- **Bootstrap**: pretend our sample _is_ the electorate, and simulate polls from it
+- Simulating a poll from the sample = drawing 2,000 respondents **with replacement**
+- [Efron (1979)]{.fgv}: you _pull yourself up by your bootstraps_
 
 . . .
 
@@ -211,7 +212,7 @@ Definition (Root)
 A **root** is any real-valued function $R_n(X^n, \theta(P))$ of the data and of the parameter.
 :::
 
-- The name is due to Beran (1984)
+- The name is due to [Beran (1984)]{.fgv}
 - Examples: $\sqrt n\,(\hat\theta_n - \theta(P))$ and $\sqrt n\,(\hat\theta_n - \theta(P))/\hat\sigma_n$
 - In the poll: $\theta(P)$ stacks the 18 shares, and $R_n = \max_{s,k}|t_{s,k}|$
 
@@ -222,9 +223,10 @@ A **root** is any real-valued function $R_n(X^n, \theta(P))$ of the data and of 
 Definition (Sampling Distribution of the Root)
 :::
 $$
-J_n(x, P) \equiv P\left\{R_n(X^n, \theta(P)) \le x\right\},
-\qquad
-J_n^{-1}(1-\alpha, P) \equiv \inf\left\{x : J_n(x, P) \ge 1-\alpha\right\}
+\begin{aligned}
+J_n(x, P) &\equiv P\left\{R_n(X^n, \theta(P)) \le x\right\}\\
+J_n^{-1}(1-\alpha, P) &\equiv \inf\left\{x : J_n(x, P) \ge 1-\alpha\right\}
+\end{aligned}
 $$
 :::
 
@@ -249,7 +251,6 @@ $$
 $$
 \hat\theta_n - \frac{J_n^{-1}(1-\frac{\alpha}{2}, P)}{\sqrt n} \le \theta \le \hat\theta_n - \frac{J_n^{-1}(\frac{\alpha}{2}, P)}{\sqrt n}
 $$
-- Careful with the flip: the **upper** quantile gives the **lower** endpoint
 - If $J_n$ is symmetric around zero, this is just $\hat\theta_n \pm J_n^{-1}(1-\frac{\alpha}{2}, P)/\sqrt n$
 
 . . .
@@ -274,12 +275,13 @@ Examples:
 
 - $X_i \iid N(\theta, 1)$: $\ \sqrt n\,(\bar X_n - \theta) \sim N(0,1)$, whatever $\theta$ is
 - $X_i \iid N(\mu, \sigma^2)$: $\ \sqrt n\,(\bar X_n - \mu)/S_n \sim t_{n-1}$, whatever $\mu$ and $\sigma$ are
-- Location-scale families, $X_i \sim F[(x - \theta)/\sigma]$ with $F$ known: $\ (\hat\theta_n - \theta)/\hat\sigma_n$
-- Continuous $F$: $\ \sqrt n \sup_x |\hat F_n(x) - F(x)|$ (Kolmogorov–Smirnov)
 
 . . .
 
-- Location-scale needs equivariant $\hat\theta_n$ and $\hat\sigma_n$, like $\bar X_n$ and $S_n$ (L&R Example 18.2.1)
+Not pivots:
+
+- $X_i \iid N(\mu, \sigma^2)$: $\ \sqrt n\,(\bar X_n - \mu) \sim N(0, \sigma^2)$, which depends on $\sigma$
+- $X_i \iid P$, any $P$ with finite variance: the law of $\sqrt n\,(\bar X_n - \mu)/S_n$ depends on $P$
 
 ## Why Pivots Are Great
 
@@ -296,7 +298,25 @@ Examples:
 
 . . .
 
-- [Exercise: show that the location-scale root is a pivot (L&R Problem 18.1)]{.alert}
+- Location-scale model: $X_i = \theta + \sigma\varepsilon_i$, with $\varepsilon_i \iid F$ and $F$ known
+- [Exercise: show that $(\bar X_n - \theta)/S_n$ is a pivot]{.alert} [(L&R Problem 18.1)]{.fgv}
+
+## Not Pivots
+
+Being a pivot is a property of the root **and** of the model $\mathcal{P}$:
+
+- Two normal samples with $\sigma_X \neq \sigma_Y$: the law of Welch's $T$ depends on $\sigma_X/\sigma_Y$
+$$
+T = \frac{(\bar X - \bar Y) - (\mu_X - \mu_Y)}{\sqrt{S_X^2/n_X + S_Y^2/n_Y}}
+$$
+- Proportions: the law of $\sqrt n\,(\hat p - p)/\sqrt{\hat p(1-\hat p)}$ is discrete and depends on $p$
+- Median: $\sqrt n\,(\hat m_n - m) \xrightarrow{d} N(0, 1/4f(m)^2)$: depends on the density at $m$
+- $U(0,\theta)$: $X_{(n)}/\theta$ is a pivot, but $n\,(X_{(n)} - \theta)$ is not: its law scales with $\theta$
+
+. . .
+
+- The TV margin of error is not a pivot: its true coverage swings with $p$ and $n$
+- See [Brown, Cai and DasGupta (2001)]{.fgv} for how erratic it gets
 
 ## Asymptotic Pivots
 
@@ -505,7 +525,7 @@ $$
 
 - Efron's **percentile** interval uses the quantiles of $\hat\theta^*_{n,b}$ directly: no flip!
 - It's popular in software, but it is **not** the interval above
-- [Exercise: when does the percentile interval work? (L&R Problem 18.11)]{.alert}
+- [Exercise: when does the percentile interval work?]{.alert} [(L&R Problem 18.11)]{.fgv}
 
 ## What Is an Observation?
 
@@ -666,7 +686,7 @@ Questions?
 
 ::: {.thm}
 ::: {.thmhead}
-Theorem (L&R 18.3.1)
+Theorem [(L&R 18.3.1)]{.fgv}
 :::
 Let $\mathcal{C}_P$ be a set of sequences $\{P_n\}$ that contains $\{P, P, \dots\}$. Assume that, for every $\{P_n\} \in \mathcal{C}_P$, $J_n(\cdot, P_n)$ converges weakly to the same **continuous** limit $J(\cdot, P)$. If $\{\hat P_n\} \in \mathcal{C}_P$ with probability one, then:
 
@@ -700,7 +720,7 @@ $$
 
 . . .
 
-- For (ii): if $F_n \Rightarrow F$, then $F_n^{-1}(1-\alpha) \to F^{-1}(1-\alpha)$ (L&R Lemma 11.2.1)
+- For (ii): if $F_n \Rightarrow F$, then $F_n^{-1}(1-\alpha) \to F^{-1}(1-\alpha)$ [(L&R Lemma 11.2.1)]{.fgv}
 - This needs $F$ continuous and strictly increasing at $F^{-1}(1-\alpha)$
 - Apply it path by path, with $F_n = J_n(\cdot, \hat P_n(\omega))$ and $F = J(\cdot, P)$ $\implies$ (ii)
 
@@ -717,7 +737,7 @@ $$
 
 . . .
 
-- Bonus: (iii) still holds if (i) and (ii) hold only in probability (L&R Problem 18.3)
+- Bonus: (iii) still holds if (i) and (ii) hold only in probability [(L&R Problem 18.3)]{.fgv}
 - Almost sure: **strongly** consistent bootstrap. In probability: **weakly** consistent
 
 ## Reading the Theorem
@@ -737,7 +757,7 @@ $$
 
 ::: {.thm}
 ::: {.thmhead}
-Theorem (L&R 18.3.3)
+Theorem [(L&R 18.3.3)]{.fgv}
 :::
 Let $F$ have finite, nonzero variance $\sigma^2(F)$ and mean $\theta(F)$. Let $J_n(\cdot, F)$ be the distribution of $R_n = \sqrt n\,(\bar X_n - \theta(F))$ under $F$.
 
@@ -801,14 +821,14 @@ $$
 
 . . .
 
-- In one line: Mallows' metric $d_2(\hat F_n, F) \to 0$ a.s. (Bickel and Freedman, 1981)
-- [Exercise: show that $\theta(F_n) \to \theta(F)$ follows from the other two conditions (L&R 18.5)]{.alert}
+- In one line: Mallows' metric $d_2(\hat F_n, F) \to 0$ a.s. [(Bickel and Freedman, 1981)]{.fgv}
+- [Exercise: show that the condition $\theta(F_n) \to \theta(F)$ is redundant]{.alert} [(L&R Problem 18.5)]{.fgv}
 
 ## Beyond the Mean
 
-- **Studentized mean** (L&R 18.3.4): $\sqrt n\,(\bar X_n - \theta)/\hat\sigma_n$ works too: the bootstrap-t
-- **Multivariate mean** (L&R 18.3.5): $\|\sqrt n\,(\bar X_n - \theta)\|$ works for **any** norm $\|\cdot\|$
-- **Smooth functions** (L&R 18.3.6): $\sqrt n\,[f(\bar X_n) - f(\theta)]$, $f$ differentiable: delta method
+- **Studentized mean** [(L&R 18.3.4)]{.fgv}: $\sqrt n\,(\bar X_n - \theta)/\hat\sigma_n$ works too: the bootstrap-t
+- **Multivariate mean** [(L&R 18.3.5)]{.fgv}: $\|\sqrt n\,(\bar X_n - \theta)\|$ works for **any** norm $\|\cdot\|$
+- **Smooth functions** [(L&R 18.3.6)]{.fgv}: $\sqrt n\,[f(\bar X_n) - f(\theta)]$, $f$ differentiable: delta method
 
 . . .
 
@@ -818,7 +838,7 @@ $$
 
 . . .
 
-- Reading Hansen? He writes these results as $\sqrt n\,(\bar Y^* - \bar Y) \xrightarrow{d^*} N(0, \Sigma)$, same idea
+- Reading [Hansen]{.fgv}? He writes these results as $\sqrt n\,(\bar Y^* - \bar Y) \xrightarrow{d^*} N(0, \Sigma)$, same idea
 
 ## &nbsp; {.standout background-color="var(--slate)"}
 
@@ -886,10 +906,10 @@ plt.tight_layout()
 
 Other failures, all with iid data:
 
-- Infinite variance: for the mean, it works a.s. **iff** $\sigma^2 < \infty$ (Giné and Zinn, 1989)
-- Parameter on the boundary: $\hat\mu_n = \max(\bar X_n, 0)$ when $\mu = 0$ (L&R Problem 18.10)
-- Degenerate smooth functions: $\sqrt n\,(\bar X_n^2 - \mu^2)$ when $\mu = 0$ (L&R Problem 18.17)
-- Superefficient estimators (Hodges): not even the parametric bootstrap works (Beran, 1984)
+- Infinite variance: for the mean, it works a.s. **iff** $\sigma^2 < \infty$ [(Giné and Zinn, 1989)]{.fgv}
+- Parameter on the boundary: $\hat\mu_n = \max(\bar X_n, 0)$ when $\mu = 0$ [(L&R Problem 18.10)]{.fgv}
+- Degenerate smooth functions: $\sqrt n\,(\bar X_n^2 - \mu^2)$ when $\mu = 0$ [(L&R Problem 18.17)]{.fgv}
+- Superefficient estimators (Hodges): not even the parametric bootstrap works [(Beran, 1984)]{.fgv}
 
 ## Handle With Care
 
@@ -898,7 +918,7 @@ Other failures, all with iid data:
 **If it fails**
 
 - $m$-out-of-$n$: resample only $m \ll n$
-- Subsampling (L&R Section 18.7)
+- Subsampling [(L&R Section 18.7)]{.fgv}
 - Find a theorem for **your** root
 - Bootstrap a pivot when you can
 :::
@@ -929,9 +949,10 @@ Questions?
 
 ## References
 
-- Chapter 18 of _Testing Statistical Hypotheses_, by Erich Lehmann and Joseph Romano (Sections 18.1 to 18.3 and Example 18.7.2)
-- Chapter 10 of _Econometrics_, by Bruce Hansen
-- Efron (1979), "Bootstrap Methods: Another Look at the Jackknife", _Annals of Statistics_
-- Bickel and Freedman (1981), "Some Asymptotic Theory for the Bootstrap", _Annals of Statistics_
-- Beran (1984), "Bootstrap Methods in Statistics", _Jahresbericht der Deutschen Mathematiker-Vereinigung_
-- Giné and Zinn (1989), "Necessary Conditions for the Bootstrap of the Mean", _Annals of Statistics_
+- Chapter 18 of _Testing Statistical Hypotheses_, by [Erich Lehmann and Joseph Romano]{.fgv} (Sections 18.1 to 18.3 and Example 18.7.2)
+- Chapter 10 of _Econometrics_, by [Bruce Hansen]{.fgv}
+- [Efron (1979)]{.fgv}, "Bootstrap Methods: Another Look at the Jackknife", _Annals of Statistics_
+- [Bickel and Freedman (1981)]{.fgv}, "Some Asymptotic Theory for the Bootstrap", _Annals of Statistics_
+- [Beran (1984)]{.fgv}, "Bootstrap Methods in Statistics", _Jahresbericht der Deutschen Mathematiker-Vereinigung_
+- [Giné and Zinn (1989)]{.fgv}, "Necessary Conditions for the Bootstrap of the Mean", _Annals of Statistics_
+- [Brown, Cai and DasGupta (2001)]{.fgv}, "Interval Estimation for a Binomial Proportion", _Statistical Science_

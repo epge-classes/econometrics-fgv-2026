@@ -278,7 +278,7 @@ $$
 \quad\implies\quad
 \hat p \pm 1.96\sqrt{\frac{\hat p(1-\hat p)}{n}}
 \]</span></li>
-<li>In our poll, <span class="math inline">\(n = 2{,}000\)</span> and <span class="math inline">\(\hat p =\)</span> 37.8%: the “margem de erro” is <span class="math inline">\(\pm\)</span> 2.1 p.p.</li>
+<li>In our simulated poll, <span class="math inline">\(n = 2{,}000\)</span> and <span class="math inline">\(\hat p =\)</span> 37.8%, so the interval is <span class="math inline">\(\hat p \pm\)</span> 2.1 p.p.</li>
 </ul>
 </div>
 <div class="fragment">
@@ -308,16 +308,19 @@ $$
 </ul>
 <div class="fragment">
 <ul>
-<li>We want <strong>one</strong> statement about all 18 shares at once: <span class="math display">\[
+<li>We want <strong>one</strong> statement about all 18 shares at once:</li>
+</ul>
+<p><span class="math display">\[
 P\left\{ p_{s,k} \in \left[\hat p_{s,k} - c\cdot \widehat{se}_{s,k},\ \hat p_{s,k} + c\cdot \widehat{se}_{s,k}\right] \text{ for every } s, k \right\} = 1 - \alpha
-\]</span></li>
+\]</span></p>
+<ul>
 <li>Same form as on TV: only the multiplier <span class="math inline">\(c\)</span> changes</li>
 <li><span class="math inline">\(c = 1.96\)</span> is too small. How large must <span class="math inline">\(c\)</span> be?</li>
 </ul>
 </div>
 </section>
-<section id="why-this-root" class="slide level2">
-<h2>Why This Root?</h2>
+<section id="from-18-intervals-to-one-statistic" class="slide level2">
+<h2>From 18 Intervals to One Statistic</h2>
 <p>Let <span class="math inline">\(t_{s,k} \equiv (\hat p_{s,k} - p_{s,k})/\widehat{se}_{s,k}\)</span>, the usual t-statistic. Then <span class="math display">\[
 \text{all 18 intervals cover}
 \iff |t_{s,k}| \le c \ \text{ for every } s,k
@@ -325,30 +328,29 @@ P\left\{ p_{s,k} \in \left[\hat p_{s,k} - c\cdot \widehat{se}_{s,k},\ \hat p_{s,
 \]</span></p>
 <ul>
 <li>So <span class="math inline">\(c\)</span> is the <span class="math inline">\(1-\alpha\)</span> quantile of <span class="math inline">\(R_n\)</span>: the whole problem boils down to one number</li>
+<li>Easy, right?</li>
 </ul>
 <div class="fragment">
 <ul>
-<li>Why divide by <span class="math inline">\(\widehat{se}_{s,k}\)</span>? Shares in RS are much noisier than in SP</li>
-<li>Without it, every interval gets the same width: <span class="math inline">\(\hat p_{s,k} \pm c\)</span></li>
-<li>Then the noisy RS cells set <span class="math inline">\(c\)</span>, and SP gets needlessly wide intervals</li>
-<li>Studentizing puts all 18 on the same scale: each one gets a fair share of <span class="math inline">\(\alpha\)</span></li>
+<li>. . . but what is the distribution of <span class="math inline">\(R_n\)</span>?</li>
 </ul>
 </div>
 </section>
 <section id="what-is-the-distribution-of-r_n" class="slide level2">
 <h2>What Is the Distribution of <span class="math inline">\(R_n\)</span>?</h2>
 <ul>
-<li>CLT + delta method: <span class="math inline">\((t_{s,k})_{s,k} \xrightarrow{d} Z \sim N(0, \Sigma(P))\)</span>, so <span class="math inline">\(R_n \xrightarrow{d} \max_{s,k}|Z_{s,k}|\)</span></li>
+<li><span class="math inline">\((t_{s,k})_{s,k} \xrightarrow{d} Z \sim N(0, \Sigma)\)</span>: CLT, delta method and Slutsky</li>
+<li><span class="math inline">\(R_n \xrightarrow{d} \max_{s,k}|Z_{s,k}|\)</span>: continuous mapping theorem, since the max is continuous</li>
 <li>Across states, the <span class="math inline">\(Z\)</span>’s are independent. Within a state, candidates compete for voters: <span class="math display">\[
 \Corr(Z_{s,j}, Z_{s,k}) = -\sqrt{\frac{p_{s,j}\, p_{s,k}}{(1-p_{s,j})(1-p_{s,k})}}, \qquad j \neq k
 \]</span></li>
 <li>The maximum of 18 correlated normals has no closed-form quantile</li>
-<li>And that quantile depends on the unknown shares <span class="math inline">\(p_{s,k}\)</span></li>
+<li>And that quantile depends on the <em>unknown</em> shares <span class="math inline">\(p_{s,k}\)</span></li>
 </ul>
 <div class="fragment">
 <div class="thm takeaway">
 <div class="thmhead">
-<p>What we really want</p>
+<p><u>What we really want</u></p>
 </div>
 <p>The distribution of <span class="math inline">\(R_n\)</span> <strong>at our sample size</strong>, without having to derive its limit.</p>
 </div>
@@ -357,15 +359,15 @@ P\left\{ p_{s,k} \in \left[\hat p_{s,k} - c\cdot \widehat{se}_{s,k},\ \hat p_{s,
 <section id="the-idea-in-words" class="slide level2">
 <h2>The Idea in Words</h2>
 <ul>
-<li>If we knew <span class="math inline">\(P\)</span>, we would simulate many polls from <span class="math inline">\(P\)</span> and compute <span class="math inline">\(R_n\)</span> in each one</li>
-<li>The <span class="math inline">\(95\%\)</span> quantile of the simulated <span class="math inline">\(R_n\)</span>’s would be our <span class="math inline">\(c\)</span>. But we don’t know <span class="math inline">\(P\)</span>…</li>
+<li>If we knew how everyone votes, we would simulate many polls and compute <span class="math inline">\(R_n\)</span> in each</li>
+<li>The <span class="math inline">\(95\%\)</span> quantile of the simulated <span class="math inline">\(R_n\)</span>’s would be our <span class="math inline">\(c\)</span>. But we don’t know that…</li>
 </ul>
 <div class="fragment">
 <ul>
-<li>We do know <span class="math inline">\(\hat P_n\)</span>: the empirical distribution of our 2,000 respondents</li>
-<li><strong>Bootstrap</strong>: simulate polls from <span class="math inline">\(\hat P_n\)</span> instead of <span class="math inline">\(P\)</span></li>
-<li>Simulating from <span class="math inline">\(\hat P_n\)</span> = drawing 2,000 respondents <strong>with replacement</strong> from our sample</li>
-<li>Efron (1979): you <em>pull yourself up by your bootstraps</em></li>
+<li>What we do have: our 2,000 respondents, a miniature of the electorate</li>
+<li><strong>Bootstrap</strong>: pretend our sample <em>is</em> the electorate, and simulate polls from it</li>
+<li>Simulating a poll from the sample = drawing 2,000 respondents <strong>with replacement</strong></li>
+<li><span class="fgv">Efron (1979)</span>: you <em>pull yourself up by your bootstraps</em></li>
 </ul>
 </div>
 <div class="fragment">
@@ -396,7 +398,7 @@ P\left\{ p_{s,k} \in \left[\hat p_{s,k} - c\cdot \widehat{se}_{s,k},\ \hat p_{s,
 <p>A <strong>root</strong> is any real-valued function <span class="math inline">\(R_n(X^n, \theta(P))\)</span> of the data and of the parameter.</p>
 </div>
 <ul>
-<li>The name is due to Beran (1984)</li>
+<li>The name is due to <span class="fgv">Beran (1984)</span></li>
 <li>Examples: <span class="math inline">\(\sqrt n\,(\hat\theta_n - \theta(P))\)</span> and <span class="math inline">\(\sqrt n\,(\hat\theta_n - \theta(P))/\hat\sigma_n\)</span></li>
 <li>In the poll: <span class="math inline">\(\theta(P)\)</span> stacks the 18 shares, and <span class="math inline">\(R_n = \max_{s,k}|t_{s,k}|\)</span></li>
 </ul>
@@ -409,9 +411,10 @@ P\left\{ p_{s,k} \in \left[\hat p_{s,k} - c\cdot \widehat{se}_{s,k},\ \hat p_{s,
 <p>Definition (Sampling Distribution of the Root)</p>
 </div>
 <p><span class="math display">\[
-J_n(x, P) \equiv P\left\{R_n(X^n, \theta(P)) \le x\right\},
-\qquad
-J_n^{-1}(1-\alpha, P) \equiv \inf\left\{x : J_n(x, P) \ge 1-\alpha\right\}
+\begin{aligned}
+J_n(x, P) &amp;\equiv P\left\{R_n(X^n, \theta(P)) \le x\right\}\\
+J_n^{-1}(1-\alpha, P) &amp;\equiv \inf\left\{x : J_n(x, P) \ge 1-\alpha\right\}
+\end{aligned}
 \]</span></p>
 </div>
 <ul>
@@ -436,7 +439,6 @@ J_n^{-1}(\tfrac{\alpha}{2}, P) \le \sqrt n\,(\hat\theta_n - \theta) \le J_n^{-1}
 <li>Solve for <span class="math inline">\(\theta\)</span>: <span class="math display">\[
 \hat\theta_n - \frac{J_n^{-1}(1-\frac{\alpha}{2}, P)}{\sqrt n} \le \theta \le \hat\theta_n - \frac{J_n^{-1}(\frac{\alpha}{2}, P)}{\sqrt n}
 \]</span></li>
-<li>Careful with the flip: the <strong>upper</strong> quantile gives the <strong>lower</strong> endpoint</li>
 <li>If <span class="math inline">\(J_n\)</span> is symmetric around zero, this is just <span class="math inline">\(\hat\theta_n \pm J_n^{-1}(1-\frac{\alpha}{2}, P)/\sqrt n\)</span></li>
 </ul>
 <div class="fragment">
@@ -460,12 +462,12 @@ J_n^{-1}(\tfrac{\alpha}{2}, P) \le \sqrt n\,(\hat\theta_n - \theta) \le J_n^{-1}
 <ul>
 <li><span class="math inline">\(X_i \iid N(\theta, 1)\)</span>: <span class="math inline">\(\ \sqrt n\,(\bar X_n - \theta) \sim N(0,1)\)</span>, whatever <span class="math inline">\(\theta\)</span> is</li>
 <li><span class="math inline">\(X_i \iid N(\mu, \sigma^2)\)</span>: <span class="math inline">\(\ \sqrt n\,(\bar X_n - \mu)/S_n \sim t_{n-1}\)</span>, whatever <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> are</li>
-<li>Location-scale families, <span class="math inline">\(X_i \sim F[(x - \theta)/\sigma]\)</span> with <span class="math inline">\(F\)</span> known: <span class="math inline">\(\ (\hat\theta_n - \theta)/\hat\sigma_n\)</span></li>
-<li>Continuous <span class="math inline">\(F\)</span>: <span class="math inline">\(\ \sqrt n \sup_x |\hat F_n(x) - F(x)|\)</span> (Kolmogorov–Smirnov)</li>
 </ul>
 <div class="fragment">
+<p>Not pivots:</p>
 <ul>
-<li>Location-scale needs equivariant <span class="math inline">\(\hat\theta_n\)</span> and <span class="math inline">\(\hat\sigma_n\)</span>, like <span class="math inline">\(\bar X_n\)</span> and <span class="math inline">\(S_n\)</span> (L&amp;R Example 18.2.1)</li>
+<li><span class="math inline">\(X_i \iid N(\mu, \sigma^2)\)</span>: <span class="math inline">\(\ \sqrt n\,(\bar X_n - \mu) \sim N(0, \sigma^2)\)</span>, which depends on <span class="math inline">\(\sigma\)</span></li>
+<li><span class="math inline">\(X_i \iid P\)</span>, any <span class="math inline">\(P\)</span> with finite variance: the law of <span class="math inline">\(\sqrt n\,(\bar X_n - \mu)/S_n\)</span> depends on <span class="math inline">\(P\)</span></li>
 </ul>
 </div>
 </section>
@@ -486,7 +488,26 @@ J_n^{-1}(\tfrac{\alpha}{2}, P) \le \sqrt n\,(\hat\theta_n - \theta) \le J_n^{-1}
 </div>
 <div class="fragment">
 <ul>
-<li><span class="alert">Exercise: show that the location-scale root is a pivot (L&amp;R Problem 18.1)</span></li>
+<li>Location-scale model: <span class="math inline">\(X_i = \theta + \sigma\varepsilon_i\)</span>, with <span class="math inline">\(\varepsilon_i \iid F\)</span> and <span class="math inline">\(F\)</span> known</li>
+<li><span class="alert">Exercise: show that <span class="math inline">\((\bar X_n - \theta)/S_n\)</span> is a pivot</span> <span class="fgv">(L&amp;R Problem 18.1)</span></li>
+</ul>
+</div>
+</section>
+<section id="not-pivots" class="slide level2">
+<h2>Not Pivots</h2>
+<p>Being a pivot is a property of the root <strong>and</strong> of the model <span class="math inline">\(\mathcal{P}\)</span>:</p>
+<ul>
+<li>Two normal samples with <span class="math inline">\(\sigma_X \neq \sigma_Y\)</span>: the law of Welch’s <span class="math inline">\(T\)</span> depends on <span class="math inline">\(\sigma_X/\sigma_Y\)</span> <span class="math display">\[
+T = \frac{(\bar X - \bar Y) - (\mu_X - \mu_Y)}{\sqrt{S_X^2/n_X + S_Y^2/n_Y}}
+\]</span></li>
+<li>Proportions: the law of <span class="math inline">\(\sqrt n\,(\hat p - p)/\sqrt{\hat p(1-\hat p)}\)</span> is discrete and depends on <span class="math inline">\(p\)</span></li>
+<li>Median: <span class="math inline">\(\sqrt n\,(\hat m_n - m) \xrightarrow{d} N(0, 1/4f(m)^2)\)</span>: depends on the density at <span class="math inline">\(m\)</span></li>
+<li><span class="math inline">\(U(0,\theta)\)</span>: <span class="math inline">\(X_{(n)}/\theta\)</span> is a pivot, but <span class="math inline">\(n\,(X_{(n)} - \theta)\)</span> is not: its law scales with <span class="math inline">\(\theta\)</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>The TV margin of error is not a pivot: its true coverage swings with <span class="math inline">\(p\)</span> and <span class="math inline">\(n\)</span></li>
+<li>See <span class="fgv">Brown, Cai and DasGupta (2001)</span> for how erratic it gets</li>
 </ul>
 </div>
 </section>
@@ -668,7 +689,7 @@ C_n^{*} = \left\{\theta \in \Theta : J_n^{-1}(\tfrac{\alpha}{2}, \hat P_n) \le R
 <section id="in-code" class="slide level2">
 <h2>In Code</h2>
 <p><code>S[i]</code> is the state (0 to 5) and <code>V[i]</code> the vote (0 = A, 1 = B, 2 = C, 3 = other) of respondent <code>i</code></p>
-<div id="e7396b96" class="cell" data-execution_count="4">
+<div id="07b155ad" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="" aria-label="1"></a><span class="kw">def</span> shares(S, V):                     <span class="co"># 6 x 3 array with p_hat[s, k]</span></span>
 <span id="cb1-2"><a href="" aria-label="2"></a>    <span class="cf">return</span> np.array([[np.mean(V[S <span class="op">==</span> s] <span class="op">==</span> k) <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>)] <span class="cf">for</span> s <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">6</span>)])</span>
 <span id="cb1-3"><a href="" aria-label="3"></a></span>
@@ -701,7 +722,7 @@ C_n^{*} = \left\{\theta \in \Theta : J_n^{-1}(\tfrac{\alpha}{2}, \hat P_n) \le R
 <ul>
 <li>Efron’s <strong>percentile</strong> interval uses the quantiles of <span class="math inline">\(\hat\theta^*_{n,b}\)</span> directly: no flip!</li>
 <li>It’s popular in software, but it is <strong>not</strong> the interval above</li>
-<li><span class="alert">Exercise: when does the percentile interval work? (L&amp;R Problem 18.11)</span></li>
+<li><span class="alert">Exercise: when does the percentile interval work?</span> <span class="fgv">(L&amp;R Problem 18.11)</span></li>
 </ul>
 </div>
 </section>
@@ -732,24 +753,24 @@ C_n^{*} = \left\{\theta \in \Theta : J_n^{-1}(\tfrac{\alpha}{2}, \hat P_n) \le R
 <section id="play-with-n-and-b" class="slide level2">
 <h2>Play With <span class="math inline">\(n\)</span> and <span class="math inline">\(B\)</span></h2>
 <p>Bars: <span class="math inline">\(B\)</span> bootstrap draws from <strong>one</strong> poll. Curve: the true <span class="math inline">\(J_n\)</span> (40,000 polls from <span class="math inline">\(P\)</span>)</p>
-<div id="38ba42ff" class="cell" data-execution_count="6">
+<div id="6250e61a" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <script type="ojs-define">{"contents": [{"name": "poll_probs", "value": [0.1406, 0.1221, 0.0629, 0.044399999999999995, 0.061200000000000004, 0.0702, 0.027, 0.021599999999999998, 0.05600000000000001, 0.049, 0.019600000000000003, 0.015400000000000002, 0.0396, 0.05039999999999999, 0.016800000000000002, 0.0132, 0.03705, 0.0323, 0.0152, 0.010450000000000001, 0.033249999999999995, 0.03515, 0.01615, 0.010450000000000001]}, {"name": "poll_truth", "value": {"1000": {"dens": [0.06749999999999995, 0.09950000000000013, 0.16599999999999987, 0.25650000000000034, 0.3757499999999997, 0.48174999999999957, 0.6157499999999995, 0.6917500000000009, 0.724250000000001, 0.7762499999999992, 0.7592499999999993, 0.6974999999999993, 0.6937500000000024, 0.5892499999999968, 0.5162500000000019, 0.43324999999999964, 0.38624999999999965, 0.3085000000000011, 0.26649999999999857, 0.2015000000000007, 0.16199999999999987, 0.1349999999999999, 0.1132499999999999, 0.09574999999999992, 0.07075000000000024, 0.05974999999999994, 0.04699999999999996, 0.039749999999999966, 0.03174999999999997, 0.023000000000000083, 0.017500000000000064, 0.017749999999999905, 0.013999999999999926, 0.015500000000000054, 0.007750000000000027, 0.006250000000000022, 0.005999999999999968, 0.004999999999999974, 0.004250000000000015, 0.004250000000000015, 0.003249999999999983, 0.002250000000000008, 0.0017500000000000063, 0.001499999999999992, 0.008000000000000028], "c": 3.2846592923264764, "cov196": 0.3937}, "2000": {"dens": [0.08224999999999993, 0.10200000000000013, 0.17374999999999985, 0.28050000000000036, 0.40949999999999964, 0.5344999999999995, 0.6247499999999995, 0.7062500000000009, 0.778500000000001, 0.8034999999999993, 0.7449999999999993, 0.7547499999999994, 0.6712500000000023, 0.5899999999999969, 0.5277500000000019, 0.4414999999999996, 0.3657499999999997, 0.3042500000000011, 0.24124999999999872, 0.18875000000000067, 0.14749999999999985, 0.11999999999999988, 0.09999999999999991, 0.06699999999999995, 0.050500000000000184, 0.050999999999999955, 0.03499999999999997, 0.02224999999999998, 0.02124999999999998, 0.01400000000000005, 0.010000000000000035, 0.008249999999999955, 0.006499999999999966, 0.0052500000000000185, 0.004500000000000016, 0.0030000000000000105, 0.002249999999999988, 0.0004999999999999973, 0.0015000000000000052, 0.0007500000000000026, 0.0004999999999999973, 0.00025000000000000087, 0.00025000000000000087, 0.0, 0.002250000000000008], "c": 3.123217743364043, "cov196": 0.418225}, "5000": {"dens": [0.08124999999999993, 0.10450000000000013, 0.18699999999999983, 0.28875000000000034, 0.41649999999999965, 0.5554999999999995, 0.6509999999999995, 0.755750000000001, 0.7870000000000011, 0.8437499999999992, 0.7919999999999993, 0.7344999999999994, 0.7135000000000026, 0.6014999999999968, 0.5135000000000018, 0.42649999999999966, 0.3414999999999997, 0.280500000000001, 0.23049999999999876, 0.17500000000000063, 0.1297499999999999, 0.10549999999999991, 0.07674999999999993, 0.052249999999999956, 0.04000000000000014, 0.032749999999999974, 0.028499999999999977, 0.015999999999999986, 0.01174999999999999, 0.009500000000000034, 0.0052500000000000185, 0.0034999999999999814, 0.003249999999999983, 0.002000000000000007, 0.0010000000000000035, 0.0007500000000000026, 0.000749999999999996, 0.0, 0.00025000000000000087, 0.00025000000000000087, 0.0, 0.00025000000000000087, 0.0, 0.0, 0.0], "c": 3.0154682878834773, "cov196": 0.433025}, "10000": {"dens": [0.08449999999999992, 0.09375000000000012, 0.19074999999999984, 0.27950000000000036, 0.42299999999999965, 0.5529999999999995, 0.6777499999999994, 0.771000000000001, 0.7915000000000011, 0.8137499999999993, 0.8019999999999993, 0.7512499999999994, 0.6967500000000024, 0.6027499999999968, 0.5092500000000019, 0.41999999999999965, 0.3592499999999997, 0.27425000000000094, 0.23499999999999874, 0.17075000000000062, 0.1324999999999999, 0.0969999999999999, 0.07549999999999993, 0.05524999999999995, 0.042750000000000156, 0.028749999999999977, 0.018749999999999982, 0.015749999999999986, 0.01149999999999999, 0.005750000000000021, 0.00550000000000002, 0.002999999999999984, 0.003249999999999983, 0.002250000000000008, 0.0012500000000000044, 0.00025000000000000087, 0.000749999999999996, 0.00024999999999999865, 0.00025000000000000087, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "c": 3.0000174613178516, "cov196": 0.435575}, "20000": {"dens": [0.07999999999999993, 0.10800000000000014, 0.17449999999999985, 0.27550000000000036, 0.43199999999999966, 0.5399999999999996, 0.6614999999999994, 0.768750000000001, 0.8330000000000011, 0.8164999999999992, 0.8442499999999993, 0.7654999999999994, 0.6705000000000023, 0.6034999999999968, 0.5222500000000018, 0.43349999999999966, 0.3502499999999997, 0.27450000000000097, 0.21324999999999886, 0.1657500000000006, 0.1252499999999999, 0.09499999999999992, 0.06924999999999994, 0.04749999999999996, 0.04050000000000014, 0.02699999999999998, 0.020249999999999983, 0.01199999999999999, 0.009499999999999991, 0.006500000000000023, 0.0052500000000000185, 0.0027499999999999855, 0.002499999999999987, 0.0015000000000000052, 0.0005000000000000017, 0.0005000000000000017, 0.0004999999999999973, 0.0004999999999999973, 0.0, 0.00025000000000000087, 0.0, 0.0, 0.0, 0.0, 0.0], "c": 2.9774919661906765, "cov196": 0.4351}}}, {"name": "poll_edges", "value": [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7000000000000002, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4000000000000004, 2.5, 2.6, 2.7, 2.8, 2.9000000000000004, 3.0, 3.1, 3.2, 3.3000000000000003, 3.4000000000000004, 3.5, 3.6, 3.7, 3.8000000000000003, 3.9000000000000004, 4.0, 4.1, 4.2, 4.300000000000001, 4.4, 4.5, 4.6, 4.7, 4.800000000000001, 4.9, 5.0, 5.1000000000000005, 5.2, 5.3, 5.4, 5.5]}, {"name": "poll_c_limit", "value": 2.9736550120861516}]}</script>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb2" data-startfrom="567" data-source-offset="0"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 566;"><span id="cb2-567"><a href="" aria-label="567"></a>viewof demo <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">form</span>({</span>
-<span id="cb2-568"><a href="" aria-label="568"></a>  <span class="dt">n</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">radio</span>([<span class="dv">1000</span><span class="op">,</span> <span class="dv">2000</span><span class="op">,</span> <span class="dv">5000</span><span class="op">,</span> <span class="dv">10000</span><span class="op">,</span> <span class="dv">20000</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">1000</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Poll size n"</span><span class="op">,</span> <span class="dt">format</span><span class="op">:</span> d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="fu">toLocaleString</span>(<span class="st">"en-US"</span>)})<span class="op">,</span></span>
-<span id="cb2-569"><a href="" aria-label="569"></a>  <span class="dt">B</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="dv">50</span><span class="op">,</span> <span class="dv">10000</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">200</span><span class="op">,</span> <span class="dt">step</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">transform</span><span class="op">:</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">log</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Bootstrap draws B"</span>})<span class="op">,</span></span>
-<span id="cb2-570"><a href="" aria-label="570"></a>  <span class="dt">poll</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">button</span>(<span class="st">"Draw a new poll"</span><span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">reduce</span><span class="op">:</span> v <span class="kw">=&gt;</span> v <span class="op">+</span> <span class="dv">1</span>})</span>
-<span id="cb2-571"><a href="" aria-label="571"></a>}<span class="op">,</span> {<span class="dt">template</span><span class="op">:</span> ({n<span class="op">,</span> B<span class="op">,</span> poll}) <span class="kw">=&gt;</span> {</span>
-<span id="cb2-572"><a href="" aria-label="572"></a>  n<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="fu">setProperty</span>(<span class="st">"--input-width"</span><span class="op">,</span> <span class="st">"560px"</span>)</span>
-<span id="cb2-573"><a href="" aria-label="573"></a>  n<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">maxWidth</span> <span class="op">=</span> <span class="st">"none"</span></span>
-<span id="cb2-574"><a href="" aria-label="574"></a>  B<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="fu">setProperty</span>(<span class="st">"--input-width"</span><span class="op">,</span> <span class="st">"300px"</span>)</span>
-<span id="cb2-575"><a href="" aria-label="575"></a>  <span class="cf">return</span> <span class="fu">html</span><span class="vs">`&lt;div style="display: flex; flex-direction: column; align-items: center"&gt;</span></span>
-<span id="cb2-576"><a href="" aria-label="576"></a><span class="vs">    </span><span class="sc">${</span>n<span class="sc">}</span><span class="vs">&lt;div style="display: flex; align-items: center; column-gap: 30px"&gt;</span><span class="sc">${</span>B<span class="sc">}${</span>poll<span class="sc">}</span><span class="vs">&lt;/div&gt;</span></span>
-<span id="cb2-577"><a href="" aria-label="577"></a><span class="vs">  &lt;/div&gt;`</span></span>
-<span id="cb2-578"><a href="" aria-label="578"></a>}})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb2" data-startfrom="587" data-source-offset="0"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 586;"><span id="cb2-587"><a href="" aria-label="587"></a>viewof demo <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">form</span>({</span>
+<span id="cb2-588"><a href="" aria-label="588"></a>  <span class="dt">n</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">radio</span>([<span class="dv">1000</span><span class="op">,</span> <span class="dv">2000</span><span class="op">,</span> <span class="dv">5000</span><span class="op">,</span> <span class="dv">10000</span><span class="op">,</span> <span class="dv">20000</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">1000</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Poll size n"</span><span class="op">,</span> <span class="dt">format</span><span class="op">:</span> d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="fu">toLocaleString</span>(<span class="st">"en-US"</span>)})<span class="op">,</span></span>
+<span id="cb2-589"><a href="" aria-label="589"></a>  <span class="dt">B</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="dv">50</span><span class="op">,</span> <span class="dv">10000</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">200</span><span class="op">,</span> <span class="dt">step</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">transform</span><span class="op">:</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">log</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Bootstrap draws B"</span>})<span class="op">,</span></span>
+<span id="cb2-590"><a href="" aria-label="590"></a>  <span class="dt">poll</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">button</span>(<span class="st">"Draw a new poll"</span><span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">reduce</span><span class="op">:</span> v <span class="kw">=&gt;</span> v <span class="op">+</span> <span class="dv">1</span>})</span>
+<span id="cb2-591"><a href="" aria-label="591"></a>}<span class="op">,</span> {<span class="dt">template</span><span class="op">:</span> ({n<span class="op">,</span> B<span class="op">,</span> poll}) <span class="kw">=&gt;</span> {</span>
+<span id="cb2-592"><a href="" aria-label="592"></a>  n<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="fu">setProperty</span>(<span class="st">"--input-width"</span><span class="op">,</span> <span class="st">"560px"</span>)</span>
+<span id="cb2-593"><a href="" aria-label="593"></a>  n<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">maxWidth</span> <span class="op">=</span> <span class="st">"none"</span></span>
+<span id="cb2-594"><a href="" aria-label="594"></a>  B<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="fu">setProperty</span>(<span class="st">"--input-width"</span><span class="op">,</span> <span class="st">"300px"</span>)</span>
+<span id="cb2-595"><a href="" aria-label="595"></a>  <span class="cf">return</span> <span class="fu">html</span><span class="vs">`&lt;div style="display: flex; flex-direction: column; align-items: center"&gt;</span></span>
+<span id="cb2-596"><a href="" aria-label="596"></a><span class="vs">    </span><span class="sc">${</span>n<span class="sc">}</span><span class="vs">&lt;div style="display: flex; align-items: center; column-gap: 30px"&gt;</span><span class="sc">${</span>B<span class="sc">}${</span>poll<span class="sc">}</span><span class="vs">&lt;/div&gt;</span></span>
+<span id="cb2-597"><a href="" aria-label="597"></a><span class="vs">  &lt;/div&gt;`</span></span>
+<span id="cb2-598"><a href="" aria-label="598"></a>}})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div id="ojs-cell-1" data-nodetype="declaration">
 
@@ -757,75 +778,75 @@ C_n^{*} = \left\{\theta \in \Theta : J_n^{-1}(\tfrac{\alpha}{2}, \hat P_n) \le R
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb3" data-startfrom="586" data-source-offset="-158"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 585;"><span id="cb3-586"><a href="" aria-label="586"></a><span class="kw">function</span> <span class="fu">rmultinom</span>(n<span class="op">,</span> pr<span class="op">,</span> binom) {</span>
-<span id="cb3-587"><a href="" aria-label="587"></a>  <span class="kw">const</span> out <span class="op">=</span> <span class="kw">new</span> <span class="bu">Array</span>(pr<span class="op">.</span><span class="at">length</span>)<span class="op">.</span><span class="fu">fill</span>(<span class="dv">0</span>)</span>
-<span id="cb3-588"><a href="" aria-label="588"></a>  <span class="kw">let</span> left <span class="op">=</span> n<span class="op">,</span> mass <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb3-589"><a href="" aria-label="589"></a>  <span class="cf">for</span> (<span class="kw">let</span> j <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> j <span class="op">&lt;</span> pr<span class="op">.</span><span class="at">length</span> <span class="op">-</span> <span class="dv">1</span> <span class="op">&amp;&amp;</span> left <span class="op">&gt;</span> <span class="dv">0</span><span class="op">;</span> j<span class="op">++</span>) {</span>
-<span id="cb3-590"><a href="" aria-label="590"></a>    <span class="kw">const</span> q <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(<span class="dv">1</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(<span class="dv">0</span><span class="op">,</span> pr[j] <span class="op">/</span> mass))</span>
-<span id="cb3-591"><a href="" aria-label="591"></a>    out[j] <span class="op">=</span> q <span class="op">&gt;</span> <span class="dv">0</span> <span class="op">?</span> <span class="fu">binom</span>(left<span class="op">,</span> q)() <span class="op">:</span> <span class="dv">0</span></span>
-<span id="cb3-592"><a href="" aria-label="592"></a>    left <span class="op">-=</span> out[j]</span>
-<span id="cb3-593"><a href="" aria-label="593"></a>    mass <span class="op">-=</span> pr[j]</span>
-<span id="cb3-594"><a href="" aria-label="594"></a>  }</span>
-<span id="cb3-595"><a href="" aria-label="595"></a>  out[pr<span class="op">.</span><span class="at">length</span> <span class="op">-</span> <span class="dv">1</span>] <span class="op">+=</span> left</span>
-<span id="cb3-596"><a href="" aria-label="596"></a>  <span class="cf">return</span> out</span>
-<span id="cb3-597"><a href="" aria-label="597"></a>}</span>
-<span id="cb3-598"><a href="" aria-label="598"></a></span>
-<span id="cb3-599"><a href="" aria-label="599"></a><span class="co">// max_{s,k} |t_{s,k}| for 6 states x 4 votes (the first 3 votes are candidates)</span></span>
-<span id="cb3-600"><a href="" aria-label="600"></a><span class="kw">function</span> <span class="fu">maxT</span>(counts<span class="op">,</span> pRef) {</span>
-<span id="cb3-601"><a href="" aria-label="601"></a>  <span class="kw">let</span> m <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb3-602"><a href="" aria-label="602"></a>  <span class="cf">for</span> (<span class="kw">let</span> s <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> s <span class="op">&lt;</span> <span class="dv">6</span><span class="op">;</span> s<span class="op">++</span>) {</span>
-<span id="cb3-603"><a href="" aria-label="603"></a>    <span class="kw">const</span> N <span class="op">=</span> counts[<span class="dv">4</span> <span class="op">*</span> s] <span class="op">+</span> counts[<span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> <span class="dv">1</span>] <span class="op">+</span> counts[<span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> <span class="dv">2</span>] <span class="op">+</span> counts[<span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> <span class="dv">3</span>]</span>
-<span id="cb3-604"><a href="" aria-label="604"></a>    <span class="cf">for</span> (<span class="kw">let</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> <span class="dv">3</span><span class="op">;</span> k<span class="op">++</span>) {</span>
-<span id="cb3-605"><a href="" aria-label="605"></a>      <span class="kw">const</span> p <span class="op">=</span> counts[<span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> k] <span class="op">/</span> N</span>
-<span id="cb3-606"><a href="" aria-label="606"></a>      <span class="kw">const</span> t <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">abs</span>(p <span class="op">-</span> pRef[<span class="dv">3</span> <span class="op">*</span> s <span class="op">+</span> k]) <span class="op">/</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(p <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> p) <span class="op">/</span> N)</span>
-<span id="cb3-607"><a href="" aria-label="607"></a>      m <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(m<span class="op">,</span> <span class="bu">Number</span><span class="op">.</span><span class="fu">isNaN</span>(t) <span class="op">?</span> <span class="kw">Infinity</span> <span class="op">:</span> t)</span>
-<span id="cb3-608"><a href="" aria-label="608"></a>    }</span>
-<span id="cb3-609"><a href="" aria-label="609"></a>  }</span>
-<span id="cb3-610"><a href="" aria-label="610"></a>  <span class="cf">return</span> m</span>
-<span id="cb3-611"><a href="" aria-label="611"></a>}</span>
-<span id="cb3-612"><a href="" aria-label="612"></a></span>
-<span id="cb3-613"><a href="" aria-label="613"></a>pollCounts <span class="op">=</span> <span class="fu">rmultinom</span>(demo<span class="op">.</span><span class="at">n</span><span class="op">,</span> poll_probs<span class="op">,</span> d3<span class="op">.</span><span class="at">randomBinomial</span><span class="op">.</span><span class="fu">source</span>(d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="dv">1000</span> <span class="op">+</span> demo<span class="op">.</span><span class="at">poll</span>)))</span>
-<span id="cb3-614"><a href="" aria-label="614"></a>pollShares <span class="op">=</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">18</span>)<span class="op">.</span><span class="fu">map</span>(i <span class="kw">=&gt;</span> {</span>
-<span id="cb3-615"><a href="" aria-label="615"></a>  <span class="kw">const</span> s <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">floor</span>(i <span class="op">/</span> <span class="dv">3</span>)<span class="op">,</span> k <span class="op">=</span> i <span class="op">%</span> <span class="dv">3</span></span>
-<span id="cb3-616"><a href="" aria-label="616"></a>  <span class="kw">const</span> c <span class="op">=</span> pollCounts<span class="op">.</span><span class="fu">slice</span>(<span class="dv">4</span> <span class="op">*</span> s<span class="op">,</span> <span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> <span class="dv">4</span>)</span>
-<span id="cb3-617"><a href="" aria-label="617"></a>  <span class="cf">return</span> c[k] <span class="op">/</span> d3<span class="op">.</span><span class="fu">sum</span>(c)</span>
-<span id="cb3-618"><a href="" aria-label="618"></a>})</span>
-<span id="cb3-619"><a href="" aria-label="619"></a></span>
-<span id="cb3-620"><a href="" aria-label="620"></a>bootR <span class="op">=</span> {</span>
-<span id="cb3-621"><a href="" aria-label="621"></a>  <span class="kw">const</span> binom <span class="op">=</span> d3<span class="op">.</span><span class="at">randomBinomial</span><span class="op">.</span><span class="fu">source</span>(d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="dv">7</span> <span class="op">+</span> <span class="dv">31</span> <span class="op">*</span> demo<span class="op">.</span><span class="at">poll</span>))</span>
-<span id="cb3-622"><a href="" aria-label="622"></a>  <span class="kw">const</span> freq <span class="op">=</span> pollCounts<span class="op">.</span><span class="fu">map</span>(c <span class="kw">=&gt;</span> c <span class="op">/</span> demo<span class="op">.</span><span class="at">n</span>)</span>
-<span id="cb3-623"><a href="" aria-label="623"></a>  <span class="cf">return</span> <span class="bu">Float64Array</span><span class="op">.</span><span class="fu">from</span>({<span class="dt">length</span><span class="op">:</span> demo<span class="op">.</span><span class="at">B</span>}<span class="op">,</span> () <span class="kw">=&gt;</span> <span class="fu">maxT</span>(<span class="fu">rmultinom</span>(demo<span class="op">.</span><span class="at">n</span><span class="op">,</span> freq<span class="op">,</span> binom)<span class="op">,</span> pollShares))</span>
-<span id="cb3-624"><a href="" aria-label="624"></a>}</span>
-<span id="cb3-625"><a href="" aria-label="625"></a></span>
-<span id="cb3-626"><a href="" aria-label="626"></a>cStar <span class="op">=</span> d3<span class="op">.</span><span class="fu">quantile</span>(bootR<span class="op">,</span> <span class="fl">0.95</span>)</span>
-<span id="cb3-627"><a href="" aria-label="627"></a>truthN <span class="op">=</span> poll_truth[<span class="bu">String</span>(demo<span class="op">.</span><span class="at">n</span>)]</span>
-<span id="cb3-628"><a href="" aria-label="628"></a>bw <span class="op">=</span> poll_edges[<span class="dv">1</span>] <span class="op">-</span> poll_edges[<span class="dv">0</span>]</span>
-<span id="cb3-629"><a href="" aria-label="629"></a>histBoot <span class="op">=</span> poll_edges<span class="op">.</span><span class="fu">slice</span>(<span class="dv">0</span><span class="op">,</span> <span class="op">-</span><span class="dv">1</span>)<span class="op">.</span><span class="fu">map</span>((x0<span class="op">,</span> i) <span class="kw">=&gt;</span> {</span>
-<span id="cb3-630"><a href="" aria-label="630"></a>  <span class="kw">const</span> x1 <span class="op">=</span> poll_edges[i <span class="op">+</span> <span class="dv">1</span>]</span>
-<span id="cb3-631"><a href="" aria-label="631"></a>  <span class="kw">const</span> inBin <span class="op">=</span> bootR<span class="op">.</span><span class="fu">filter</span>(r <span class="kw">=&gt;</span> (i <span class="op">===</span> <span class="dv">0</span> <span class="op">?</span> <span class="kw">true</span> <span class="op">:</span> r <span class="op">&gt;=</span> x0) <span class="op">&amp;&amp;</span> (i <span class="op">===</span> poll_edges<span class="op">.</span><span class="at">length</span> <span class="op">-</span> <span class="dv">2</span> <span class="op">?</span> <span class="kw">true</span> <span class="op">:</span> r <span class="op">&lt;</span> x1))<span class="op">.</span><span class="at">length</span></span>
-<span id="cb3-632"><a href="" aria-label="632"></a>  <span class="cf">return</span> {x0<span class="op">,</span> x1<span class="op">,</span> <span class="dt">dens</span><span class="op">:</span> inBin <span class="op">/</span> (demo<span class="op">.</span><span class="at">B</span> <span class="op">*</span> bw)}</span>
-<span id="cb3-633"><a href="" aria-label="633"></a>})</span>
-<span id="cb3-634"><a href="" aria-label="634"></a>truthLine <span class="op">=</span> truthN<span class="op">.</span><span class="at">dens</span><span class="op">.</span><span class="fu">map</span>((d<span class="op">,</span> i) <span class="kw">=&gt;</span> ({<span class="dt">x</span><span class="op">:</span> (poll_edges[i] <span class="op">+</span> poll_edges[i <span class="op">+</span> <span class="dv">1</span>]) <span class="op">/</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">dens</span><span class="op">:</span> d}))</span>
-<span id="cb3-635"><a href="" aria-label="635"></a></span>
-<span id="cb3-636"><a href="" aria-label="636"></a>Plot<span class="op">.</span><span class="fu">plot</span>({</span>
-<span id="cb3-637"><a href="" aria-label="637"></a>  <span class="dt">width</span><span class="op">:</span> <span class="dv">1150</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">390</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">50</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
-<span id="cb3-638"><a href="" aria-label="638"></a>  <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"20px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
-<span id="cb3-639"><a href="" aria-label="639"></a>  <span class="dt">x</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"max |t|"</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="dv">1</span><span class="op">,</span> <span class="fl">5.5</span>]<span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
-<span id="cb3-640"><a href="" aria-label="640"></a>  <span class="dt">y</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="fl">1.6</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> <span class="dv">4</span>}<span class="op">,</span></span>
-<span id="cb3-641"><a href="" aria-label="641"></a>  <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
-<span id="cb3-642"><a href="" aria-label="642"></a>  <span class="dt">marks</span><span class="op">:</span> [</span>
-<span id="cb3-643"><a href="" aria-label="643"></a>    Plot<span class="op">.</span><span class="fu">rectY</span>(histBoot<span class="op">,</span> {<span class="dt">x1</span><span class="op">:</span> <span class="st">"x0"</span><span class="op">,</span> <span class="dt">x2</span><span class="op">:</span> <span class="st">"x1"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"dens"</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">fillOpacity</span><span class="op">:</span> <span class="fl">0.35</span><span class="op">,</span> <span class="dt">inset</span><span class="op">:</span> <span class="fl">0.5</span>})<span class="op">,</span></span>
-<span id="cb3-644"><a href="" aria-label="644"></a>    Plot<span class="op">.</span><span class="fu">line</span>(truthLine<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"dens"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#2D3E50"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span><span class="op">,</span> <span class="dt">curve</span><span class="op">:</span> <span class="st">"basis"</span>})<span class="op">,</span></span>
-<span id="cb3-645"><a href="" aria-label="645"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([<span class="fl">1.96</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"7,5"</span>})<span class="op">,</span></span>
-<span id="cb3-646"><a href="" aria-label="646"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([poll_c_limit]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#888888"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"3,4"</span>})<span class="op">,</span></span>
-<span id="cb3-647"><a href="" aria-label="647"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([truthN<span class="op">.</span><span class="at">c</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#2D3E50"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span>})<span class="op">,</span></span>
-<span id="cb3-648"><a href="" aria-label="648"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([cStar]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span>})<span class="op">,</span></span>
-<span id="cb3-649"><a href="" aria-label="649"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`bootstrap ĉ* = </span><span class="sc">${</span>cStar<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">8</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})<span class="op">,</span></span>
-<span id="cb3-650"><a href="" aria-label="650"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`true c = </span><span class="sc">${</span>truthN<span class="op">.</span><span class="at">c</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">36</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#2D3E50"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})<span class="op">,</span></span>
-<span id="cb3-651"><a href="" aria-label="651"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`limit = </span><span class="sc">${</span>poll_c_limit<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">64</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#888888"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})<span class="op">,</span></span>
-<span id="cb3-652"><a href="" aria-label="652"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`TV: 1.96 covers all 18 only </span><span class="sc">${</span><span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>(<span class="dv">100</span> <span class="op">*</span> truthN<span class="op">.</span><span class="at">cov196</span>)<span class="sc">}</span><span class="vs">% of the time`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">92</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})</span>
-<span id="cb3-653"><a href="" aria-label="653"></a>  ]</span>
-<span id="cb3-654"><a href="" aria-label="654"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb3" data-startfrom="606" data-source-offset="-158"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 605;"><span id="cb3-606"><a href="" aria-label="606"></a><span class="kw">function</span> <span class="fu">rmultinom</span>(n<span class="op">,</span> pr<span class="op">,</span> binom) {</span>
+<span id="cb3-607"><a href="" aria-label="607"></a>  <span class="kw">const</span> out <span class="op">=</span> <span class="kw">new</span> <span class="bu">Array</span>(pr<span class="op">.</span><span class="at">length</span>)<span class="op">.</span><span class="fu">fill</span>(<span class="dv">0</span>)</span>
+<span id="cb3-608"><a href="" aria-label="608"></a>  <span class="kw">let</span> left <span class="op">=</span> n<span class="op">,</span> mass <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb3-609"><a href="" aria-label="609"></a>  <span class="cf">for</span> (<span class="kw">let</span> j <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> j <span class="op">&lt;</span> pr<span class="op">.</span><span class="at">length</span> <span class="op">-</span> <span class="dv">1</span> <span class="op">&amp;&amp;</span> left <span class="op">&gt;</span> <span class="dv">0</span><span class="op">;</span> j<span class="op">++</span>) {</span>
+<span id="cb3-610"><a href="" aria-label="610"></a>    <span class="kw">const</span> q <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(<span class="dv">1</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(<span class="dv">0</span><span class="op">,</span> pr[j] <span class="op">/</span> mass))</span>
+<span id="cb3-611"><a href="" aria-label="611"></a>    out[j] <span class="op">=</span> q <span class="op">&gt;</span> <span class="dv">0</span> <span class="op">?</span> <span class="fu">binom</span>(left<span class="op">,</span> q)() <span class="op">:</span> <span class="dv">0</span></span>
+<span id="cb3-612"><a href="" aria-label="612"></a>    left <span class="op">-=</span> out[j]</span>
+<span id="cb3-613"><a href="" aria-label="613"></a>    mass <span class="op">-=</span> pr[j]</span>
+<span id="cb3-614"><a href="" aria-label="614"></a>  }</span>
+<span id="cb3-615"><a href="" aria-label="615"></a>  out[pr<span class="op">.</span><span class="at">length</span> <span class="op">-</span> <span class="dv">1</span>] <span class="op">+=</span> left</span>
+<span id="cb3-616"><a href="" aria-label="616"></a>  <span class="cf">return</span> out</span>
+<span id="cb3-617"><a href="" aria-label="617"></a>}</span>
+<span id="cb3-618"><a href="" aria-label="618"></a></span>
+<span id="cb3-619"><a href="" aria-label="619"></a><span class="co">// max_{s,k} |t_{s,k}| for 6 states x 4 votes (the first 3 votes are candidates)</span></span>
+<span id="cb3-620"><a href="" aria-label="620"></a><span class="kw">function</span> <span class="fu">maxT</span>(counts<span class="op">,</span> pRef) {</span>
+<span id="cb3-621"><a href="" aria-label="621"></a>  <span class="kw">let</span> m <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-622"><a href="" aria-label="622"></a>  <span class="cf">for</span> (<span class="kw">let</span> s <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> s <span class="op">&lt;</span> <span class="dv">6</span><span class="op">;</span> s<span class="op">++</span>) {</span>
+<span id="cb3-623"><a href="" aria-label="623"></a>    <span class="kw">const</span> N <span class="op">=</span> counts[<span class="dv">4</span> <span class="op">*</span> s] <span class="op">+</span> counts[<span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> <span class="dv">1</span>] <span class="op">+</span> counts[<span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> <span class="dv">2</span>] <span class="op">+</span> counts[<span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> <span class="dv">3</span>]</span>
+<span id="cb3-624"><a href="" aria-label="624"></a>    <span class="cf">for</span> (<span class="kw">let</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> <span class="dv">3</span><span class="op">;</span> k<span class="op">++</span>) {</span>
+<span id="cb3-625"><a href="" aria-label="625"></a>      <span class="kw">const</span> p <span class="op">=</span> counts[<span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> k] <span class="op">/</span> N</span>
+<span id="cb3-626"><a href="" aria-label="626"></a>      <span class="kw">const</span> t <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">abs</span>(p <span class="op">-</span> pRef[<span class="dv">3</span> <span class="op">*</span> s <span class="op">+</span> k]) <span class="op">/</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(p <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> p) <span class="op">/</span> N)</span>
+<span id="cb3-627"><a href="" aria-label="627"></a>      m <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(m<span class="op">,</span> <span class="bu">Number</span><span class="op">.</span><span class="fu">isNaN</span>(t) <span class="op">?</span> <span class="kw">Infinity</span> <span class="op">:</span> t)</span>
+<span id="cb3-628"><a href="" aria-label="628"></a>    }</span>
+<span id="cb3-629"><a href="" aria-label="629"></a>  }</span>
+<span id="cb3-630"><a href="" aria-label="630"></a>  <span class="cf">return</span> m</span>
+<span id="cb3-631"><a href="" aria-label="631"></a>}</span>
+<span id="cb3-632"><a href="" aria-label="632"></a></span>
+<span id="cb3-633"><a href="" aria-label="633"></a>pollCounts <span class="op">=</span> <span class="fu">rmultinom</span>(demo<span class="op">.</span><span class="at">n</span><span class="op">,</span> poll_probs<span class="op">,</span> d3<span class="op">.</span><span class="at">randomBinomial</span><span class="op">.</span><span class="fu">source</span>(d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="dv">1000</span> <span class="op">+</span> demo<span class="op">.</span><span class="at">poll</span>)))</span>
+<span id="cb3-634"><a href="" aria-label="634"></a>pollShares <span class="op">=</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">18</span>)<span class="op">.</span><span class="fu">map</span>(i <span class="kw">=&gt;</span> {</span>
+<span id="cb3-635"><a href="" aria-label="635"></a>  <span class="kw">const</span> s <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">floor</span>(i <span class="op">/</span> <span class="dv">3</span>)<span class="op">,</span> k <span class="op">=</span> i <span class="op">%</span> <span class="dv">3</span></span>
+<span id="cb3-636"><a href="" aria-label="636"></a>  <span class="kw">const</span> c <span class="op">=</span> pollCounts<span class="op">.</span><span class="fu">slice</span>(<span class="dv">4</span> <span class="op">*</span> s<span class="op">,</span> <span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> <span class="dv">4</span>)</span>
+<span id="cb3-637"><a href="" aria-label="637"></a>  <span class="cf">return</span> c[k] <span class="op">/</span> d3<span class="op">.</span><span class="fu">sum</span>(c)</span>
+<span id="cb3-638"><a href="" aria-label="638"></a>})</span>
+<span id="cb3-639"><a href="" aria-label="639"></a></span>
+<span id="cb3-640"><a href="" aria-label="640"></a>bootR <span class="op">=</span> {</span>
+<span id="cb3-641"><a href="" aria-label="641"></a>  <span class="kw">const</span> binom <span class="op">=</span> d3<span class="op">.</span><span class="at">randomBinomial</span><span class="op">.</span><span class="fu">source</span>(d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="dv">7</span> <span class="op">+</span> <span class="dv">31</span> <span class="op">*</span> demo<span class="op">.</span><span class="at">poll</span>))</span>
+<span id="cb3-642"><a href="" aria-label="642"></a>  <span class="kw">const</span> freq <span class="op">=</span> pollCounts<span class="op">.</span><span class="fu">map</span>(c <span class="kw">=&gt;</span> c <span class="op">/</span> demo<span class="op">.</span><span class="at">n</span>)</span>
+<span id="cb3-643"><a href="" aria-label="643"></a>  <span class="cf">return</span> <span class="bu">Float64Array</span><span class="op">.</span><span class="fu">from</span>({<span class="dt">length</span><span class="op">:</span> demo<span class="op">.</span><span class="at">B</span>}<span class="op">,</span> () <span class="kw">=&gt;</span> <span class="fu">maxT</span>(<span class="fu">rmultinom</span>(demo<span class="op">.</span><span class="at">n</span><span class="op">,</span> freq<span class="op">,</span> binom)<span class="op">,</span> pollShares))</span>
+<span id="cb3-644"><a href="" aria-label="644"></a>}</span>
+<span id="cb3-645"><a href="" aria-label="645"></a></span>
+<span id="cb3-646"><a href="" aria-label="646"></a>cStar <span class="op">=</span> d3<span class="op">.</span><span class="fu">quantile</span>(bootR<span class="op">,</span> <span class="fl">0.95</span>)</span>
+<span id="cb3-647"><a href="" aria-label="647"></a>truthN <span class="op">=</span> poll_truth[<span class="bu">String</span>(demo<span class="op">.</span><span class="at">n</span>)]</span>
+<span id="cb3-648"><a href="" aria-label="648"></a>bw <span class="op">=</span> poll_edges[<span class="dv">1</span>] <span class="op">-</span> poll_edges[<span class="dv">0</span>]</span>
+<span id="cb3-649"><a href="" aria-label="649"></a>histBoot <span class="op">=</span> poll_edges<span class="op">.</span><span class="fu">slice</span>(<span class="dv">0</span><span class="op">,</span> <span class="op">-</span><span class="dv">1</span>)<span class="op">.</span><span class="fu">map</span>((x0<span class="op">,</span> i) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-650"><a href="" aria-label="650"></a>  <span class="kw">const</span> x1 <span class="op">=</span> poll_edges[i <span class="op">+</span> <span class="dv">1</span>]</span>
+<span id="cb3-651"><a href="" aria-label="651"></a>  <span class="kw">const</span> inBin <span class="op">=</span> bootR<span class="op">.</span><span class="fu">filter</span>(r <span class="kw">=&gt;</span> (i <span class="op">===</span> <span class="dv">0</span> <span class="op">?</span> <span class="kw">true</span> <span class="op">:</span> r <span class="op">&gt;=</span> x0) <span class="op">&amp;&amp;</span> (i <span class="op">===</span> poll_edges<span class="op">.</span><span class="at">length</span> <span class="op">-</span> <span class="dv">2</span> <span class="op">?</span> <span class="kw">true</span> <span class="op">:</span> r <span class="op">&lt;</span> x1))<span class="op">.</span><span class="at">length</span></span>
+<span id="cb3-652"><a href="" aria-label="652"></a>  <span class="cf">return</span> {x0<span class="op">,</span> x1<span class="op">,</span> <span class="dt">dens</span><span class="op">:</span> inBin <span class="op">/</span> (demo<span class="op">.</span><span class="at">B</span> <span class="op">*</span> bw)}</span>
+<span id="cb3-653"><a href="" aria-label="653"></a>})</span>
+<span id="cb3-654"><a href="" aria-label="654"></a>truthLine <span class="op">=</span> truthN<span class="op">.</span><span class="at">dens</span><span class="op">.</span><span class="fu">map</span>((d<span class="op">,</span> i) <span class="kw">=&gt;</span> ({<span class="dt">x</span><span class="op">:</span> (poll_edges[i] <span class="op">+</span> poll_edges[i <span class="op">+</span> <span class="dv">1</span>]) <span class="op">/</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">dens</span><span class="op">:</span> d}))</span>
+<span id="cb3-655"><a href="" aria-label="655"></a></span>
+<span id="cb3-656"><a href="" aria-label="656"></a>Plot<span class="op">.</span><span class="fu">plot</span>({</span>
+<span id="cb3-657"><a href="" aria-label="657"></a>  <span class="dt">width</span><span class="op">:</span> <span class="dv">1150</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">390</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">50</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
+<span id="cb3-658"><a href="" aria-label="658"></a>  <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"20px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
+<span id="cb3-659"><a href="" aria-label="659"></a>  <span class="dt">x</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"max |t|"</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="dv">1</span><span class="op">,</span> <span class="fl">5.5</span>]<span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
+<span id="cb3-660"><a href="" aria-label="660"></a>  <span class="dt">y</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="fl">1.6</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> <span class="dv">4</span>}<span class="op">,</span></span>
+<span id="cb3-661"><a href="" aria-label="661"></a>  <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb3-662"><a href="" aria-label="662"></a>  <span class="dt">marks</span><span class="op">:</span> [</span>
+<span id="cb3-663"><a href="" aria-label="663"></a>    Plot<span class="op">.</span><span class="fu">rectY</span>(histBoot<span class="op">,</span> {<span class="dt">x1</span><span class="op">:</span> <span class="st">"x0"</span><span class="op">,</span> <span class="dt">x2</span><span class="op">:</span> <span class="st">"x1"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"dens"</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">fillOpacity</span><span class="op">:</span> <span class="fl">0.35</span><span class="op">,</span> <span class="dt">inset</span><span class="op">:</span> <span class="fl">0.5</span>})<span class="op">,</span></span>
+<span id="cb3-664"><a href="" aria-label="664"></a>    Plot<span class="op">.</span><span class="fu">line</span>(truthLine<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"dens"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#2D3E50"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span><span class="op">,</span> <span class="dt">curve</span><span class="op">:</span> <span class="st">"basis"</span>})<span class="op">,</span></span>
+<span id="cb3-665"><a href="" aria-label="665"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([<span class="fl">1.96</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"7,5"</span>})<span class="op">,</span></span>
+<span id="cb3-666"><a href="" aria-label="666"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([poll_c_limit]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#888888"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"3,4"</span>})<span class="op">,</span></span>
+<span id="cb3-667"><a href="" aria-label="667"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([truthN<span class="op">.</span><span class="at">c</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#2D3E50"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span>})<span class="op">,</span></span>
+<span id="cb3-668"><a href="" aria-label="668"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([cStar]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span>})<span class="op">,</span></span>
+<span id="cb3-669"><a href="" aria-label="669"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`bootstrap ĉ* = </span><span class="sc">${</span>cStar<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">8</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})<span class="op">,</span></span>
+<span id="cb3-670"><a href="" aria-label="670"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`true c = </span><span class="sc">${</span>truthN<span class="op">.</span><span class="at">c</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">36</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#2D3E50"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})<span class="op">,</span></span>
+<span id="cb3-671"><a href="" aria-label="671"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`limit = </span><span class="sc">${</span>poll_c_limit<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">64</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#888888"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})<span class="op">,</span></span>
+<span id="cb3-672"><a href="" aria-label="672"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`TV: 1.96 covers all 18 only </span><span class="sc">${</span><span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>(<span class="dv">100</span> <span class="op">*</span> truthN<span class="op">.</span><span class="at">cov196</span>)<span class="sc">}</span><span class="vs">% of the time`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">92</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})</span>
+<span id="cb3-673"><a href="" aria-label="673"></a>  ]</span>
+<span id="cb3-674"><a href="" aria-label="674"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <div id="ojs-cell-2-1" data-nodetype="declaration">
@@ -920,7 +941,7 @@ C_n^{*} = \left\{\theta \in \Theta : J_n^{-1}(\tfrac{\alpha}{2}, \hat P_n) \le R
 <h2>Consistency: The General Recipe</h2>
 <div class="thm">
 <div class="thmhead">
-<p>Theorem (L&amp;R 18.3.1)</p>
+<p>Theorem <span class="fgv">(L&amp;R 18.3.1)</span></p>
 </div>
 <p>Let <span class="math inline">\(\mathcal{C}_P\)</span> be a set of sequences <span class="math inline">\(\{P_n\}\)</span> that contains <span class="math inline">\(\{P, P, \dots\}\)</span>. Assume that, for every <span class="math inline">\(\{P_n\} \in \mathcal{C}_P\)</span>, <span class="math inline">\(J_n(\cdot, P_n)\)</span> converges weakly to the same <strong>continuous</strong> limit <span class="math inline">\(J(\cdot, P)\)</span>. If <span class="math inline">\(\{\hat P_n\} \in \mathcal{C}_P\)</span> with probability one, then:</p>
 <ol type="i">
@@ -954,7 +975,7 @@ C_n^{*} = \left\{\theta \in \Theta : J_n^{-1}(\tfrac{\alpha}{2}, \hat P_n) \le R
 </div>
 <div class="fragment">
 <ul>
-<li>For (ii): if <span class="math inline">\(F_n \Rightarrow F\)</span>, then <span class="math inline">\(F_n^{-1}(1-\alpha) \to F^{-1}(1-\alpha)\)</span> (L&amp;R Lemma 11.2.1)</li>
+<li>For (ii): if <span class="math inline">\(F_n \Rightarrow F\)</span>, then <span class="math inline">\(F_n^{-1}(1-\alpha) \to F^{-1}(1-\alpha)\)</span> <span class="fgv">(L&amp;R Lemma 11.2.1)</span></li>
 <li>This needs <span class="math inline">\(F\)</span> continuous and strictly increasing at <span class="math inline">\(F^{-1}(1-\alpha)\)</span></li>
 <li>Apply it path by path, with <span class="math inline">\(F_n = J_n(\cdot, \hat P_n(\omega))\)</span> and <span class="math inline">\(F = J(\cdot, P)\)</span> <span class="math inline">\(\implies\)</span> (ii)</li>
 </ul>
@@ -973,7 +994,7 @@ P\left\{R_n(X^n, \theta(P)) \le \hat c_n\right\}
 </ul>
 <div class="fragment">
 <ul>
-<li>Bonus: (iii) still holds if (i) and (ii) hold only in probability (L&amp;R Problem 18.3)</li>
+<li>Bonus: (iii) still holds if (i) and (ii) hold only in probability <span class="fgv">(L&amp;R Problem 18.3)</span></li>
 <li>Almost sure: <strong>strongly</strong> consistent bootstrap. In probability: <strong>weakly</strong> consistent</li>
 </ul>
 </div>
@@ -998,7 +1019,7 @@ P\left\{R_n(X^n, \theta(P)) \le \hat c_n\right\}
 <h2>The Nonparametric Mean</h2>
 <div class="thm">
 <div class="thmhead">
-<p>Theorem (L&amp;R 18.3.3)</p>
+<p>Theorem <span class="fgv">(L&amp;R 18.3.3)</span></p>
 </div>
 <p>Let <span class="math inline">\(F\)</span> have finite, nonzero variance <span class="math inline">\(\sigma^2(F)\)</span> and mean <span class="math inline">\(\theta(F)\)</span>. Let <span class="math inline">\(J_n(\cdot, F)\)</span> be the distribution of <span class="math inline">\(R_n = \sqrt n\,(\bar X_n - \theta(F))\)</span> under <span class="math inline">\(F\)</span>.</p>
 <ol type="i">
@@ -1069,17 +1090,17 @@ P\left\{R_n(X^n, \theta(P)) \le \hat c_n\right\}
 </ul>
 <div class="fragment">
 <ul>
-<li>In one line: Mallows’ metric <span class="math inline">\(d_2(\hat F_n, F) \to 0\)</span> a.s. (Bickel and Freedman, 1981)</li>
-<li><span class="alert">Exercise: show that <span class="math inline">\(\theta(F_n) \to \theta(F)\)</span> follows from the other two conditions (L&amp;R 18.5)</span></li>
+<li>In one line: Mallows’ metric <span class="math inline">\(d_2(\hat F_n, F) \to 0\)</span> a.s. <span class="fgv">(Bickel and Freedman, 1981)</span></li>
+<li><span class="alert">Exercise: show that the condition <span class="math inline">\(\theta(F_n) \to \theta(F)\)</span> is redundant</span> <span class="fgv">(L&amp;R Problem 18.5)</span></li>
 </ul>
 </div>
 </section>
 <section id="beyond-the-mean" class="slide level2">
 <h2>Beyond the Mean</h2>
 <ul>
-<li><strong>Studentized mean</strong> (L&amp;R 18.3.4): <span class="math inline">\(\sqrt n\,(\bar X_n - \theta)/\hat\sigma_n\)</span> works too: the bootstrap-t</li>
-<li><strong>Multivariate mean</strong> (L&amp;R 18.3.5): <span class="math inline">\(\|\sqrt n\,(\bar X_n - \theta)\|\)</span> works for <strong>any</strong> norm <span class="math inline">\(\|\cdot\|\)</span></li>
-<li><strong>Smooth functions</strong> (L&amp;R 18.3.6): <span class="math inline">\(\sqrt n\,[f(\bar X_n) - f(\theta)]\)</span>, <span class="math inline">\(f\)</span> differentiable: delta method</li>
+<li><strong>Studentized mean</strong> <span class="fgv">(L&amp;R 18.3.4)</span>: <span class="math inline">\(\sqrt n\,(\bar X_n - \theta)/\hat\sigma_n\)</span> works too: the bootstrap-t</li>
+<li><strong>Multivariate mean</strong> <span class="fgv">(L&amp;R 18.3.5)</span>: <span class="math inline">\(\|\sqrt n\,(\bar X_n - \theta)\|\)</span> works for <strong>any</strong> norm <span class="math inline">\(\|\cdot\|\)</span></li>
+<li><strong>Smooth functions</strong> <span class="fgv">(L&amp;R 18.3.6)</span>: <span class="math inline">\(\sqrt n\,[f(\bar X_n) - f(\theta)]\)</span>, <span class="math inline">\(f\)</span> differentiable: delta method</li>
 </ul>
 <div class="fragment">
 <ul>
@@ -1090,7 +1111,7 @@ P\left\{R_n(X^n, \theta(P)) \le \hat c_n\right\}
 </div>
 <div class="fragment">
 <ul>
-<li>Reading Hansen? He writes these results as <span class="math inline">\(\sqrt n\,(\bar Y^* - \bar Y) \xrightarrow{d^*} N(0, \Sigma)\)</span>, same idea</li>
+<li>Reading <span class="fgv">Hansen</span>? He writes these results as <span class="math inline">\(\sqrt n\,(\bar Y^* - \bar Y) \xrightarrow{d^*} N(0, \Sigma)\)</span>, same idea</li>
 </ul>
 </div>
 </section>
@@ -1141,10 +1162,10 @@ P\left\{R^*_n = 0 \,\middle|\, X^n\right\} = 1 - \left(1 - \tfrac{1}{n}\right)^n
 <div class="fragment">
 <p>Other failures, all with iid data:</p>
 <ul>
-<li>Infinite variance: for the mean, it works a.s. <strong>iff</strong> <span class="math inline">\(\sigma^2 &lt; \infty\)</span> (Giné and Zinn, 1989)</li>
-<li>Parameter on the boundary: <span class="math inline">\(\hat\mu_n = \max(\bar X_n, 0)\)</span> when <span class="math inline">\(\mu = 0\)</span> (L&amp;R Problem 18.10)</li>
-<li>Degenerate smooth functions: <span class="math inline">\(\sqrt n\,(\bar X_n^2 - \mu^2)\)</span> when <span class="math inline">\(\mu = 0\)</span> (L&amp;R Problem 18.17)</li>
-<li>Superefficient estimators (Hodges): not even the parametric bootstrap works (Beran, 1984)</li>
+<li>Infinite variance: for the mean, it works a.s. <strong>iff</strong> <span class="math inline">\(\sigma^2 &lt; \infty\)</span> <span class="fgv">(Giné and Zinn, 1989)</span></li>
+<li>Parameter on the boundary: <span class="math inline">\(\hat\mu_n = \max(\bar X_n, 0)\)</span> when <span class="math inline">\(\mu = 0\)</span> <span class="fgv">(L&amp;R Problem 18.10)</span></li>
+<li>Degenerate smooth functions: <span class="math inline">\(\sqrt n\,(\bar X_n^2 - \mu^2)\)</span> when <span class="math inline">\(\mu = 0\)</span> <span class="fgv">(L&amp;R Problem 18.17)</span></li>
+<li>Superefficient estimators (Hodges): not even the parametric bootstrap works <span class="fgv">(Beran, 1984)</span></li>
 </ul>
 </div>
 </section>
@@ -1155,7 +1176,7 @@ P\left\{R^*_n = 0 \,\middle|\, X^n\right\} = 1 - \left(1 - \tfrac{1}{n}\right)^n
 <p><strong>If it fails</strong></p>
 <ul>
 <li><span class="math inline">\(m\)</span>-out-of-<span class="math inline">\(n\)</span>: resample only <span class="math inline">\(m \ll n\)</span></li>
-<li>Subsampling (L&amp;R Section 18.7)</li>
+<li>Subsampling <span class="fgv">(L&amp;R Section 18.7)</span></li>
 <li>Find a theorem for <strong>your</strong> root</li>
 <li>Bootstrap a pivot when you can</li>
 </ul>
@@ -1185,12 +1206,13 @@ P\left\{R^*_n = 0 \,\middle|\, X^n\right\} = 1 - \left(1 - \tfrac{1}{n}\right)^n
 <section id="references" class="slide level2">
 <h2>References</h2>
 <ul>
-<li>Chapter 18 of <em>Testing Statistical Hypotheses</em>, by Erich Lehmann and Joseph Romano (Sections 18.1 to 18.3 and Example 18.7.2)</li>
-<li>Chapter 10 of <em>Econometrics</em>, by Bruce Hansen</li>
-<li>Efron (1979), “Bootstrap Methods: Another Look at the Jackknife”, <em>Annals of Statistics</em></li>
-<li>Bickel and Freedman (1981), “Some Asymptotic Theory for the Bootstrap”, <em>Annals of Statistics</em></li>
-<li>Beran (1984), “Bootstrap Methods in Statistics”, <em>Jahresbericht der Deutschen Mathematiker-Vereinigung</em></li>
-<li>Giné and Zinn (1989), “Necessary Conditions for the Bootstrap of the Mean”, <em>Annals of Statistics</em></li>
+<li>Chapter 18 of <em>Testing Statistical Hypotheses</em>, by <span class="fgv">Erich Lehmann and Joseph Romano</span> (Sections 18.1 to 18.3 and Example 18.7.2)</li>
+<li>Chapter 10 of <em>Econometrics</em>, by <span class="fgv">Bruce Hansen</span></li>
+<li><span class="fgv">Efron (1979)</span>, “Bootstrap Methods: Another Look at the Jackknife”, <em>Annals of Statistics</em></li>
+<li><span class="fgv">Bickel and Freedman (1981)</span>, “Some Asymptotic Theory for the Bootstrap”, <em>Annals of Statistics</em></li>
+<li><span class="fgv">Beran (1984)</span>, “Bootstrap Methods in Statistics”, <em>Jahresbericht der Deutschen Mathematiker-Vereinigung</em></li>
+<li><span class="fgv">Giné and Zinn (1989)</span>, “Necessary Conditions for the Bootstrap of the Mean”, <em>Annals of Statistics</em></li>
+<li><span class="fgv">Brown, Cai and DasGupta (2001)</span>, “Interval Estimation for a Binomial Proportion”, <em>Statistical Science</em></li>
 </ul>
 
 </section></section>
