@@ -288,7 +288,8 @@ Not pivots:
 - Coverage is **exact**: $P\{\theta(P) \in C_n\} = 1-\alpha$ for every $n$ and every $P \in \mathcal{P}$
 - No asymptotics at all: $n = 15$ is as good as $n = 15{,}000$
 - Only **one** distribution to learn: look it up once in a table (think $t_{n-1}$)
-- No closed form? Simulate it once, from any $P \in \mathcal{P}$ you like
+- No closed form? Simulate it under any convenient $P_0 \in \mathcal{P}$, e.g., $\mu = 0$ and $\sigma = 1$
+- Since $J_n(\cdot, P_0) = J_n(\cdot, P)$, that gives the exact quantiles for the true $P$ too
 
 . . .
 
