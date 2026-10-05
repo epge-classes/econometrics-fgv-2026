@@ -1,0 +1,937 @@
+---
+title: "Lecture 2: Bootstrap 101"
+talkdate: "October 2026"
+jupyter: python3
+---
+
+# Motivation {visibility="uncounted"}
+
+## The Margin of Error You See on TV
+
+```{python}
+#| include: false
+import numpy as np
+import matplotlib.pyplot as plt
+plt.rcParams['font.sans-serif'] = ['Arial']
+blue, orange, slate, red = '#0072BC', '#EB811B', '#2D3E50', '#C62828'
+
+# A fictional online poll: each respondent declares a state and a vote
+states = ['SP', 'MG', 'RJ', 'BA', 'PR', 'RS']
+cands = ['A', 'B', 'C']
+w = np.array([0.37, 0.18, 0.14, 0.12, 0.095, 0.095])   # roughly the size of each electorate
+shares_true = np.array([                                # A, B, C, other (made up)
+    [0.38, 0.33, 0.17, 0.12],
+    [0.34, 0.39, 0.15, 0.12],
+    [0.40, 0.35, 0.14, 0.11],
+    [0.33, 0.42, 0.14, 0.11],
+    [0.39, 0.34, 0.16, 0.11],
+    [0.35, 0.37, 0.17, 0.11]])
+probs = (w[:, None] * shares_true).ravel()              # 24 cells: (state, vote)
+p_true = shares_true[:, :3]
+
+# The poll on the TV graphic
+n_tv = 2000
+np.random.seed(6)
+cells = np.random.choice(24, size=n_tv, p=probs)
+S, V = cells // 4, cells % 4                            # state 0..5, vote 0..3 (3 = other)
+pA_hat = np.mean(V == 0)
+moe_A = 1.96 * np.sqrt(pA_hat * (1 - pA_hat) / n_tv)
+pA_txt, moe_txt = f'{100 * pA_hat:.1f}%', f'{100 * moe_A:.1f}'
+
+# The root max_{s,k} |t_{s,k}| from cell counts (rows = polls)
+def max_t_counts(counts, p_ref):
+    c = counts.reshape(len(counts), 6, 4)
+    N = c.sum(-1, keepdims=True)
+    p = c[..., :3] / N
+    with np.errstate(divide='ignore', invalid='ignore'):
+        t = np.abs(p - p_ref) / np.sqrt(p * (1 - p) / N)
+    return np.where(np.isnan(t), np.inf, t).reshape(len(counts), -1).max(1)
+
+# The truth J_n(., P) at n = 2,000, by simulating many polls from P
+np.random.seed(2026)
+R_true = max_t_counts(np.random.multinomial(n_tv, probs, size=40000), p_true)
+cover_196 = f'{100 * np.mean(R_true <= 1.96):.0f}%'
+c_true = f'{np.quantile(R_true, 0.95):.2f}'
+
+# The limit J(., P): max |Z| with Z ~ N(0, Sigma(P)), block-diagonal by state
+np.random.seed(2027)
+Z = []
+for s in range(6):
+    p = p_true[s]
+    C = -np.sqrt(np.outer(p, p) / np.outer(1 - p, 1 - p))
+    np.fill_diagonal(C, 1)
+    Z.append(np.random.multivariate_normal(np.zeros(3), C, size=200000))
+c_limit = np.quantile(np.abs(np.concatenate(Z, axis=1)).max(axis=1), 0.95)
+c_limit_txt = f'{c_limit:.2f}'
+```
+
+- An online poll asks $n$ voters whether they will vote for candidate A
+- Online polls are self-selected, but let's pretend respondents are iid today ;)
+- $X_i = 1$ if respondent $i$ picks A, so $p = P\{X_i = 1\}$ and $\hat p = \bar X_n$
+
+. . .
+
+- The CLT and Slutsky's theorem give
+$$
+\frac{\sqrt n\,(\hat p - p)}{\sqrt{\hat p(1-\hat p)}} \xrightarrow{d} N(0,1)
+\quad\implies\quad
+\hat p \pm 1.96\sqrt{\frac{\hat p(1-\hat p)}{n}}
+$$
+- In our poll, $n = 2{,}000$ and $\hat p =$ `{python} pA_txt`: the "margem de erro" is $\pm$ `{python} moe_txt` p.p.
+
+. . .
+
+- Two ingredients: a **known** limit, and a nuisance parameter we can **estimate**
+
+## Now the Whole TV Graphic
+
+Each respondent also declares a **state**. Here are 18 95% intervals from the same poll:
+
+```{python}
+#| fig-align: center
+p_hat = np.array([[np.mean(V[S == s] == k) for k in range(3)] for s in range(6)])
+N_s = np.bincount(S, minlength=6)[:, None]
+se_hat = np.sqrt(p_hat * (1 - p_hat) / N_s)
+
+def poll_plot(c_joint=None):
+    fig, ax = plt.subplots(figsize=(11, 4.1))
+    for k, (col, dx) in enumerate(zip([blue, orange, slate], [-0.24, 0, 0.24])):
+        x = np.arange(6) + dx
+        if c_joint is not None:
+            ax.vlines(x, p_hat[:, k] - c_joint * se_hat[:, k], p_hat[:, k] + c_joint * se_hat[:, k],
+                      color=col, alpha=0.25, lw=11)
+        miss = np.abs(p_hat[:, k] - p_true[:, k]) > 1.96 * se_hat[:, k]
+        for xm in x[miss]:                                  # shade the intervals that missed
+            ax.axvspan(xm - 0.1, xm + 0.1, color=red, alpha=0.15, lw=0)
+        ax.vlines(x, p_hat[:, k] - 1.96 * se_hat[:, k], p_hat[:, k] + 1.96 * se_hat[:, k],
+                  color=np.where(miss, red, col), lw=np.where(miss, 3.5, 2))
+        ax.plot(x, p_hat[:, k], 'o', color=col, ms=7, label=f'Candidate {cands[k]}')
+        ax.plot(x, p_true[:, k], 'x', color='black', ms=9, mew=2,
+                label='True share' if k == 2 else None)
+    ax.set_xticks(np.arange(6), [f'{s}\n($N_s$ = {N_s[i, 0]})' for i, s in enumerate(states)])
+    ax.yaxis.set_major_formatter(lambda v, _: f'{100 * v:.0f}%')
+    ax.tick_params(labelsize=13)
+    ax.set_ylim(0, 0.62)
+    ax.grid(alpha=0.3, axis='y')
+    ax.legend(ncol=4, loc='upper center', frameon=False, fontsize=13)
+    plt.tight_layout()
+
+poll_plot()
+```
+
+- Each interval is right 95% of the time. What's the chance that **all 18** are right?
+
+. . .
+
+- Simulating many polls from the truth: only about `{python} cover_196`. The red ones missed
+
+## A Joint Confidence Set
+
+- $p_{s,k}$: share of candidate $k \in \{A, B, C\}$ among voters in state $s$
+- $N_s$: number of respondents from state $s$, and $\widehat{se}_{s,k} = \sqrt{\hat p_{s,k}(1-\hat p_{s,k})/N_s}$
+
+. . .
+
+- We want **one** statement about all 18 shares at once:
+$$
+P\left\{ p_{s,k} \in \left[\hat p_{s,k} - c\cdot \widehat{se}_{s,k},\ \hat p_{s,k} + c\cdot \widehat{se}_{s,k}\right] \text{ for every } s, k \right\} = 1 - \alpha
+$$
+- Same form as on TV: only the multiplier $c$ changes
+- $c = 1.96$ is too small. How large must $c$ be?
+
+## Why This Root?
+
+Let $t_{s,k} \equiv (\hat p_{s,k} - p_{s,k})/\widehat{se}_{s,k}$, the usual t-statistic. Then
+$$
+\text{all 18 intervals cover}
+\iff |t_{s,k}| \le c \ \text{ for every } s,k
+\iff \underbrace{\max_{s,k}\, |t_{s,k}|}_{\equiv\, R_n} \le c
+$$
+
+- So $c$ is the $1-\alpha$ quantile of $R_n$: the whole problem boils down to one number
+
+. . .
+
+- Why divide by $\widehat{se}_{s,k}$? Shares in RS are much noisier than in SP
+- Without it, every interval gets the same width: $\hat p_{s,k} \pm c$
+- Then the noisy RS cells set $c$, and SP gets needlessly wide intervals
+- Studentizing puts all 18 on the same scale: each one gets a fair share of $\alpha$
+
+## What Is the Distribution of $R_n$?
+
+- CLT + delta method: $(t_{s,k})_{s,k} \xrightarrow{d} Z \sim N(0, \Sigma(P))$, so $R_n \xrightarrow{d} \max_{s,k}|Z_{s,k}|$
+- Across states, the $Z$'s are independent. Within a state, candidates compete for voters:
+$$
+\Corr(Z_{s,j}, Z_{s,k}) = -\sqrt{\frac{p_{s,j}\, p_{s,k}}{(1-p_{s,j})(1-p_{s,k})}}, \qquad j \neq k
+$$
+- The maximum of 18 correlated normals has no closed-form quantile
+- And that quantile depends on the unknown shares $p_{s,k}$
+
+. . .
+
+::: {.thm .takeaway}
+::: {.thmhead}
+What we really want
+:::
+The distribution of $R_n$ **at our sample size**, without having to derive its limit.
+:::
+
+## The Idea in Words
+
+- If we knew $P$, we would simulate many polls from $P$ and compute $R_n$ in each one
+- The $95\%$ quantile of the simulated $R_n$'s would be our $c$. But we don't know $P$...
+
+. . .
+
+- We do know $\hat P_n$: the empirical distribution of our 2,000 respondents
+- **Bootstrap**: simulate polls from $\hat P_n$ instead of $P$
+- Simulating from $\hat P_n$ = drawing 2,000 respondents **with replacement** from our sample
+- Efron (1979): you _pull yourself up by your bootstraps_
+
+. . .
+
+- Dark magic? Do they teach this at Hogwarts? No: it's just the plug-in principle!
+- Today: the **non-parametric** bootstrap with **iid** data
+
+# Roots and Pivots {visibility="uncounted"}
+
+## Setup
+
+- Data: $X^n = (X_1, \dots, X_n)$, iid with unknown distribution $P \in \mathcal{P}$
+- The model $\mathcal{P}$ can be parametric, semiparametric or nonparametric
+- Parameter of interest: $\theta(P) \in \Theta \equiv \{\theta(P) : P \in \mathcal{P}\}$
+- Goal: a random set $C_n = C_n(X^n)$ such that $P\{\theta(P) \in C_n\} \approx 1-\alpha$
+
+. . .
+
+::: {.thm}
+::: {.thmhead}
+Definition (Root)
+:::
+A **root** is any real-valued function $R_n(X^n, \theta(P))$ of the data and of the parameter.
+:::
+
+- The name is due to Beran (1984)
+- Examples: $\sqrt n\,(\hat\theta_n - \theta(P))$ and $\sqrt n\,(\hat\theta_n - \theta(P))/\hat\sigma_n$
+- In the poll: $\theta(P)$ stacks the 18 shares, and $R_n = \max_{s,k}|t_{s,k}|$
+
+## The Object of Interest
+
+::: {.thm}
+::: {.thmhead}
+Definition (Sampling Distribution of the Root)
+:::
+$$
+J_n(x, P) \equiv P\left\{R_n(X^n, \theta(P)) \le x\right\},
+\qquad
+J_n^{-1}(1-\alpha, P) \equiv \inf\left\{x : J_n(x, P) \ge 1-\alpha\right\}
+$$
+:::
+
+- $J_n$ depends on the sample size $n$ **and** on the unknown $P$
+- The infimum handles discrete distributions, where quantiles may not be unique
+
+. . .
+
+- If we knew $J_n(\cdot, P)$, we could invert the root:
+$$
+C_n = \left\{\theta \in \Theta : J_n^{-1}(\tfrac{\alpha}{2}, P) \le R_n(X^n, \theta) \le J_n^{-1}(1 - \tfrac{\alpha}{2}, P)\right\}
+$$
+- By construction, $P\{\theta(P) \in C_n\} \ge 1 - \alpha$, with equality if $J_n$ is continuous
+
+## From $J_n$ to an Interval
+
+- With $R_n = \sqrt n\,(\hat\theta_n - \theta)$, the two inequalities that define $C_n$ read
+$$
+J_n^{-1}(\tfrac{\alpha}{2}, P) \le \sqrt n\,(\hat\theta_n - \theta) \le J_n^{-1}(1 - \tfrac{\alpha}{2}, P)
+$$
+- Solve for $\theta$:
+$$
+\hat\theta_n - \frac{J_n^{-1}(1-\frac{\alpha}{2}, P)}{\sqrt n} \le \theta \le \hat\theta_n - \frac{J_n^{-1}(\frac{\alpha}{2}, P)}{\sqrt n}
+$$
+- Careful with the flip: the **upper** quantile gives the **lower** endpoint
+- If $J_n$ is symmetric around zero, this is just $\hat\theta_n \pm J_n^{-1}(1-\frac{\alpha}{2}, P)/\sqrt n$
+
+. . .
+
+::: {.thm .takeaway}
+::: {.thmhead}
+The goal of this lecture
+:::
+We want a confidence set for $\theta(P)$. For that, all we need is $J_n(\cdot, P)$.
+:::
+
+## Pivots
+
+::: {.thm}
+::: {.thmhead}
+Definition (Pivot)
+:::
+The root $R_n(X^n, \theta(P))$ is a **pivot** if $J_n(x, P)$ does not depend on $P$: $J_n(x, P) = J_n(x)$ for all $P \in \mathcal{P}$.
+:::
+
+Examples:
+
+- $X_i \iid N(\theta, 1)$: $\ \sqrt n\,(\bar X_n - \theta) \sim N(0,1)$, whatever $\theta$ is
+- $X_i \iid N(\mu, \sigma^2)$: $\ \sqrt n\,(\bar X_n - \mu)/S_n \sim t_{n-1}$, whatever $\mu$ and $\sigma$ are
+- Location-scale families, $X_i \sim F[(x - \theta)/\sigma]$ with $F$ known: $\ (\hat\theta_n - \theta)/\hat\sigma_n$
+- Continuous $F$: $\ \sqrt n \sup_x |\hat F_n(x) - F(x)|$ (Kolmogorov–Smirnov)
+
+. . .
+
+- Location-scale needs equivariant $\hat\theta_n$ and $\hat\sigma_n$, like $\bar X_n$ and $S_n$ (L&R Example 18.2.1)
+
+## Why Pivots Are Great
+
+- Coverage is **exact**: $P\{\theta(P) \in C_n\} = 1-\alpha$ for every $n$ and every $P \in \mathcal{P}$
+- No asymptotics at all: $n = 15$ is as good as $n = 15{,}000$
+- Only **one** distribution to learn: look it up once in a table (think $t_{n-1}$)
+- No closed form? Simulate it once, from any $P \in \mathcal{P}$ you like
+
+. . .
+
+- Bootstrap preview: we will replace $P$ by an estimate $\hat P_n$
+- The less $J_n(\cdot, P)$ depends on $P$, the less that replacement hurts
+- Moral, and we will come back to it: bootstrap a pivot whenever you can
+
+. . .
+
+- [Exercise: show that the location-scale root is a pivot (L&R Problem 18.1)]{.alert}
+
+## Asymptotic Pivots
+
+::: {.thm}
+::: {.thmhead}
+Definition (Asymptotic Pivot)
+:::
+The root is an **asymptotic pivot** if $J_n(\cdot, P)$ converges weakly to a limit $J$ that does not depend on $P$.
+:::
+
+- The t-statistic: if $0 < \sigma^2(P) < \infty$, then $\sqrt n\,(\bar X_n - \theta(P))/S_n \xrightarrow{d} N(0,1)$
+- That's the TV margin of error: it holds for **every** $P$ with finite variance
+- Parametric models: $n(\hat\theta_n - \theta)'I(\hat\theta_n)(\hat\theta_n - \theta) \xrightarrow{d} \chi^2_k$ (Wald)
+
+. . .
+
+- Recipe: build $C_n$ with the quantiles of $J$ instead of those of $J_n$
+- The price: coverage is only right in the limit, $\lim_{n} P\{\theta(P) \in C_n\} = 1-\alpha$
+
+## When the Limit Depends on $P$
+
+- The typical case: $J_n(\cdot, P) \to J(\cdot, P)$, and the limit depends on $P$
+- Example: $\sqrt n\,(\bar X_n - \theta(P)) \xrightarrow{d} N(0, \sigma^2(P))$, so use $J(x, \hat P_n) = \Phi(x/\hat\sigma_n)$
+
+. . .
+
+- This only works if you **know** $J(\cdot, P)$ and can estimate whatever it depends on
+- The $\alpha$-trimmed mean, for a symmetric $F$: good luck estimating its asymptotic variance
+$$
+\sigma^2(\alpha, F) = \frac{1}{(1-2\alpha)^2}\left[\int_{F^{-1}(\alpha)}^{F^{-1}(1-\alpha)} \left(t - \theta(F)\right)^2 dF(t) + 2\alpha\left(F^{-1}(\alpha) - \theta(F)\right)^2\right]
+$$
+- In the poll, $J(\cdot, P)$ is the law of $\max_{s,k}|Z_{s,k}|$: no closed form at all
+
+. . .
+
+- Even then, it's a **double** approximation: $J_n(\cdot, P) \approx J(\cdot, P) \approx J(\cdot, \hat P_n)$
+
+## Two Ways to Approximate $J_n(x, P)$
+
+$$
+\begin{aligned}
+\textbf{Asymptotics:}&\quad J_n(x, P) \;\underset{n \to \infty}{\approx}\; J(x, P) \;\approx\; J(x, \hat P_n)\\[10pt]
+\textbf{Bootstrap:}&\quad J_n(x, P) \;\underset{n \to \infty}{\approx}\; J_n(x, \hat P_n) \;\underset{B \to \infty}{\approx}\; L_n(x)
+\end{aligned}
+$$
+
+- Asymptotics: you must know the limit $J(\cdot, P)$, and then estimate it
+- Bootstrap: estimate $J_n(\cdot, P)$ directly, by plugging $\hat P_n$ into $J_n$ itself
+- $L_n$ is a simulation-based approximation (more soon): $B$ is up to you, $n$ is not
+
+. . .
+
+::: {.thm .takeaway}
+::: {.thmhead}
+Read this twice
+:::
+The bootstrap does **not** avoid asymptotics: it is justified as $n \to \infty$. What it avoids is having to **know** $J(\cdot, P)$.
+:::
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# The Bootstrap {visibility="uncounted"}
+
+## The Bootstrap Estimator
+
+- Estimate $P$ by the **empirical distribution**, which puts mass $1/n$ on each $X_i$:
+$$
+\hat P_n(E) \equiv \frac{1}{n}\sum_{i=1}^n I\{X_i \in E\}
+$$
+- The bootstrap estimator of the sampling distribution is a plug-in: $J_n(x, \hat P_n)$
+- Unusual target: $J_n(\cdot, P)$ changes with $n$, and we estimate it at our $n$
+
+. . .
+
+- The bootstrap confidence set replaces $P$ by $\hat P_n$ in the quantiles:
+$$
+C_n^{*} = \left\{\theta \in \Theta : J_n^{-1}(\tfrac{\alpha}{2}, \hat P_n) \le R_n(X^n, \theta) \le J_n^{-1}(1-\tfrac{\alpha}{2}, \hat P_n)\right\}
+$$
+- Two questions: is $J_n(\cdot, \hat P_n)$ close to $J_n(\cdot, P)$? And how do we compute it?
+
+## Why Should $\hat P_n$ Be Close to $P$?
+
+- With real-valued data, $\hat F_n(t) \equiv \hat P_n\big((-\infty, t]\big)$ is the empirical CDF
+- Fixed $t$: $\hat F_n(t) \to F(t)$ a.s. by the SLLN, since $\E\left[I\{X_i \le t\}\right] = F(t)$
+- We can do much better: the convergence is **uniform** in $t$
+
+::: {.thm}
+::: {.thmhead}
+Theorem (Glivenko–Cantelli)
+:::
+If $X_1, \dots, X_n$ are iid real-valued random variables with CDF $F$, then
+$$
+\sup_{t \in \R} \left|\hat F_n(t) - F(t)\right| \to 0 \quad \text{almost surely}
+$$
+:::
+
+- And fast: $P\left\{\sup_t |\hat F_n(t) - F(t)| > d\right\} \le 2e^{-2nd^2}$ for every $n$ (DKW inequality)
+- In the poll, $\hat P_n$ is just 24 cell frequencies: the SLLN alone does the job
+
+## Glivenko–Cantelli Works, Baby!
+
+$X_i \iid U[0,1]$, two independent samples for each $n$: $\hat F_n$ is a **random** function
+
+```{python}
+#| fig-align: center
+np.random.seed(42)
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.4))
+for ax, n_gc in zip(axes, [10, 1000]):
+    ax.plot([0, 1], [0, 1], color='black', ls='--', lw=1.5, label='True $F(t) = t$')
+    for col, lab in zip([blue, orange], ['Sample 1', 'Sample 2']):
+        x = np.sort(np.random.uniform(0, 1, n_gc))
+        i = np.arange(1, n_gc + 1)
+        sup_gap = max(np.max(i / n_gc - x), np.max(x - (i - 1) / n_gc))
+        ax.step(np.r_[0, x, 1], np.r_[0, i / n_gc, 1], where='post', color=col, lw=2,
+                label=f'{lab}: sup gap = {sup_gap:.3f}')
+    ax.set_title(f'$n$ = {n_gc:,}', fontsize=15)
+    ax.set_xlabel('$t$', fontsize=13)
+    ax.grid(alpha=0.3)
+    ax.legend(loc='upper left', fontsize=12)
+plt.tight_layout()
+```
+
+## Is That Enough?
+
+- Glivenko–Cantelli: $\hat P_n$ is close to $P$
+- But we need more: $J_n(\cdot, \hat P_n)$ close to $J_n(\cdot, P)$
+- That requires $J_n(\cdot, P)$ to be **continuous** in $P$: close inputs, close outputs
+
+. . .
+
+Two ingredients, which we will make precise soon:
+
+1. $\hat P_n \to P$ in some sense (Glivenko–Cantelli, the SLLN)
+2. Whenever $P_n \to P$ in that sense, $J_n(\cdot, P_n) \to J(\cdot, P)$
+
+. . .
+
+- Ingredient 2 is the delicate one. We will meet a root for which it fails: the maximum!
+
+# In Practice {visibility="uncounted"}
+
+## Computing $J_n(x, \hat P_n)$
+
+- Exact computation averages over all $n^n$ equally likely resamples: hopeless
+- So we simulate. Conditional on the data, for each $b = 1, \dots, B$:
+
+1. Draw $n$ observations **with replacement** from the data: $X^{n*}_b = (X^*_{1,b}, \dots, X^*_{n,b})$
+2. Compute the root at the plug-in parameter: $R^*_{n,b} = R_n(X^{n*}_b, \hat\theta_n)$, with $\hat\theta_n = \theta(\hat P_n)$
+3. Compute the empirical CDF of the $B$ roots: $L_n(x) \equiv \frac{1}{B}\sum_{b=1}^B I\{R^*_{n,b} \le x\}$
+4. Use the quantiles of $L_n$ in place of those of $J_n(\cdot, P)$
+
+. . .
+
+- Two sources of randomness are floating around here. Which ones?
+
+## Two Details That Matter
+
+- Why center at $\hat\theta_n$? Under $\hat P_n$, the "true" parameter **is** $\theta(\hat P_n) = \hat\theta_n$
+- In the poll: bootstrap shares are centered at $\hat p_{s,k}$, not at the unknown $p_{s,k}$
+
+. . .
+
+- How large should $B$ be? For a fixed sample, $L_n \to J_n(\cdot, \hat P_n)$ as $B \to \infty$
+- $B$ only kills the **simulation** error, which is under your control
+- $n$ drives the **statistical** error, $J_n(\cdot, \hat P_n) - J_n(\cdot, P)$: nothing to do about it
+- Tail quantiles need many draws: $B \ge 1{,}000$ is a reasonable start
+
+## In Code
+
+`S[i]` is the state (0 to 5) and `V[i]` the vote (0 = A, 1 = B, 2 = C, 3 = other) of respondent `i`
+
+```{python}
+#| echo: true
+def shares(S, V):                     # 6 x 3 array with p_hat[s, k]
+    return np.array([[np.mean(V[S == s] == k) for k in range(3)] for s in range(6)])
+
+def max_t(S, V, p_ref):               # the root R_n, centered at p_ref
+    p = shares(S, V)
+    se = np.sqrt(p * (1 - p) / np.bincount(S, minlength=6)[:, None])
+    return np.max(np.abs(p - p_ref) / se)
+
+def bootstrap_c(S, V, B=1000, alpha=0.05):
+    n, p_hat = len(S), shares(S, V)   # under P_hat, the truth is p_hat
+    R_star = [max_t(S[i], V[i], p_hat)
+              for i in np.random.randint(0, n, size=(B, n))]  # resample rows
+    return np.quantile(R_star, 1 - alpha)
+```
+
+- The joint interval is then `p_hat ± bootstrap_c(S, V) * se_hat`. That's it!
+
+## Building the Interval
+
+- Bootstrap quantiles: $\hat c_q \equiv L_n^{-1}(q)$, from the $B$ draws of $R^*_{n,b} = \sqrt n\,(\hat\theta^*_{n,b} - \hat\theta_n)$
+- Equi-tailed interval, flip included:
+$$
+\left[\hat\theta_n - \hat c_{1-\alpha/2}/\sqrt n,\ \ \hat\theta_n - \hat c_{\alpha/2}/\sqrt n\right]
+$$
+- Symmetric interval: bootstrap $|R_n|$ instead, then use $\hat\theta_n \pm L_n^{-1}(1-\alpha)/\sqrt n$
+- Joint rectangle (the poll): $\hat p_{s,k} \pm \hat c^{\,*}\,\widehat{se}_{s,k}$, with $\hat c^{\,*}$ the $1-\alpha$ quantile of $\max_{s,k}|t^*_{s,k}|$
+
+. . .
+
+- Efron's **percentile** interval uses the quantiles of $\hat\theta^*_{n,b}$ directly: no flip!
+- It's popular in software, but it is **not** the interval above
+- [Exercise: when does the percentile interval work? (L&R Problem 18.11)]{.alert}
+
+## What Is an Observation?
+
+- In a regression, the unit is the pair $Z_i = (Y_i, X_i)$: resample **rows**
+- Pairs bootstrap: draw $Z^*_1, \dots, Z^*_n$ with replacement, run OLS, store $\hat\beta^*_b$
+- Root: $\sqrt n\,(\hat\beta^*_{b,j} - \hat\beta_j)$ or the t-statistic, exactly as before
+- Bootstrap standard error: the standard deviation of $\hat\beta^*_{1,j}, \dots, \hat\beta^*_{B,j}$
+
+. . .
+
+- Never resample $Y$ and $X$ separately: that destroys the relation you want to learn!
+- The pairs bootstrap is robust to heteroskedasticity: it mimics the sandwich formula
+- Why it works: $\hat\beta = \left(\frac{1}{n}\sum_i X_iX_i'\right)^{-1}\frac{1}{n}\sum_i X_iY_i$ is a smooth function of means (soon)
+
+## Back to the Poll
+
+```{python}
+#| fig-align: center
+np.random.seed(123)
+c_star = bootstrap_c(S, V, B=1000)
+c_star_txt = f'{c_star:.2f}'
+
+# Coverage over many polls of 2,000 (bootstrap via cell counts: same thing, faster)
+np.random.seed(321)
+hits_196, hits_boot, M = 0, 0, 500
+for m in range(M):
+    counts = np.random.multinomial(n_tv, probs)
+    R = max_t_counts(counts[None], p_true)[0]
+    p_m = counts.reshape(6, 4)[:, :3] / counts.reshape(6, 4).sum(1, keepdims=True)
+    c_m = np.quantile(max_t_counts(np.random.multinomial(n_tv, counts / n_tv, size=1000), p_m), 0.95)
+    hits_196 += R <= 1.96
+    hits_boot += R <= c_m
+cov_196_txt, cov_boot_txt = f'{100 * hits_196 / M:.0f}%', f'{100 * hits_boot / M:.0f}%'
+
+poll_plot(c_joint=c_star)
+```
+
+- Thin bars: $\pm 1.96\,\widehat{se}$. Shaded bars: the joint rectangle, $\pm \hat c^{\,*}\widehat{se}$ with $\hat c^{\,*} =$ `{python} c_star_txt` ($B = 1{,}000$)
+- Over `{python} f"{M}"` simulated polls, all 18 covered: `{python} cov_196_txt` with $\pm 1.96$, `{python} cov_boot_txt` with $\pm \hat c^{\,*}$
+
+## Play With $n$ and $B$
+
+Bars: $B$ bootstrap draws from **one** poll. Curve: the true $J_n$ (40,000 polls from $P$)
+
+```{python}
+# Hand the poll design and the truth J_n(., P) for a few poll sizes to the Observable JS cells below
+n_grid = [1000, 2000, 5000, 10000, 20000]
+edges = np.linspace(1, 5.5, 46)
+truth = {}
+np.random.seed(2028)
+for n_g in n_grid:
+    R = max_t_counts(np.random.multinomial(n_g, probs, size=40000), p_true)
+    dens, _ = np.histogram(np.clip(R, edges[0], edges[-1] - 1e-9), bins=edges, density=True)
+    truth[str(n_g)] = {'dens': dens.tolist(), 'c': float(np.quantile(R, 0.95)), 'cov196': float(np.mean(R <= 1.96))}
+ojs_define(poll_probs=probs.tolist(), poll_truth=truth, poll_edges=edges.tolist(), poll_c_limit=float(c_limit))
+```
+
+```{ojs}
+//| echo: false
+viewof demo = Inputs.form({
+  n: Inputs.radio([1000, 2000, 5000, 10000, 20000], {value: 1000, label: "Poll size n", format: d => d.toLocaleString("en-US")}),
+  B: Inputs.range([50, 10000], {value: 200, step: 1, transform: Math.log, label: "Bootstrap draws B"}),
+  poll: Inputs.button("Draw a new poll", {value: 1, reduce: v => v + 1})
+}, {template: ({n, B, poll}) => {
+  n.style.setProperty("--input-width", "560px")
+  n.style.maxWidth = "none"
+  B.style.setProperty("--input-width", "300px")
+  return html`<div style="display: flex; flex-direction: column; align-items: center">
+    ${n}<div style="display: flex; align-items: center; column-gap: 30px">${B}${poll}</div>
+  </div>`
+}})
+```
+
+```{ojs}
+//| echo: false
+// Multinomial draw as a chain of binomials (exact). With categorical data,
+// resampling n rows with replacement is a Multinomial(n, cell frequencies) draw.
+function rmultinom(n, pr, binom) {
+  const out = new Array(pr.length).fill(0)
+  let left = n, mass = 1
+  for (let j = 0; j < pr.length - 1 && left > 0; j++) {
+    const q = Math.min(1, Math.max(0, pr[j] / mass))
+    out[j] = q > 0 ? binom(left, q)() : 0
+    left -= out[j]
+    mass -= pr[j]
+  }
+  out[pr.length - 1] += left
+  return out
+}
+
+// max_{s,k} |t_{s,k}| for 6 states x 4 votes (the first 3 votes are candidates)
+function maxT(counts, pRef) {
+  let m = 0
+  for (let s = 0; s < 6; s++) {
+    const N = counts[4 * s] + counts[4 * s + 1] + counts[4 * s + 2] + counts[4 * s + 3]
+    for (let k = 0; k < 3; k++) {
+      const p = counts[4 * s + k] / N
+      const t = Math.abs(p - pRef[3 * s + k]) / Math.sqrt(p * (1 - p) / N)
+      m = Math.max(m, Number.isNaN(t) ? Infinity : t)
+    }
+  }
+  return m
+}
+
+pollCounts = rmultinom(demo.n, poll_probs, d3.randomBinomial.source(d3.randomLcg(1000 + demo.poll)))
+pollShares = d3.range(18).map(i => {
+  const s = Math.floor(i / 3), k = i % 3
+  const c = pollCounts.slice(4 * s, 4 * s + 4)
+  return c[k] / d3.sum(c)
+})
+
+bootR = {
+  const binom = d3.randomBinomial.source(d3.randomLcg(7 + 31 * demo.poll))
+  const freq = pollCounts.map(c => c / demo.n)
+  return Float64Array.from({length: demo.B}, () => maxT(rmultinom(demo.n, freq, binom), pollShares))
+}
+
+cStar = d3.quantile(bootR, 0.95)
+truthN = poll_truth[String(demo.n)]
+bw = poll_edges[1] - poll_edges[0]
+histBoot = poll_edges.slice(0, -1).map((x0, i) => {
+  const x1 = poll_edges[i + 1]
+  const inBin = bootR.filter(r => (i === 0 ? true : r >= x0) && (i === poll_edges.length - 2 ? true : r < x1)).length
+  return {x0, x1, dens: inBin / (demo.B * bw)}
+})
+truthLine = truthN.dens.map((d, i) => ({x: (poll_edges[i] + poll_edges[i + 1]) / 2, dens: d}))
+
+Plot.plot({
+  width: 1150, height: 390, marginLeft: 50, marginBottom: 45,
+  style: {fontSize: "20px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {label: "max |t|", domain: [1, 5.5], labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: [0, 1.6], ticks: 4},
+  grid: true,
+  marks: [
+    Plot.rectY(histBoot, {x1: "x0", x2: "x1", y: "dens", fill: "#0072BC", fillOpacity: 0.35, inset: 0.5}),
+    Plot.line(truthLine, {x: "x", y: "dens", stroke: "#2D3E50", strokeWidth: 3, curve: "basis"}),
+    Plot.ruleX([1.96], {stroke: "#EB811B", strokeWidth: 3, strokeDasharray: "7,5"}),
+    Plot.ruleX([poll_c_limit], {stroke: "#888888", strokeWidth: 2, strokeDasharray: "3,4"}),
+    Plot.ruleX([truthN.c], {stroke: "#2D3E50", strokeWidth: 3}),
+    Plot.ruleX([cStar], {stroke: "#0072BC", strokeWidth: 3}),
+    Plot.text([`bootstrap ĉ* = ${cStar.toFixed(2)}`], {frameAnchor: "top-right", dx: -10, dy: 8, fill: "#0072BC", fontWeight: "bold", fontSize: 21, stroke: "white", strokeWidth: 6}),
+    Plot.text([`true c = ${truthN.c.toFixed(2)}`], {frameAnchor: "top-right", dx: -10, dy: 36, fill: "#2D3E50", fontWeight: "bold", fontSize: 21, stroke: "white", strokeWidth: 6}),
+    Plot.text([`limit = ${poll_c_limit.toFixed(2)}`], {frameAnchor: "top-right", dx: -10, dy: 64, fill: "#888888", fontWeight: "bold", fontSize: 21, stroke: "white", strokeWidth: 6}),
+    Plot.text([`TV: 1.96 covers all 18 only ${Math.round(100 * truthN.cov196)}% of the time`], {frameAnchor: "top-right", dx: -10, dy: 92, fill: "#EB811B", fontWeight: "bold", fontSize: 21, stroke: "white", strokeWidth: 6})
+  ]
+})
+```
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# Why It Works {visibility="uncounted"}
+
+## Consistency: The General Recipe
+
+::: {.thm}
+::: {.thmhead}
+Theorem (L&R 18.3.1)
+:::
+Let $\mathcal{C}_P$ be a set of sequences $\{P_n\}$ that contains $\{P, P, \dots\}$. Assume that, for every $\{P_n\} \in \mathcal{C}_P$, $J_n(\cdot, P_n)$ converges weakly to the same **continuous** limit $J(\cdot, P)$. If $\{\hat P_n\} \in \mathcal{C}_P$ with probability one, then:
+
+(i) $\ \sup_x \left|J_n(x, \hat P_n) - J_n(x, P)\right| \to 0$ almost surely
+
+(ii) $\ J_n^{-1}(1-\alpha, \hat P_n) \to J^{-1}(1-\alpha, P)$ almost surely, if $J(\cdot, P)$ is strictly increasing at $J^{-1}(1-\alpha, P)$
+
+(iii) $\ P\left\{R_n(X^n, \theta(P)) \le J_n^{-1}(1-\alpha, \hat P_n)\right\} \to 1-\alpha$
+:::
+
+- Think of $\mathcal{C}_P$ as the sequences with $d(P_n, P) \to 0$, for some metric $d$
+- Part (iii): the bootstrap confidence set has asymptotically correct coverage
+
+## Proof of (i) and (ii) {.tightmath}
+
+- Fix a nonrandom $\{P_n\} \in \mathcal{C}_P$. Since $J(\cdot, P)$ is continuous, Pólya's theorem gives
+$$
+\sup_x |J_n(x, P_n) - J(x, P)| \to 0
+\quad\text{and}\quad
+\sup_x |J_n(x, P) - J(x, P)| \to 0
+$$
+- The second one uses the constant sequence $\{P, P, \dots\} \in \mathcal{C}_P$. By the triangle inequality:
+$$
+\sup_x |J_n(x, P_n) - J_n(x, P)| \le \sup_x |J_n(x, P_n) - J(x, P)| + \sup_x |J(x, P) - J_n(x, P)| \to 0
+$$
+
+. . .
+
+- Now the randomness: fix an $\omega$ in the probability-one event where $\{\hat P_n(\omega)\} \in \mathcal{C}_P$
+- Along that path, $\{\hat P_n(\omega)\}$ is just a nonrandom sequence in $\mathcal{C}_P$: apply the above $\implies$ (i)
+
+. . .
+
+- For (ii): if $F_n \Rightarrow F$, then $F_n^{-1}(1-\alpha) \to F^{-1}(1-\alpha)$ (L&R Lemma 11.2.1)
+- This needs $F$ continuous and strictly increasing at $F^{-1}(1-\alpha)$
+- Apply it path by path, with $F_n = J_n(\cdot, \hat P_n(\omega))$ and $F = J(\cdot, P)$ $\implies$ (ii)
+
+## Proof of (iii)
+
+- Under $P$, $R_n(X^n, \theta(P)) \xrightarrow{d} J(\cdot, P)$: take $\{P, P, \dots\}$ in the assumption
+- By (ii), $\hat c_n \equiv J_n^{-1}(1-\alpha, \hat P_n) \to c \equiv J^{-1}(1-\alpha, P)$ almost surely
+- By Slutsky, $R_n(X^n, \theta(P)) - \hat c_n \xrightarrow{d} J(\cdot + c, P)$, which is continuous at zero, so
+$$
+P\left\{R_n(X^n, \theta(P)) \le \hat c_n\right\}
+= P\left\{R_n(X^n, \theta(P)) - \hat c_n \le 0\right\}
+\to J(c, P) = 1 - \alpha
+$$
+
+. . .
+
+- Bonus: (iii) still holds if (i) and (ii) hold only in probability (L&R Problem 18.3)
+- Almost sure: **strongly** consistent bootstrap. In probability: **weakly** consistent
+
+## Reading the Theorem
+
+- All the work is in the assumption: $J_n(\cdot, P_n) \to J(\cdot, P)$ along **every** sequence in $\mathcal{C}_P$
+- That is a form of continuity of $J_n$ in $P$, uniformly in $n$: "local uniformity"
+- Why sequences? $\hat P_n$ is random, but each realized path is a nonrandom sequence
+- So: first study nonrandom $\{P_n\}$, then plug in $\{\hat P_n\}$ path by path
+
+. . .
+
+- The right notion of "$P_n \to P$", i.e., the set $\mathcal{C}_P$, depends on the root
+- The bigger $\mathcal{C}_P$ can be, the easier it is to show that $\{\hat P_n\} \in \mathcal{C}_P$
+- Recipe for a new root: (1) find $\mathcal{C}_P$ with $J_n(\cdot, P_n) \to J(\cdot, P)$; (2) show $\{\hat P_n\} \in \mathcal{C}_P$
+
+## The Nonparametric Mean
+
+::: {.thm}
+::: {.thmhead}
+Theorem (L&R 18.3.3)
+:::
+Let $F$ have finite, nonzero variance $\sigma^2(F)$ and mean $\theta(F)$. Let $J_n(\cdot, F)$ be the distribution of $R_n = \sqrt n\,(\bar X_n - \theta(F))$ under $F$.
+
+(i) Let $\mathcal{C}_F$ be the set of sequences $\{F_n\}$ such that $F_n \Rightarrow F$, $\theta(F_n) \to \theta(F)$ and $\sigma^2(F_n) \to \sigma^2(F)$. For every $\{F_n\} \in \mathcal{C}_F$, $J_n(\cdot, F_n)$ converges weakly to $N(0, \sigma^2(F))$.
+
+(ii) If $X_1, \dots, X_n$ are iid $F$, then the bootstrap $J_n(\cdot, \hat F_n)$ is strongly consistent: (i)–(iii) of the previous theorem hold.
+:::
+
+- Part (i) is a CLT for a **triangular array**: row $n$ is iid from $F_n$, which changes with $n$
+- That's exactly what resampling from $\hat F_n$ looks like: a new distribution for each $n$
+
+## Proof of (i): Setup
+
+- For each $n$, let $X_{n,1}, \dots, X_{n,n}$ be iid $F_n$, and let $Y_{n,i} \equiv X_{n,i} - \theta(F_n)$
+- Since $\sigma^2(F_n) \to \sigma^2(F) > 0$, Lindeberg–Feller gives $\sqrt n\, \bar Y_n \xrightarrow{d} N(0, \sigma^2(F))$ as long as
+$$
+\E\left[Y_{n,1}^2\, I\{Y_{n,1}^2 > \epsilon^2 n\}\right] \to 0 \qquad \text{for every } \epsilon > 0
+$$
+- The rows are iid, so the Lindeberg condition only involves $Y_{n,1}$
+
+. . .
+
+What we know about $Y_{n,1}$:
+
+- $Y_{n,1} \xrightarrow{d} Y \equiv X - \theta(F)$, with $X \sim F$: because $F_n \Rightarrow F$ and $\theta(F_n) \to \theta(F)$
+- $\E[Y_{n,1}^2] = \sigma^2(F_n) \to \sigma^2(F) = \E[Y^2]$
+- By the continuous mapping theorem, $Y_{n,1}^2 \xrightarrow{d} Y^2$
+
+## Proof of (i): Lindeberg {.tightmath}
+
+- Fix $\beta > 0$, a continuity point of the distribution of $Y^2$. For all $n > \beta/\epsilon^2$:
+$$
+\E\left[Y_{n,1}^2\, I\{Y_{n,1}^2 > \epsilon^2 n\}\right]
+\le \E\left[Y_{n,1}^2\, I\{Y_{n,1}^2 > \beta\}\right]
+= \E\left[Y_{n,1}^2\right] - \E\left[Y_{n,1}^2\, I\{Y_{n,1}^2 \le \beta\}\right]
+$$
+
+. . .
+
+- $Y_{n,1}^2 I\{Y_{n,1}^2 \le \beta\} \xrightarrow{d} Y^2 I\{Y^2 \le \beta\}$: continuous mapping, since $P\{Y^2 = \beta\} = 0$
+- These variables live in $[0, \beta]$, so their expectations converge too. Hence
+$$
+\E\left[Y_{n,1}^2\, I\{Y_{n,1}^2 > \beta\}\right] \to \E[Y^2] - \E\left[Y^2 I\{Y^2 \le \beta\}\right] = \E\left[Y^2 I\{Y^2 > \beta\}\right]
+$$
+
+. . .
+
+- So $\limsup_n \E\left[Y_{n,1}^2 I\{Y_{n,1}^2 > \epsilon^2 n\}\right] \le \E\left[Y^2 I\{Y^2 > \beta\}\right]$ for every such $\beta$
+- Continuity points are dense, so we can let $\beta \to \infty$ along them
+- Since $\E[Y^2] < \infty$, dominated convergence gives $\E[Y^2 I\{Y^2 > \beta\}] \downarrow 0$ $\blacksquare$
+
+## Proof of (ii)
+
+- By the previous theorem, it's enough to show that $\{\hat F_n\} \in \mathcal{C}_F$ with probability one:
+
+1. $\hat F_n \Rightarrow F$ a.s.: Glivenko–Cantelli gives $\sup_t |\hat F_n(t) - F(t)| \to 0$ a.s.
+2. $\theta(\hat F_n) = \bar X_n \to \theta(F)$ a.s.: the SLLN, since $\E|X| < \infty$ when $\sigma^2(F) < \infty$
+3. $\sigma^2(\hat F_n) = \frac{1}{n}\sum_i X_i^2 - \bar X_n^2 \to \sigma^2(F)$ a.s.: the SLLN for $X_i$ and for $X_i^2$
+
+- The intersection of three probability-one events has probability one $\blacksquare$
+
+. . .
+
+- In one line: Mallows' metric $d_2(\hat F_n, F) \to 0$ a.s. (Bickel and Freedman, 1981)
+- [Exercise: show that $\theta(F_n) \to \theta(F)$ follows from the other two conditions (L&R 18.5)]{.alert}
+
+## Beyond the Mean
+
+- **Studentized mean** (L&R 18.3.4): $\sqrt n\,(\bar X_n - \theta)/\hat\sigma_n$ works too: the bootstrap-t
+- **Multivariate mean** (L&R 18.3.5): $\|\sqrt n\,(\bar X_n - \theta)\|$ works for **any** norm $\|\cdot\|$
+- **Smooth functions** (L&R 18.3.6): $\sqrt n\,[f(\bar X_n) - f(\theta)]$, $f$ differentiable: delta method
+
+. . .
+
+- The poll: $p_{s,k} = P\{S = s, V = k\}/P\{S = s\}$ is a ratio of means, a smooth function
+- The max is continuous, and studentizing works as for the t-stat: our CI is valid
+- OLS: $\hat\beta = \left(\frac{1}{n}\sum_i X_iX_i'\right)^{-1}\frac{1}{n}\sum_i X_iY_i$, also a smooth function of means
+
+. . .
+
+- Reading Hansen? He writes these results as $\sqrt n\,(\bar Y^* - \bar Y) \xrightarrow{d^*} N(0, \Sigma)$, same idea
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# When It Fails {visibility="uncounted"}
+
+## The Maximum of a Uniform
+
+- $X_i \iid U(0, \theta)$, estimator $\hat\theta_n = X_{(n)} = \max_i X_i$, root $R_n = n\,(X_{(n)} - \theta) \le 0$
+- For $x \le 0$, the true distribution is
+$$
+J_n(x, P) = P\left\{X_{(n)} \le \theta + \tfrac{x}{n}\right\} = \left(1 + \frac{x}{n\theta}\right)^n \to e^{x/\theta}
+$$
+- So $R_n \xrightarrow{d} -\theta \cdot \text{Exp}(1)$: a **continuous** limit, with no mass at any point
+
+. . .
+
+- Bootstrap root: $R^*_n = n\,(X^*_{(n)} - X_{(n)}) \le 0$, which is zero if $X_{(n)}$ is ever drawn
+- Each draw misses $X_{(n)}$ with probability $1 - 1/n$, so, given the data,
+$$
+P\left\{R^*_n = 0 \,\middle|\, X^n\right\} = 1 - \left(1 - \tfrac{1}{n}\right)^n \to 1 - e^{-1} \approx 0.632
+$$
+- The bootstrap puts 63% of its mass on a single point, where the truth puts none!
+
+## In Pictures
+
+```{python}
+#| fig-align: center
+np.random.seed(11)
+B_fail = 10000
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.4))
+xg = np.linspace(-4, 0.5, 600)
+for ax, n_f in zip(axes, [100, 10000]):
+    x = np.sort(np.random.uniform(0, 1, n_f))                    # theta = 1
+    # The index of the max of n draws with replacement: P(j* <= j) = (j/n)^n
+    j_star = np.maximum(np.ceil(n_f * np.random.uniform(size=B_fail) ** (1 / n_f)), 1).astype(int)
+    R_star = np.sort(n_f * (x[j_star - 1] - x[-1]))
+    L_n = np.searchsorted(R_star, xg, side='right') / B_fail
+    J_n = np.where(xg <= 0, np.clip(1 + xg / n_f, 0, None) ** n_f, 1.0)
+    ax.plot(xg, J_n, color='black', ls='--', lw=2, label='True $J_n(x, P)$')
+    ax.step(xg, L_n, where='post', color=blue, lw=2.5, label='Bootstrap $L_n(x)$')
+    jump = np.mean(R_star == 0)
+    ax.annotate(f'jump at 0: {jump:.2f}', xy=(0, 1 - jump / 2), xytext=(-3.6, 0.85),
+                fontsize=14, color=red, arrowprops=dict(arrowstyle='->', color=red, lw=1.5))
+    ax.set_title(f'$n$ = {n_f:,}, $B$ = {B_fail:,}', fontsize=15)
+    ax.set_xlabel('$x$', fontsize=13)
+    ax.set_ylim(-0.02, 1.05)
+    ax.grid(alpha=0.3)
+    ax.legend(loc='upper left', fontsize=12, bbox_to_anchor=(0, 0.75))
+plt.tight_layout()
+```
+
+- More data does **not** help: the jump at zero is still there with $n = 10{,}000$
+
+## What Went Wrong?
+
+- Ingredient 2 failed: $J_n(\cdot, P_n) \to J(\cdot, P)$ breaks for sequences $P_n$ that look like $\hat P_n$
+- E.g., $P_n$ uniform on $n$ points in $[0, \theta]$, just like $\hat P_n$: you will prove this in the problem set
+- The known counterexamples share the culprit: a lack of uniformity in $P$
+
+. . .
+
+Other failures, all with iid data:
+
+- Infinite variance: for the mean, it works a.s. **iff** $\sigma^2 < \infty$ (Giné and Zinn, 1989)
+- Parameter on the boundary: $\hat\mu_n = \max(\bar X_n, 0)$ when $\mu = 0$ (L&R Problem 18.10)
+- Degenerate smooth functions: $\sqrt n\,(\bar X_n^2 - \mu^2)$ when $\mu = 0$ (L&R Problem 18.17)
+- Superefficient estimators (Hodges): not even the parametric bootstrap works (Beran, 1984)
+
+## Handle With Care
+
+:::: {.columns}
+::: {.column width="50%"}
+**If it fails**
+
+- $m$-out-of-$n$: resample only $m \ll n$
+- Subsampling (L&R Section 18.7)
+- Find a theorem for **your** root
+- Bootstrap a pivot when you can
+:::
+
+::: {.column width="50%" .polecol}
+**Other bootstraps**
+
+- Parametric: draw from $P_{\hat\psi}$
+- Residual: resample OLS residuals
+- Wild: robust to heteroskedasticity
+- Block: dependent data (soon!)
+- Cluster: resample whole clusters
+:::
+::::
+
+::: {.thm .takeaway}
+::: {.thmhead}
+The bottom line
+:::
+The bootstrap is not magic. Like any asymptotic approximation, it needs a theorem.
+:::
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+Questions?
+:::
+
+## References
+
+- Chapter 18 of _Testing Statistical Hypotheses_, by Erich Lehmann and Joseph Romano (Sections 18.1 to 18.3 and Example 18.7.2)
+- Chapter 10 of _Econometrics_, by Bruce Hansen
+- Efron (1979), "Bootstrap Methods: Another Look at the Jackknife", _Annals of Statistics_
+- Bickel and Freedman (1981), "Some Asymptotic Theory for the Bootstrap", _Annals of Statistics_
+- Beran (1984), "Bootstrap Methods in Statistics", _Jahresbericht der Deutschen Mathematiker-Vereinigung_
+- Giné and Zinn (1989), "Necessary Conditions for the Bootstrap of the Mean", _Annals of Statistics_

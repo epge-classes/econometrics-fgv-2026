@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="lecture02_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lecture02_files/libs/quarto-html/tabby.min.js"></script>
+<script src="lecture02_files/libs/quarto-html/popper.min.js"></script>
+<script src="lecture02_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="lecture02_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lecture02_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="lecture02_files/libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.18">
+
+  <title>Lecture 2: Bootstrap 101</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="lecture02_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="lecture02_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="lecture02_files/libs/revealjs/dist/theme/quarto-2e8f9a204b5badfa986f6549738efd1d.css">
+  <link href="lecture02_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="lecture02_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="lecture02_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="lecture02_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <!-- Text is set in Arial. Arimo (metric-compatible with Arial) downloads only as a
+       fallback where Arial is not installed; browsers skip it when Arial is present.
+       Arimo has no 300 weight, so do not request one: Google Fonts rejects the whole URL.
+       Fira Mono is the code font. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&amp;family=Fira+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <!-- Math font: classic Computer Modern (MathJax 3's look), Raul's pick.
+       Quarto's RevealMath plugin overwrites window.MathJax, so trap the
+       first assignment, inject output.font, then step out of the way.
+       Built against Quarto 1.10.18; re-check math rendering after upgrading Quarto.
+       Alternatives: mathjax-newcm (MathJax 4 default, serif New CM),
+       mathjax-fira (sans-serif math), mathjax-modern,
+       mathjax-stix2, mathjax-pagella. -->
+  <script>
+  (function () {
+    var FONT = 'mathjax-tex';
+    Object.defineProperty(window, 'MathJax', {
+      configurable: true,
+      get: function () { return undefined; },
+      set: function (v) {
+        var cfg = Object.assign({}, v || {});
+        // MathJax-2 leftovers the plugin injects; MathJax 4 does not use them
+        delete cfg.messageStyle; delete cfg.tex2jax;
+        delete cfg.skipStartupTypeset; delete cfg.config; delete cfg.mathjax;
+        cfg.output = Object.assign({ font: FONT }, cfg.output);
+        Object.defineProperty(window, 'MathJax', {
+          value: cfg, writable: true, configurable: true, enumerable: true
+        });
+      }
+    });
+  })();
+  </script>
+  <script type="module" src="lecture02_files/libs/quarto-ojs/quarto-ojs-runtime.js"></script>
+  <link href="lecture02_files/libs/quarto-ojs/quarto-ojs.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+  
+  <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+</head>
+<body class="quarto-light">
+<!-- Math macros shared by every lecture (MathJax reads them from this hidden block).
+     \symbf keeps the unicode-math spelling used throughout the 2025 Beamer lectures. -->
+<div style="position:absolute;visibility:hidden;height:0;overflow:hidden">
+$$
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\Pr}{\mathbb{P}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\Corr}{\mathrm{Corr}}
+\newcommand{\plim}{\operatorname*{plim}}
+\newcommand{\symbf}[1]{\boldsymbol{#1}}
+\newcommand{\iid}{\overset{\text{iid}}{\sim}}
+$$
+</div>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <div class="ttl">Lecture 2: Bootstrap 101</div>
+  <div class="ttlrule"></div>
+  <div class="presenter">Raul Riva</div>
+  <div class="affil">FGV, Brazilian School of Economics and Finance (<span class="fgv">FGV EPGE</span>)</div>
+  <div class="talkdate">October 2026</div>
+  <div class="venue">Econometrics I (Part I)</div>
+</section>
+<section>
+<section id="motivation" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>Motivation</h1>
+
+</section>
+<section id="the-margin-of-error-you-see-on-tv" class="slide level2">
+<h2>The Margin of Error You See on TV</h2>
+<ul>
+<li>An online poll asks <span class="math inline">\(n\)</span> voters whether they will vote for candidate A</li>
+<li>Online polls are self-selected, but let’s pretend respondents are iid today ;)</li>
+<li><span class="math inline">\(X_i = 1\)</span> if respondent <span class="math inline">\(i\)</span> picks A, so <span class="math inline">\(p = P\{X_i = 1\}\)</span> and <span class="math inline">\(\hat p = \bar X_n\)</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>The CLT and Slutsky’s theorem give <span class="math display">\[
+\frac{\sqrt n\,(\hat p - p)}{\sqrt{\hat p(1-\hat p)}} \xrightarrow{d} N(0,1)
+\quad\implies\quad
+\hat p \pm 1.96\sqrt{\frac{\hat p(1-\hat p)}{n}}
+\]</span></li>
+<li>In our poll, <span class="math inline">\(n = 2{,}000\)</span> and <span class="math inline">\(\hat p =\)</span> 37.8%: the “margem de erro” is <span class="math inline">\(\pm\)</span> 2.1 p.p.</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Two ingredients: a <strong>known</strong> limit, and a nuisance parameter we can <strong>estimate</strong></li>
+</ul>
+</div>
+</section>
+<section id="now-the-whole-tv-graphic" class="slide level2">
+<h2>Now the Whole TV Graphic</h2>
+<p>Each respondent also declares a <strong>state</strong>. Here are 18 95% intervals from the same poll:</p>
+
+<img data-src="lecture02_files/figure-revealjs/cell-3-output-1.svg" class="quarto-figure quarto-figure-center r-stretch"><ul>
+<li>Each interval is right 95% of the time. What’s the chance that <strong>all 18</strong> are right?</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Simulating many polls from the truth: only about 42%. The red ones missed</li>
+</ul>
+</div>
+</section>
+<section id="a-joint-confidence-set" class="slide level2">
+<h2>A Joint Confidence Set</h2>
+<ul>
+<li><span class="math inline">\(p_{s,k}\)</span>: share of candidate <span class="math inline">\(k \in \{A, B, C\}\)</span> among voters in state <span class="math inline">\(s\)</span></li>
+<li><span class="math inline">\(N_s\)</span>: number of respondents from state <span class="math inline">\(s\)</span>, and <span class="math inline">\(\widehat{se}_{s,k} = \sqrt{\hat p_{s,k}(1-\hat p_{s,k})/N_s}\)</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>We want <strong>one</strong> statement about all 18 shares at once: <span class="math display">\[
+P\left\{ p_{s,k} \in \left[\hat p_{s,k} - c\cdot \widehat{se}_{s,k},\ \hat p_{s,k} + c\cdot \widehat{se}_{s,k}\right] \text{ for every } s, k \right\} = 1 - \alpha
+\]</span></li>
+<li>Same form as on TV: only the multiplier <span class="math inline">\(c\)</span> changes</li>
+<li><span class="math inline">\(c = 1.96\)</span> is too small. How large must <span class="math inline">\(c\)</span> be?</li>
+</ul>
+</div>
+</section>
+<section id="why-this-root" class="slide level2">
+<h2>Why This Root?</h2>
+<p>Let <span class="math inline">\(t_{s,k} \equiv (\hat p_{s,k} - p_{s,k})/\widehat{se}_{s,k}\)</span>, the usual t-statistic. Then <span class="math display">\[
+\text{all 18 intervals cover}
+\iff |t_{s,k}| \le c \ \text{ for every } s,k
+\iff \underbrace{\max_{s,k}\, |t_{s,k}|}_{\equiv\, R_n} \le c
+\]</span></p>
+<ul>
+<li>So <span class="math inline">\(c\)</span> is the <span class="math inline">\(1-\alpha\)</span> quantile of <span class="math inline">\(R_n\)</span>: the whole problem boils down to one number</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Why divide by <span class="math inline">\(\widehat{se}_{s,k}\)</span>? Shares in RS are much noisier than in SP</li>
+<li>Without it, every interval gets the same width: <span class="math inline">\(\hat p_{s,k} \pm c\)</span></li>
+<li>Then the noisy RS cells set <span class="math inline">\(c\)</span>, and SP gets needlessly wide intervals</li>
+<li>Studentizing puts all 18 on the same scale: each one gets a fair share of <span class="math inline">\(\alpha\)</span></li>
+</ul>
+</div>
+</section>
+<section id="what-is-the-distribution-of-r_n" class="slide level2">
+<h2>What Is the Distribution of <span class="math inline">\(R_n\)</span>?</h2>
+<ul>
+<li>CLT + delta method: <span class="math inline">\((t_{s,k})_{s,k} \xrightarrow{d} Z \sim N(0, \Sigma(P))\)</span>, so <span class="math inline">\(R_n \xrightarrow{d} \max_{s,k}|Z_{s,k}|\)</span></li>
+<li>Across states, the <span class="math inline">\(Z\)</span>’s are independent. Within a state, candidates compete for voters: <span class="math display">\[
+\Corr(Z_{s,j}, Z_{s,k}) = -\sqrt{\frac{p_{s,j}\, p_{s,k}}{(1-p_{s,j})(1-p_{s,k})}}, \qquad j \neq k
+\]</span></li>
+<li>The maximum of 18 correlated normals has no closed-form quantile</li>
+<li>And that quantile depends on the unknown shares <span class="math inline">\(p_{s,k}\)</span></li>
+</ul>
+<div class="fragment">
+<div class="thm takeaway">
+<div class="thmhead">
+<p>What we really want</p>
+</div>
+<p>The distribution of <span class="math inline">\(R_n\)</span> <strong>at our sample size</strong>, without having to derive its limit.</p>
+</div>
+</div>
+</section>
+<section id="the-idea-in-words" class="slide level2">
+<h2>The Idea in Words</h2>
+<ul>
+<li>If we knew <span class="math inline">\(P\)</span>, we would simulate many polls from <span class="math inline">\(P\)</span> and compute <span class="math inline">\(R_n\)</span> in each one</li>
+<li>The <span class="math inline">\(95\%\)</span> quantile of the simulated <span class="math inline">\(R_n\)</span>’s would be our <span class="math inline">\(c\)</span>. But we don’t know <span class="math inline">\(P\)</span>…</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>We do know <span class="math inline">\(\hat P_n\)</span>: the empirical distribution of our 2,000 respondents</li>
+<li><strong>Bootstrap</strong>: simulate polls from <span class="math inline">\(\hat P_n\)</span> instead of <span class="math inline">\(P\)</span></li>
+<li>Simulating from <span class="math inline">\(\hat P_n\)</span> = drawing 2,000 respondents <strong>with replacement</strong> from our sample</li>
+<li>Efron (1979): you <em>pull yourself up by your bootstraps</em></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Dark magic? Do they teach this at Hogwarts? No: it’s just the plug-in principle!</li>
+<li>Today: the <strong>non-parametric</strong> bootstrap with <strong>iid</strong> data</li>
+</ul>
+</div>
+</section></section>
+<section>
+<section id="roots-and-pivots" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>Roots and Pivots</h1>
+
+</section>
+<section id="setup" class="slide level2">
+<h2>Setup</h2>
+<ul>
+<li>Data: <span class="math inline">\(X^n = (X_1, \dots, X_n)\)</span>, iid with unknown distribution <span class="math inline">\(P \in \mathcal{P}\)</span></li>
+<li>The model <span class="math inline">\(\mathcal{P}\)</span> can be parametric, semiparametric or nonparametric</li>
+<li>Parameter of interest: <span class="math inline">\(\theta(P) \in \Theta \equiv \{\theta(P) : P \in \mathcal{P}\}\)</span></li>
+<li>Goal: a random set <span class="math inline">\(C_n = C_n(X^n)\)</span> such that <span class="math inline">\(P\{\theta(P) \in C_n\} \approx 1-\alpha\)</span></li>
+</ul>
+<div class="fragment">
+<div class="thm">
+<div class="thmhead">
+<p>Definition (Root)</p>
+</div>
+<p>A <strong>root</strong> is any real-valued function <span class="math inline">\(R_n(X^n, \theta(P))\)</span> of the data and of the parameter.</p>
+</div>
+<ul>
+<li>The name is due to Beran (1984)</li>
+<li>Examples: <span class="math inline">\(\sqrt n\,(\hat\theta_n - \theta(P))\)</span> and <span class="math inline">\(\sqrt n\,(\hat\theta_n - \theta(P))/\hat\sigma_n\)</span></li>
+<li>In the poll: <span class="math inline">\(\theta(P)\)</span> stacks the 18 shares, and <span class="math inline">\(R_n = \max_{s,k}|t_{s,k}|\)</span></li>
+</ul>
+</div>
+</section>
+<section id="the-object-of-interest" class="slide level2">
+<h2>The Object of Interest</h2>
+<div class="thm">
+<div class="thmhead">
+<p>Definition (Sampling Distribution of the Root)</p>
+</div>
+<p><span class="math display">\[
+J_n(x, P) \equiv P\left\{R_n(X^n, \theta(P)) \le x\right\},
+\qquad
+J_n^{-1}(1-\alpha, P) \equiv \inf\left\{x : J_n(x, P) \ge 1-\alpha\right\}
+\]</span></p>
+</div>
+<ul>
+<li><span class="math inline">\(J_n\)</span> depends on the sample size <span class="math inline">\(n\)</span> <strong>and</strong> on the unknown <span class="math inline">\(P\)</span></li>
+<li>The infimum handles discrete distributions, where quantiles may not be unique</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>If we knew <span class="math inline">\(J_n(\cdot, P)\)</span>, we could invert the root: <span class="math display">\[
+C_n = \left\{\theta \in \Theta : J_n^{-1}(\tfrac{\alpha}{2}, P) \le R_n(X^n, \theta) \le J_n^{-1}(1 - \tfrac{\alpha}{2}, P)\right\}
+\]</span></li>
+<li>By construction, <span class="math inline">\(P\{\theta(P) \in C_n\} \ge 1 - \alpha\)</span>, with equality if <span class="math inline">\(J_n\)</span> is continuous</li>
+</ul>
+</div>
+</section>
+<section id="from-j_n-to-an-interval" class="slide level2">
+<h2>From <span class="math inline">\(J_n\)</span> to an Interval</h2>
+<ul>
+<li>With <span class="math inline">\(R_n = \sqrt n\,(\hat\theta_n - \theta)\)</span>, the two inequalities that define <span class="math inline">\(C_n\)</span> read <span class="math display">\[
+J_n^{-1}(\tfrac{\alpha}{2}, P) \le \sqrt n\,(\hat\theta_n - \theta) \le J_n^{-1}(1 - \tfrac{\alpha}{2}, P)
+\]</span></li>
+<li>Solve for <span class="math inline">\(\theta\)</span>: <span class="math display">\[
+\hat\theta_n - \frac{J_n^{-1}(1-\frac{\alpha}{2}, P)}{\sqrt n} \le \theta \le \hat\theta_n - \frac{J_n^{-1}(\frac{\alpha}{2}, P)}{\sqrt n}
+\]</span></li>
+<li>Careful with the flip: the <strong>upper</strong> quantile gives the <strong>lower</strong> endpoint</li>
+<li>If <span class="math inline">\(J_n\)</span> is symmetric around zero, this is just <span class="math inline">\(\hat\theta_n \pm J_n^{-1}(1-\frac{\alpha}{2}, P)/\sqrt n\)</span></li>
+</ul>
+<div class="fragment">
+<div class="thm takeaway">
+<div class="thmhead">
+<p>The goal of this lecture</p>
+</div>
+<p>We want a confidence set for <span class="math inline">\(\theta(P)\)</span>. For that, all we need is <span class="math inline">\(J_n(\cdot, P)\)</span>.</p>
+</div>
+</div>
+</section>
+<section id="pivots" class="slide level2">
+<h2>Pivots</h2>
+<div class="thm">
+<div class="thmhead">
+<p>Definition (Pivot)</p>
+</div>
+<p>The root <span class="math inline">\(R_n(X^n, \theta(P))\)</span> is a <strong>pivot</strong> if <span class="math inline">\(J_n(x, P)\)</span> does not depend on <span class="math inline">\(P\)</span>: <span class="math inline">\(J_n(x, P) = J_n(x)\)</span> for all <span class="math inline">\(P \in \mathcal{P}\)</span>.</p>
+</div>
+<p>Examples:</p>
+<ul>
+<li><span class="math inline">\(X_i \iid N(\theta, 1)\)</span>: <span class="math inline">\(\ \sqrt n\,(\bar X_n - \theta) \sim N(0,1)\)</span>, whatever <span class="math inline">\(\theta\)</span> is</li>
+<li><span class="math inline">\(X_i \iid N(\mu, \sigma^2)\)</span>: <span class="math inline">\(\ \sqrt n\,(\bar X_n - \mu)/S_n \sim t_{n-1}\)</span>, whatever <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> are</li>
+<li>Location-scale families, <span class="math inline">\(X_i \sim F[(x - \theta)/\sigma]\)</span> with <span class="math inline">\(F\)</span> known: <span class="math inline">\(\ (\hat\theta_n - \theta)/\hat\sigma_n\)</span></li>
+<li>Continuous <span class="math inline">\(F\)</span>: <span class="math inline">\(\ \sqrt n \sup_x |\hat F_n(x) - F(x)|\)</span> (Kolmogorov–Smirnov)</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Location-scale needs equivariant <span class="math inline">\(\hat\theta_n\)</span> and <span class="math inline">\(\hat\sigma_n\)</span>, like <span class="math inline">\(\bar X_n\)</span> and <span class="math inline">\(S_n\)</span> (L&amp;R Example 18.2.1)</li>
+</ul>
+</div>
+</section>
+<section id="why-pivots-are-great" class="slide level2">
+<h2>Why Pivots Are Great</h2>
+<ul>
+<li>Coverage is <strong>exact</strong>: <span class="math inline">\(P\{\theta(P) \in C_n\} = 1-\alpha\)</span> for every <span class="math inline">\(n\)</span> and every <span class="math inline">\(P \in \mathcal{P}\)</span></li>
+<li>No asymptotics at all: <span class="math inline">\(n = 15\)</span> is as good as <span class="math inline">\(n = 15{,}000\)</span></li>
+<li>Only <strong>one</strong> distribution to learn: look it up once in a table (think <span class="math inline">\(t_{n-1}\)</span>)</li>
+<li>No closed form? Simulate it once, from any <span class="math inline">\(P \in \mathcal{P}\)</span> you like</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Bootstrap preview: we will replace <span class="math inline">\(P\)</span> by an estimate <span class="math inline">\(\hat P_n\)</span></li>
+<li>The less <span class="math inline">\(J_n(\cdot, P)\)</span> depends on <span class="math inline">\(P\)</span>, the less that replacement hurts</li>
+<li>Moral, and we will come back to it: bootstrap a pivot whenever you can</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li><span class="alert">Exercise: show that the location-scale root is a pivot (L&amp;R Problem 18.1)</span></li>
+</ul>
+</div>
+</section>
+<section id="asymptotic-pivots" class="slide level2">
+<h2>Asymptotic Pivots</h2>
+<div class="thm">
+<div class="thmhead">
+<p>Definition (Asymptotic Pivot)</p>
+</div>
+<p>The root is an <strong>asymptotic pivot</strong> if <span class="math inline">\(J_n(\cdot, P)\)</span> converges weakly to a limit <span class="math inline">\(J\)</span> that does not depend on <span class="math inline">\(P\)</span>.</p>
+</div>
+<ul>
+<li>The t-statistic: if <span class="math inline">\(0 &lt; \sigma^2(P) &lt; \infty\)</span>, then <span class="math inline">\(\sqrt n\,(\bar X_n - \theta(P))/S_n \xrightarrow{d} N(0,1)\)</span></li>
+<li>That’s the TV margin of error: it holds for <strong>every</strong> <span class="math inline">\(P\)</span> with finite variance</li>
+<li>Parametric models: <span class="math inline">\(n(\hat\theta_n - \theta)'I(\hat\theta_n)(\hat\theta_n - \theta) \xrightarrow{d} \chi^2_k\)</span> (Wald)</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Recipe: build <span class="math inline">\(C_n\)</span> with the quantiles of <span class="math inline">\(J\)</span> instead of those of <span class="math inline">\(J_n\)</span></li>
+<li>The price: coverage is only right in the limit, <span class="math inline">\(\lim_{n} P\{\theta(P) \in C_n\} = 1-\alpha\)</span></li>
+</ul>
+</div>
+</section>
+<section id="when-the-limit-depends-on-p" class="slide level2">
+<h2>When the Limit Depends on <span class="math inline">\(P\)</span></h2>
+<ul>
+<li>The typical case: <span class="math inline">\(J_n(\cdot, P) \to J(\cdot, P)\)</span>, and the limit depends on <span class="math inline">\(P\)</span></li>
+<li>Example: <span class="math inline">\(\sqrt n\,(\bar X_n - \theta(P)) \xrightarrow{d} N(0, \sigma^2(P))\)</span>, so use <span class="math inline">\(J(x, \hat P_n) = \Phi(x/\hat\sigma_n)\)</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>This only works if you <strong>know</strong> <span class="math inline">\(J(\cdot, P)\)</span> and can estimate whatever it depends on</li>
+<li>The <span class="math inline">\(\alpha\)</span>-trimmed mean, for a symmetric <span class="math inline">\(F\)</span>: good luck estimating its asymptotic variance <span class="math display">\[
+\sigma^2(\alpha, F) = \frac{1}{(1-2\alpha)^2}\left[\int_{F^{-1}(\alpha)}^{F^{-1}(1-\alpha)} \left(t - \theta(F)\right)^2 dF(t) + 2\alpha\left(F^{-1}(\alpha) - \theta(F)\right)^2\right]
+\]</span></li>
+<li>In the poll, <span class="math inline">\(J(\cdot, P)\)</span> is the law of <span class="math inline">\(\max_{s,k}|Z_{s,k}|\)</span>: no closed form at all</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Even then, it’s a <strong>double</strong> approximation: <span class="math inline">\(J_n(\cdot, P) \approx J(\cdot, P) \approx J(\cdot, \hat P_n)\)</span></li>
+</ul>
+</div>
+</section>
+<section id="two-ways-to-approximate-j_nx-p" class="slide level2">
+<h2>Two Ways to Approximate <span class="math inline">\(J_n(x, P)\)</span></h2>
+<p><span class="math display">\[
+\begin{aligned}
+\textbf{Asymptotics:}&amp;\quad J_n(x, P) \;\underset{n \to \infty}{\approx}\; J(x, P) \;\approx\; J(x, \hat P_n)\\[10pt]
+\textbf{Bootstrap:}&amp;\quad J_n(x, P) \;\underset{n \to \infty}{\approx}\; J_n(x, \hat P_n) \;\underset{B \to \infty}{\approx}\; L_n(x)
+\end{aligned}
+\]</span></p>
+<ul>
+<li>Asymptotics: you must know the limit <span class="math inline">\(J(\cdot, P)\)</span>, and then estimate it</li>
+<li>Bootstrap: estimate <span class="math inline">\(J_n(\cdot, P)\)</span> directly, by plugging <span class="math inline">\(\hat P_n\)</span> into <span class="math inline">\(J_n\)</span> itself</li>
+<li><span class="math inline">\(L_n\)</span> is a simulation-based approximation (more soon): <span class="math inline">\(B\)</span> is up to you, <span class="math inline">\(n\)</span> is not</li>
+</ul>
+<div class="fragment">
+<div class="thm takeaway">
+<div class="thmhead">
+<p>Read this twice</p>
+</div>
+<p>The bootstrap does <strong>not</strong> avoid asymptotics: it is justified as <span class="math inline">\(n \to \infty\)</span>. What it avoids is having to <strong>know</strong> <span class="math inline">\(J(\cdot, P)\)</span>.</p>
+</div>
+</div>
+</section>
+<section id="section" class="slide level2 standout" data-background-color="var(--slate)">
+<h2>&nbsp;</h2>
+<div class="standout-body">
+<p>Questions?</p>
+</div>
+</section></section>
+<section>
+<section id="the-bootstrap" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>The Bootstrap</h1>
+
+</section>
+<section id="the-bootstrap-estimator" class="slide level2">
+<h2>The Bootstrap Estimator</h2>
+<ul>
+<li>Estimate <span class="math inline">\(P\)</span> by the <strong>empirical distribution</strong>, which puts mass <span class="math inline">\(1/n\)</span> on each <span class="math inline">\(X_i\)</span>: <span class="math display">\[
+\hat P_n(E) \equiv \frac{1}{n}\sum_{i=1}^n I\{X_i \in E\}
+\]</span></li>
+<li>The bootstrap estimator of the sampling distribution is a plug-in: <span class="math inline">\(J_n(x, \hat P_n)\)</span></li>
+<li>Unusual target: <span class="math inline">\(J_n(\cdot, P)\)</span> changes with <span class="math inline">\(n\)</span>, and we estimate it at our <span class="math inline">\(n\)</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>The bootstrap confidence set replaces <span class="math inline">\(P\)</span> by <span class="math inline">\(\hat P_n\)</span> in the quantiles: <span class="math display">\[
+C_n^{*} = \left\{\theta \in \Theta : J_n^{-1}(\tfrac{\alpha}{2}, \hat P_n) \le R_n(X^n, \theta) \le J_n^{-1}(1-\tfrac{\alpha}{2}, \hat P_n)\right\}
+\]</span></li>
+<li>Two questions: is <span class="math inline">\(J_n(\cdot, \hat P_n)\)</span> close to <span class="math inline">\(J_n(\cdot, P)\)</span>? And how do we compute it?</li>
+</ul>
+</div>
+</section>
+<section id="why-should-hat-p_n-be-close-to-p" class="slide level2">
+<h2>Why Should <span class="math inline">\(\hat P_n\)</span> Be Close to <span class="math inline">\(P\)</span>?</h2>
+<ul>
+<li>With real-valued data, <span class="math inline">\(\hat F_n(t) \equiv \hat P_n\big((-\infty, t]\big)\)</span> is the empirical CDF</li>
+<li>Fixed <span class="math inline">\(t\)</span>: <span class="math inline">\(\hat F_n(t) \to F(t)\)</span> a.s. by the SLLN, since <span class="math inline">\(\E\left[I\{X_i \le t\}\right] = F(t)\)</span></li>
+<li>We can do much better: the convergence is <strong>uniform</strong> in <span class="math inline">\(t\)</span></li>
+</ul>
+<div class="thm">
+<div class="thmhead">
+<p>Theorem (Glivenko–Cantelli)</p>
+</div>
+<p>If <span class="math inline">\(X_1, \dots, X_n\)</span> are iid real-valued random variables with CDF <span class="math inline">\(F\)</span>, then <span class="math display">\[
+\sup_{t \in \R} \left|\hat F_n(t) - F(t)\right| \to 0 \quad \text{almost surely}
+\]</span></p>
+</div>
+<ul>
+<li>And fast: <span class="math inline">\(P\left\{\sup_t |\hat F_n(t) - F(t)| &gt; d\right\} \le 2e^{-2nd^2}\)</span> for every <span class="math inline">\(n\)</span> (DKW inequality)</li>
+<li>In the poll, <span class="math inline">\(\hat P_n\)</span> is just 24 cell frequencies: the SLLN alone does the job</li>
+</ul>
+</section>
+<section id="glivenkocantelli-works-baby" class="slide level2">
+<h2>Glivenko–Cantelli Works, Baby!</h2>
+<p><span class="math inline">\(X_i \iid U[0,1]\)</span>, two independent samples for each <span class="math inline">\(n\)</span>: <span class="math inline">\(\hat F_n\)</span> is a <strong>random</strong> function</p>
+
+<img data-src="lecture02_files/figure-revealjs/cell-4-output-1.svg" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="is-that-enough" class="slide level2">
+<h2>Is That Enough?</h2>
+<ul>
+<li>Glivenko–Cantelli: <span class="math inline">\(\hat P_n\)</span> is close to <span class="math inline">\(P\)</span></li>
+<li>But we need more: <span class="math inline">\(J_n(\cdot, \hat P_n)\)</span> close to <span class="math inline">\(J_n(\cdot, P)\)</span></li>
+<li>That requires <span class="math inline">\(J_n(\cdot, P)\)</span> to be <strong>continuous</strong> in <span class="math inline">\(P\)</span>: close inputs, close outputs</li>
+</ul>
+<div class="fragment">
+<p>Two ingredients, which we will make precise soon:</p>
+<ol type="1">
+<li><span class="math inline">\(\hat P_n \to P\)</span> in some sense (Glivenko–Cantelli, the SLLN)</li>
+<li>Whenever <span class="math inline">\(P_n \to P\)</span> in that sense, <span class="math inline">\(J_n(\cdot, P_n) \to J(\cdot, P)\)</span></li>
+</ol>
+</div>
+<div class="fragment">
+<ul>
+<li>Ingredient 2 is the delicate one. We will meet a root for which it fails: the maximum!</li>
+</ul>
+</div>
+</section></section>
+<section>
+<section id="in-practice" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>In Practice</h1>
+
+</section>
+<section id="computing-j_nx-hat-p_n" class="slide level2">
+<h2>Computing <span class="math inline">\(J_n(x, \hat P_n)\)</span></h2>
+<ul>
+<li>Exact computation averages over all <span class="math inline">\(n^n\)</span> equally likely resamples: hopeless</li>
+<li>So we simulate. Conditional on the data, for each <span class="math inline">\(b = 1, \dots, B\)</span>:</li>
+</ul>
+<ol type="1">
+<li>Draw <span class="math inline">\(n\)</span> observations <strong>with replacement</strong> from the data: <span class="math inline">\(X^{n*}_b = (X^*_{1,b}, \dots, X^*_{n,b})\)</span></li>
+<li>Compute the root at the plug-in parameter: <span class="math inline">\(R^*_{n,b} = R_n(X^{n*}_b, \hat\theta_n)\)</span>, with <span class="math inline">\(\hat\theta_n = \theta(\hat P_n)\)</span></li>
+<li>Compute the empirical CDF of the <span class="math inline">\(B\)</span> roots: <span class="math inline">\(L_n(x) \equiv \frac{1}{B}\sum_{b=1}^B I\{R^*_{n,b} \le x\}\)</span></li>
+<li>Use the quantiles of <span class="math inline">\(L_n\)</span> in place of those of <span class="math inline">\(J_n(\cdot, P)\)</span></li>
+</ol>
+<div class="fragment">
+<ul>
+<li>Two sources of randomness are floating around here. Which ones?</li>
+</ul>
+</div>
+</section>
+<section id="two-details-that-matter" class="slide level2">
+<h2>Two Details That Matter</h2>
+<ul>
+<li>Why center at <span class="math inline">\(\hat\theta_n\)</span>? Under <span class="math inline">\(\hat P_n\)</span>, the “true” parameter <strong>is</strong> <span class="math inline">\(\theta(\hat P_n) = \hat\theta_n\)</span></li>
+<li>In the poll: bootstrap shares are centered at <span class="math inline">\(\hat p_{s,k}\)</span>, not at the unknown <span class="math inline">\(p_{s,k}\)</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>How large should <span class="math inline">\(B\)</span> be? For a fixed sample, <span class="math inline">\(L_n \to J_n(\cdot, \hat P_n)\)</span> as <span class="math inline">\(B \to \infty\)</span></li>
+<li><span class="math inline">\(B\)</span> only kills the <strong>simulation</strong> error, which is under your control</li>
+<li><span class="math inline">\(n\)</span> drives the <strong>statistical</strong> error, <span class="math inline">\(J_n(\cdot, \hat P_n) - J_n(\cdot, P)\)</span>: nothing to do about it</li>
+<li>Tail quantiles need many draws: <span class="math inline">\(B \ge 1{,}000\)</span> is a reasonable start</li>
+</ul>
+</div>
+</section>
+<section id="in-code" class="slide level2">
+<h2>In Code</h2>
+<p><code>S[i]</code> is the state (0 to 5) and <code>V[i]</code> the vote (0 = A, 1 = B, 2 = C, 3 = other) of respondent <code>i</code></p>
+<div id="e7396b96" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="" aria-label="1"></a><span class="kw">def</span> shares(S, V):                     <span class="co"># 6 x 3 array with p_hat[s, k]</span></span>
+<span id="cb1-2"><a href="" aria-label="2"></a>    <span class="cf">return</span> np.array([[np.mean(V[S <span class="op">==</span> s] <span class="op">==</span> k) <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>)] <span class="cf">for</span> s <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">6</span>)])</span>
+<span id="cb1-3"><a href="" aria-label="3"></a></span>
+<span id="cb1-4"><a href="" aria-label="4"></a><span class="kw">def</span> max_t(S, V, p_ref):               <span class="co"># the root R_n, centered at p_ref</span></span>
+<span id="cb1-5"><a href="" aria-label="5"></a>    p <span class="op">=</span> shares(S, V)</span>
+<span id="cb1-6"><a href="" aria-label="6"></a>    se <span class="op">=</span> np.sqrt(p <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> p) <span class="op">/</span> np.bincount(S, minlength<span class="op">=</span><span class="dv">6</span>)[:, <span class="va">None</span>])</span>
+<span id="cb1-7"><a href="" aria-label="7"></a>    <span class="cf">return</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(p <span class="op">-</span> p_ref) <span class="op">/</span> se)</span>
+<span id="cb1-8"><a href="" aria-label="8"></a></span>
+<span id="cb1-9"><a href="" aria-label="9"></a><span class="kw">def</span> bootstrap_c(S, V, B<span class="op">=</span><span class="dv">1000</span>, alpha<span class="op">=</span><span class="fl">0.05</span>):</span>
+<span id="cb1-10"><a href="" aria-label="10"></a>    n, p_hat <span class="op">=</span> <span class="bu">len</span>(S), shares(S, V)   <span class="co"># under P_hat, the truth is p_hat</span></span>
+<span id="cb1-11"><a href="" aria-label="11"></a>    R_star <span class="op">=</span> [max_t(S[i], V[i], p_hat)</span>
+<span id="cb1-12"><a href="" aria-label="12"></a>              <span class="cf">for</span> i <span class="kw">in</span> np.random.randint(<span class="dv">0</span>, n, size<span class="op">=</span>(B, n))]  <span class="co"># resample rows</span></span>
+<span id="cb1-13"><a href="" aria-label="13"></a>    <span class="cf">return</span> np.quantile(R_star, <span class="dv">1</span> <span class="op">-</span> alpha)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<ul>
+<li>The joint interval is then <code>p_hat ± bootstrap_c(S, V) * se_hat</code>. That’s it!</li>
+</ul>
+</section>
+<section id="building-the-interval" class="slide level2">
+<h2>Building the Interval</h2>
+<ul>
+<li>Bootstrap quantiles: <span class="math inline">\(\hat c_q \equiv L_n^{-1}(q)\)</span>, from the <span class="math inline">\(B\)</span> draws of <span class="math inline">\(R^*_{n,b} = \sqrt n\,(\hat\theta^*_{n,b} - \hat\theta_n)\)</span></li>
+<li>Equi-tailed interval, flip included: <span class="math display">\[
+\left[\hat\theta_n - \hat c_{1-\alpha/2}/\sqrt n,\ \ \hat\theta_n - \hat c_{\alpha/2}/\sqrt n\right]
+\]</span></li>
+<li>Symmetric interval: bootstrap <span class="math inline">\(|R_n|\)</span> instead, then use <span class="math inline">\(\hat\theta_n \pm L_n^{-1}(1-\alpha)/\sqrt n\)</span></li>
+<li>Joint rectangle (the poll): <span class="math inline">\(\hat p_{s,k} \pm \hat c^{\,*}\,\widehat{se}_{s,k}\)</span>, with <span class="math inline">\(\hat c^{\,*}\)</span> the <span class="math inline">\(1-\alpha\)</span> quantile of <span class="math inline">\(\max_{s,k}|t^*_{s,k}|\)</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Efron’s <strong>percentile</strong> interval uses the quantiles of <span class="math inline">\(\hat\theta^*_{n,b}\)</span> directly: no flip!</li>
+<li>It’s popular in software, but it is <strong>not</strong> the interval above</li>
+<li><span class="alert">Exercise: when does the percentile interval work? (L&amp;R Problem 18.11)</span></li>
+</ul>
+</div>
+</section>
+<section id="what-is-an-observation" class="slide level2">
+<h2>What Is an Observation?</h2>
+<ul>
+<li>In a regression, the unit is the pair <span class="math inline">\(Z_i = (Y_i, X_i)\)</span>: resample <strong>rows</strong></li>
+<li>Pairs bootstrap: draw <span class="math inline">\(Z^*_1, \dots, Z^*_n\)</span> with replacement, run OLS, store <span class="math inline">\(\hat\beta^*_b\)</span></li>
+<li>Root: <span class="math inline">\(\sqrt n\,(\hat\beta^*_{b,j} - \hat\beta_j)\)</span> or the t-statistic, exactly as before</li>
+<li>Bootstrap standard error: the standard deviation of <span class="math inline">\(\hat\beta^*_{1,j}, \dots, \hat\beta^*_{B,j}\)</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Never resample <span class="math inline">\(Y\)</span> and <span class="math inline">\(X\)</span> separately: that destroys the relation you want to learn!</li>
+<li>The pairs bootstrap is robust to heteroskedasticity: it mimics the sandwich formula</li>
+<li>Why it works: <span class="math inline">\(\hat\beta = \left(\frac{1}{n}\sum_i X_iX_i'\right)^{-1}\frac{1}{n}\sum_i X_iY_i\)</span> is a smooth function of means (soon)</li>
+</ul>
+</div>
+</section>
+<section id="back-to-the-poll" class="slide level2">
+<h2>Back to the Poll</h2>
+
+<img data-src="lecture02_files/figure-revealjs/cell-6-output-1.svg" class="quarto-figure quarto-figure-center r-stretch"><ul>
+<li>Thin bars: <span class="math inline">\(\pm 1.96\,\widehat{se}\)</span>. Shaded bars: the joint rectangle, <span class="math inline">\(\pm \hat c^{\,*}\widehat{se}\)</span> with <span class="math inline">\(\hat c^{\,*} =\)</span> 3.08 (<span class="math inline">\(B = 1{,}000\)</span>)</li>
+<li>Over 500 simulated polls, all 18 covered: 44% with <span class="math inline">\(\pm 1.96\)</span>, 95% with <span class="math inline">\(\pm \hat c^{\,*}\)</span></li>
+</ul>
+</section>
+<section id="play-with-n-and-b" class="slide level2">
+<h2>Play With <span class="math inline">\(n\)</span> and <span class="math inline">\(B\)</span></h2>
+<p>Bars: <span class="math inline">\(B\)</span> bootstrap draws from <strong>one</strong> poll. Curve: the true <span class="math inline">\(J_n\)</span> (40,000 polls from <span class="math inline">\(P\)</span>)</p>
+<div id="38ba42ff" class="cell" data-execution_count="6">
+<div class="cell-output cell-output-display">
+<script type="ojs-define">{"contents": [{"name": "poll_probs", "value": [0.1406, 0.1221, 0.0629, 0.044399999999999995, 0.061200000000000004, 0.0702, 0.027, 0.021599999999999998, 0.05600000000000001, 0.049, 0.019600000000000003, 0.015400000000000002, 0.0396, 0.05039999999999999, 0.016800000000000002, 0.0132, 0.03705, 0.0323, 0.0152, 0.010450000000000001, 0.033249999999999995, 0.03515, 0.01615, 0.010450000000000001]}, {"name": "poll_truth", "value": {"1000": {"dens": [0.06749999999999995, 0.09950000000000013, 0.16599999999999987, 0.25650000000000034, 0.3757499999999997, 0.48174999999999957, 0.6157499999999995, 0.6917500000000009, 0.724250000000001, 0.7762499999999992, 0.7592499999999993, 0.6974999999999993, 0.6937500000000024, 0.5892499999999968, 0.5162500000000019, 0.43324999999999964, 0.38624999999999965, 0.3085000000000011, 0.26649999999999857, 0.2015000000000007, 0.16199999999999987, 0.1349999999999999, 0.1132499999999999, 0.09574999999999992, 0.07075000000000024, 0.05974999999999994, 0.04699999999999996, 0.039749999999999966, 0.03174999999999997, 0.023000000000000083, 0.017500000000000064, 0.017749999999999905, 0.013999999999999926, 0.015500000000000054, 0.007750000000000027, 0.006250000000000022, 0.005999999999999968, 0.004999999999999974, 0.004250000000000015, 0.004250000000000015, 0.003249999999999983, 0.002250000000000008, 0.0017500000000000063, 0.001499999999999992, 0.008000000000000028], "c": 3.2846592923264764, "cov196": 0.3937}, "2000": {"dens": [0.08224999999999993, 0.10200000000000013, 0.17374999999999985, 0.28050000000000036, 0.40949999999999964, 0.5344999999999995, 0.6247499999999995, 0.7062500000000009, 0.778500000000001, 0.8034999999999993, 0.7449999999999993, 0.7547499999999994, 0.6712500000000023, 0.5899999999999969, 0.5277500000000019, 0.4414999999999996, 0.3657499999999997, 0.3042500000000011, 0.24124999999999872, 0.18875000000000067, 0.14749999999999985, 0.11999999999999988, 0.09999999999999991, 0.06699999999999995, 0.050500000000000184, 0.050999999999999955, 0.03499999999999997, 0.02224999999999998, 0.02124999999999998, 0.01400000000000005, 0.010000000000000035, 0.008249999999999955, 0.006499999999999966, 0.0052500000000000185, 0.004500000000000016, 0.0030000000000000105, 0.002249999999999988, 0.0004999999999999973, 0.0015000000000000052, 0.0007500000000000026, 0.0004999999999999973, 0.00025000000000000087, 0.00025000000000000087, 0.0, 0.002250000000000008], "c": 3.123217743364043, "cov196": 0.418225}, "5000": {"dens": [0.08124999999999993, 0.10450000000000013, 0.18699999999999983, 0.28875000000000034, 0.41649999999999965, 0.5554999999999995, 0.6509999999999995, 0.755750000000001, 0.7870000000000011, 0.8437499999999992, 0.7919999999999993, 0.7344999999999994, 0.7135000000000026, 0.6014999999999968, 0.5135000000000018, 0.42649999999999966, 0.3414999999999997, 0.280500000000001, 0.23049999999999876, 0.17500000000000063, 0.1297499999999999, 0.10549999999999991, 0.07674999999999993, 0.052249999999999956, 0.04000000000000014, 0.032749999999999974, 0.028499999999999977, 0.015999999999999986, 0.01174999999999999, 0.009500000000000034, 0.0052500000000000185, 0.0034999999999999814, 0.003249999999999983, 0.002000000000000007, 0.0010000000000000035, 0.0007500000000000026, 0.000749999999999996, 0.0, 0.00025000000000000087, 0.00025000000000000087, 0.0, 0.00025000000000000087, 0.0, 0.0, 0.0], "c": 3.0154682878834773, "cov196": 0.433025}, "10000": {"dens": [0.08449999999999992, 0.09375000000000012, 0.19074999999999984, 0.27950000000000036, 0.42299999999999965, 0.5529999999999995, 0.6777499999999994, 0.771000000000001, 0.7915000000000011, 0.8137499999999993, 0.8019999999999993, 0.7512499999999994, 0.6967500000000024, 0.6027499999999968, 0.5092500000000019, 0.41999999999999965, 0.3592499999999997, 0.27425000000000094, 0.23499999999999874, 0.17075000000000062, 0.1324999999999999, 0.0969999999999999, 0.07549999999999993, 0.05524999999999995, 0.042750000000000156, 0.028749999999999977, 0.018749999999999982, 0.015749999999999986, 0.01149999999999999, 0.005750000000000021, 0.00550000000000002, 0.002999999999999984, 0.003249999999999983, 0.002250000000000008, 0.0012500000000000044, 0.00025000000000000087, 0.000749999999999996, 0.00024999999999999865, 0.00025000000000000087, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "c": 3.0000174613178516, "cov196": 0.435575}, "20000": {"dens": [0.07999999999999993, 0.10800000000000014, 0.17449999999999985, 0.27550000000000036, 0.43199999999999966, 0.5399999999999996, 0.6614999999999994, 0.768750000000001, 0.8330000000000011, 0.8164999999999992, 0.8442499999999993, 0.7654999999999994, 0.6705000000000023, 0.6034999999999968, 0.5222500000000018, 0.43349999999999966, 0.3502499999999997, 0.27450000000000097, 0.21324999999999886, 0.1657500000000006, 0.1252499999999999, 0.09499999999999992, 0.06924999999999994, 0.04749999999999996, 0.04050000000000014, 0.02699999999999998, 0.020249999999999983, 0.01199999999999999, 0.009499999999999991, 0.006500000000000023, 0.0052500000000000185, 0.0027499999999999855, 0.002499999999999987, 0.0015000000000000052, 0.0005000000000000017, 0.0005000000000000017, 0.0004999999999999973, 0.0004999999999999973, 0.0, 0.00025000000000000087, 0.0, 0.0, 0.0, 0.0, 0.0], "c": 2.9774919661906765, "cov196": 0.4351}}}, {"name": "poll_edges", "value": [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7000000000000002, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4000000000000004, 2.5, 2.6, 2.7, 2.8, 2.9000000000000004, 3.0, 3.1, 3.2, 3.3000000000000003, 3.4000000000000004, 3.5, 3.6, 3.7, 3.8000000000000003, 3.9000000000000004, 4.0, 4.1, 4.2, 4.300000000000001, 4.4, 4.5, 4.6, 4.7, 4.800000000000001, 4.9, 5.0, 5.1000000000000005, 5.2, 5.3, 5.4, 5.5]}, {"name": "poll_c_limit", "value": 2.9736550120861516}]}</script>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb2" data-startfrom="567" data-source-offset="0"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 566;"><span id="cb2-567"><a href="" aria-label="567"></a>viewof demo <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">form</span>({</span>
+<span id="cb2-568"><a href="" aria-label="568"></a>  <span class="dt">n</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">radio</span>([<span class="dv">1000</span><span class="op">,</span> <span class="dv">2000</span><span class="op">,</span> <span class="dv">5000</span><span class="op">,</span> <span class="dv">10000</span><span class="op">,</span> <span class="dv">20000</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">1000</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Poll size n"</span><span class="op">,</span> <span class="dt">format</span><span class="op">:</span> d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="fu">toLocaleString</span>(<span class="st">"en-US"</span>)})<span class="op">,</span></span>
+<span id="cb2-569"><a href="" aria-label="569"></a>  <span class="dt">B</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="dv">50</span><span class="op">,</span> <span class="dv">10000</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">200</span><span class="op">,</span> <span class="dt">step</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">transform</span><span class="op">:</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">log</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Bootstrap draws B"</span>})<span class="op">,</span></span>
+<span id="cb2-570"><a href="" aria-label="570"></a>  <span class="dt">poll</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">button</span>(<span class="st">"Draw a new poll"</span><span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">reduce</span><span class="op">:</span> v <span class="kw">=&gt;</span> v <span class="op">+</span> <span class="dv">1</span>})</span>
+<span id="cb2-571"><a href="" aria-label="571"></a>}<span class="op">,</span> {<span class="dt">template</span><span class="op">:</span> ({n<span class="op">,</span> B<span class="op">,</span> poll}) <span class="kw">=&gt;</span> {</span>
+<span id="cb2-572"><a href="" aria-label="572"></a>  n<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="fu">setProperty</span>(<span class="st">"--input-width"</span><span class="op">,</span> <span class="st">"560px"</span>)</span>
+<span id="cb2-573"><a href="" aria-label="573"></a>  n<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">maxWidth</span> <span class="op">=</span> <span class="st">"none"</span></span>
+<span id="cb2-574"><a href="" aria-label="574"></a>  B<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="fu">setProperty</span>(<span class="st">"--input-width"</span><span class="op">,</span> <span class="st">"300px"</span>)</span>
+<span id="cb2-575"><a href="" aria-label="575"></a>  <span class="cf">return</span> <span class="fu">html</span><span class="vs">`&lt;div style="display: flex; flex-direction: column; align-items: center"&gt;</span></span>
+<span id="cb2-576"><a href="" aria-label="576"></a><span class="vs">    </span><span class="sc">${</span>n<span class="sc">}</span><span class="vs">&lt;div style="display: flex; align-items: center; column-gap: 30px"&gt;</span><span class="sc">${</span>B<span class="sc">}${</span>poll<span class="sc">}</span><span class="vs">&lt;/div&gt;</span></span>
+<span id="cb2-577"><a href="" aria-label="577"></a><span class="vs">  &lt;/div&gt;`</span></span>
+<span id="cb2-578"><a href="" aria-label="578"></a>}})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb3" data-startfrom="586" data-source-offset="-158"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 585;"><span id="cb3-586"><a href="" aria-label="586"></a><span class="kw">function</span> <span class="fu">rmultinom</span>(n<span class="op">,</span> pr<span class="op">,</span> binom) {</span>
+<span id="cb3-587"><a href="" aria-label="587"></a>  <span class="kw">const</span> out <span class="op">=</span> <span class="kw">new</span> <span class="bu">Array</span>(pr<span class="op">.</span><span class="at">length</span>)<span class="op">.</span><span class="fu">fill</span>(<span class="dv">0</span>)</span>
+<span id="cb3-588"><a href="" aria-label="588"></a>  <span class="kw">let</span> left <span class="op">=</span> n<span class="op">,</span> mass <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb3-589"><a href="" aria-label="589"></a>  <span class="cf">for</span> (<span class="kw">let</span> j <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> j <span class="op">&lt;</span> pr<span class="op">.</span><span class="at">length</span> <span class="op">-</span> <span class="dv">1</span> <span class="op">&amp;&amp;</span> left <span class="op">&gt;</span> <span class="dv">0</span><span class="op">;</span> j<span class="op">++</span>) {</span>
+<span id="cb3-590"><a href="" aria-label="590"></a>    <span class="kw">const</span> q <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(<span class="dv">1</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(<span class="dv">0</span><span class="op">,</span> pr[j] <span class="op">/</span> mass))</span>
+<span id="cb3-591"><a href="" aria-label="591"></a>    out[j] <span class="op">=</span> q <span class="op">&gt;</span> <span class="dv">0</span> <span class="op">?</span> <span class="fu">binom</span>(left<span class="op">,</span> q)() <span class="op">:</span> <span class="dv">0</span></span>
+<span id="cb3-592"><a href="" aria-label="592"></a>    left <span class="op">-=</span> out[j]</span>
+<span id="cb3-593"><a href="" aria-label="593"></a>    mass <span class="op">-=</span> pr[j]</span>
+<span id="cb3-594"><a href="" aria-label="594"></a>  }</span>
+<span id="cb3-595"><a href="" aria-label="595"></a>  out[pr<span class="op">.</span><span class="at">length</span> <span class="op">-</span> <span class="dv">1</span>] <span class="op">+=</span> left</span>
+<span id="cb3-596"><a href="" aria-label="596"></a>  <span class="cf">return</span> out</span>
+<span id="cb3-597"><a href="" aria-label="597"></a>}</span>
+<span id="cb3-598"><a href="" aria-label="598"></a></span>
+<span id="cb3-599"><a href="" aria-label="599"></a><span class="co">// max_{s,k} |t_{s,k}| for 6 states x 4 votes (the first 3 votes are candidates)</span></span>
+<span id="cb3-600"><a href="" aria-label="600"></a><span class="kw">function</span> <span class="fu">maxT</span>(counts<span class="op">,</span> pRef) {</span>
+<span id="cb3-601"><a href="" aria-label="601"></a>  <span class="kw">let</span> m <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-602"><a href="" aria-label="602"></a>  <span class="cf">for</span> (<span class="kw">let</span> s <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> s <span class="op">&lt;</span> <span class="dv">6</span><span class="op">;</span> s<span class="op">++</span>) {</span>
+<span id="cb3-603"><a href="" aria-label="603"></a>    <span class="kw">const</span> N <span class="op">=</span> counts[<span class="dv">4</span> <span class="op">*</span> s] <span class="op">+</span> counts[<span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> <span class="dv">1</span>] <span class="op">+</span> counts[<span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> <span class="dv">2</span>] <span class="op">+</span> counts[<span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> <span class="dv">3</span>]</span>
+<span id="cb3-604"><a href="" aria-label="604"></a>    <span class="cf">for</span> (<span class="kw">let</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> <span class="dv">3</span><span class="op">;</span> k<span class="op">++</span>) {</span>
+<span id="cb3-605"><a href="" aria-label="605"></a>      <span class="kw">const</span> p <span class="op">=</span> counts[<span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> k] <span class="op">/</span> N</span>
+<span id="cb3-606"><a href="" aria-label="606"></a>      <span class="kw">const</span> t <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">abs</span>(p <span class="op">-</span> pRef[<span class="dv">3</span> <span class="op">*</span> s <span class="op">+</span> k]) <span class="op">/</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(p <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> p) <span class="op">/</span> N)</span>
+<span id="cb3-607"><a href="" aria-label="607"></a>      m <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(m<span class="op">,</span> <span class="bu">Number</span><span class="op">.</span><span class="fu">isNaN</span>(t) <span class="op">?</span> <span class="kw">Infinity</span> <span class="op">:</span> t)</span>
+<span id="cb3-608"><a href="" aria-label="608"></a>    }</span>
+<span id="cb3-609"><a href="" aria-label="609"></a>  }</span>
+<span id="cb3-610"><a href="" aria-label="610"></a>  <span class="cf">return</span> m</span>
+<span id="cb3-611"><a href="" aria-label="611"></a>}</span>
+<span id="cb3-612"><a href="" aria-label="612"></a></span>
+<span id="cb3-613"><a href="" aria-label="613"></a>pollCounts <span class="op">=</span> <span class="fu">rmultinom</span>(demo<span class="op">.</span><span class="at">n</span><span class="op">,</span> poll_probs<span class="op">,</span> d3<span class="op">.</span><span class="at">randomBinomial</span><span class="op">.</span><span class="fu">source</span>(d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="dv">1000</span> <span class="op">+</span> demo<span class="op">.</span><span class="at">poll</span>)))</span>
+<span id="cb3-614"><a href="" aria-label="614"></a>pollShares <span class="op">=</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">18</span>)<span class="op">.</span><span class="fu">map</span>(i <span class="kw">=&gt;</span> {</span>
+<span id="cb3-615"><a href="" aria-label="615"></a>  <span class="kw">const</span> s <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">floor</span>(i <span class="op">/</span> <span class="dv">3</span>)<span class="op">,</span> k <span class="op">=</span> i <span class="op">%</span> <span class="dv">3</span></span>
+<span id="cb3-616"><a href="" aria-label="616"></a>  <span class="kw">const</span> c <span class="op">=</span> pollCounts<span class="op">.</span><span class="fu">slice</span>(<span class="dv">4</span> <span class="op">*</span> s<span class="op">,</span> <span class="dv">4</span> <span class="op">*</span> s <span class="op">+</span> <span class="dv">4</span>)</span>
+<span id="cb3-617"><a href="" aria-label="617"></a>  <span class="cf">return</span> c[k] <span class="op">/</span> d3<span class="op">.</span><span class="fu">sum</span>(c)</span>
+<span id="cb3-618"><a href="" aria-label="618"></a>})</span>
+<span id="cb3-619"><a href="" aria-label="619"></a></span>
+<span id="cb3-620"><a href="" aria-label="620"></a>bootR <span class="op">=</span> {</span>
+<span id="cb3-621"><a href="" aria-label="621"></a>  <span class="kw">const</span> binom <span class="op">=</span> d3<span class="op">.</span><span class="at">randomBinomial</span><span class="op">.</span><span class="fu">source</span>(d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="dv">7</span> <span class="op">+</span> <span class="dv">31</span> <span class="op">*</span> demo<span class="op">.</span><span class="at">poll</span>))</span>
+<span id="cb3-622"><a href="" aria-label="622"></a>  <span class="kw">const</span> freq <span class="op">=</span> pollCounts<span class="op">.</span><span class="fu">map</span>(c <span class="kw">=&gt;</span> c <span class="op">/</span> demo<span class="op">.</span><span class="at">n</span>)</span>
+<span id="cb3-623"><a href="" aria-label="623"></a>  <span class="cf">return</span> <span class="bu">Float64Array</span><span class="op">.</span><span class="fu">from</span>({<span class="dt">length</span><span class="op">:</span> demo<span class="op">.</span><span class="at">B</span>}<span class="op">,</span> () <span class="kw">=&gt;</span> <span class="fu">maxT</span>(<span class="fu">rmultinom</span>(demo<span class="op">.</span><span class="at">n</span><span class="op">,</span> freq<span class="op">,</span> binom)<span class="op">,</span> pollShares))</span>
+<span id="cb3-624"><a href="" aria-label="624"></a>}</span>
+<span id="cb3-625"><a href="" aria-label="625"></a></span>
+<span id="cb3-626"><a href="" aria-label="626"></a>cStar <span class="op">=</span> d3<span class="op">.</span><span class="fu">quantile</span>(bootR<span class="op">,</span> <span class="fl">0.95</span>)</span>
+<span id="cb3-627"><a href="" aria-label="627"></a>truthN <span class="op">=</span> poll_truth[<span class="bu">String</span>(demo<span class="op">.</span><span class="at">n</span>)]</span>
+<span id="cb3-628"><a href="" aria-label="628"></a>bw <span class="op">=</span> poll_edges[<span class="dv">1</span>] <span class="op">-</span> poll_edges[<span class="dv">0</span>]</span>
+<span id="cb3-629"><a href="" aria-label="629"></a>histBoot <span class="op">=</span> poll_edges<span class="op">.</span><span class="fu">slice</span>(<span class="dv">0</span><span class="op">,</span> <span class="op">-</span><span class="dv">1</span>)<span class="op">.</span><span class="fu">map</span>((x0<span class="op">,</span> i) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-630"><a href="" aria-label="630"></a>  <span class="kw">const</span> x1 <span class="op">=</span> poll_edges[i <span class="op">+</span> <span class="dv">1</span>]</span>
+<span id="cb3-631"><a href="" aria-label="631"></a>  <span class="kw">const</span> inBin <span class="op">=</span> bootR<span class="op">.</span><span class="fu">filter</span>(r <span class="kw">=&gt;</span> (i <span class="op">===</span> <span class="dv">0</span> <span class="op">?</span> <span class="kw">true</span> <span class="op">:</span> r <span class="op">&gt;=</span> x0) <span class="op">&amp;&amp;</span> (i <span class="op">===</span> poll_edges<span class="op">.</span><span class="at">length</span> <span class="op">-</span> <span class="dv">2</span> <span class="op">?</span> <span class="kw">true</span> <span class="op">:</span> r <span class="op">&lt;</span> x1))<span class="op">.</span><span class="at">length</span></span>
+<span id="cb3-632"><a href="" aria-label="632"></a>  <span class="cf">return</span> {x0<span class="op">,</span> x1<span class="op">,</span> <span class="dt">dens</span><span class="op">:</span> inBin <span class="op">/</span> (demo<span class="op">.</span><span class="at">B</span> <span class="op">*</span> bw)}</span>
+<span id="cb3-633"><a href="" aria-label="633"></a>})</span>
+<span id="cb3-634"><a href="" aria-label="634"></a>truthLine <span class="op">=</span> truthN<span class="op">.</span><span class="at">dens</span><span class="op">.</span><span class="fu">map</span>((d<span class="op">,</span> i) <span class="kw">=&gt;</span> ({<span class="dt">x</span><span class="op">:</span> (poll_edges[i] <span class="op">+</span> poll_edges[i <span class="op">+</span> <span class="dv">1</span>]) <span class="op">/</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">dens</span><span class="op">:</span> d}))</span>
+<span id="cb3-635"><a href="" aria-label="635"></a></span>
+<span id="cb3-636"><a href="" aria-label="636"></a>Plot<span class="op">.</span><span class="fu">plot</span>({</span>
+<span id="cb3-637"><a href="" aria-label="637"></a>  <span class="dt">width</span><span class="op">:</span> <span class="dv">1150</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">390</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">50</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
+<span id="cb3-638"><a href="" aria-label="638"></a>  <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"20px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
+<span id="cb3-639"><a href="" aria-label="639"></a>  <span class="dt">x</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"max |t|"</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="dv">1</span><span class="op">,</span> <span class="fl">5.5</span>]<span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
+<span id="cb3-640"><a href="" aria-label="640"></a>  <span class="dt">y</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="fl">1.6</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> <span class="dv">4</span>}<span class="op">,</span></span>
+<span id="cb3-641"><a href="" aria-label="641"></a>  <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb3-642"><a href="" aria-label="642"></a>  <span class="dt">marks</span><span class="op">:</span> [</span>
+<span id="cb3-643"><a href="" aria-label="643"></a>    Plot<span class="op">.</span><span class="fu">rectY</span>(histBoot<span class="op">,</span> {<span class="dt">x1</span><span class="op">:</span> <span class="st">"x0"</span><span class="op">,</span> <span class="dt">x2</span><span class="op">:</span> <span class="st">"x1"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"dens"</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">fillOpacity</span><span class="op">:</span> <span class="fl">0.35</span><span class="op">,</span> <span class="dt">inset</span><span class="op">:</span> <span class="fl">0.5</span>})<span class="op">,</span></span>
+<span id="cb3-644"><a href="" aria-label="644"></a>    Plot<span class="op">.</span><span class="fu">line</span>(truthLine<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"dens"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#2D3E50"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span><span class="op">,</span> <span class="dt">curve</span><span class="op">:</span> <span class="st">"basis"</span>})<span class="op">,</span></span>
+<span id="cb3-645"><a href="" aria-label="645"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([<span class="fl">1.96</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"7,5"</span>})<span class="op">,</span></span>
+<span id="cb3-646"><a href="" aria-label="646"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([poll_c_limit]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#888888"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"3,4"</span>})<span class="op">,</span></span>
+<span id="cb3-647"><a href="" aria-label="647"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([truthN<span class="op">.</span><span class="at">c</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#2D3E50"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span>})<span class="op">,</span></span>
+<span id="cb3-648"><a href="" aria-label="648"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([cStar]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span>})<span class="op">,</span></span>
+<span id="cb3-649"><a href="" aria-label="649"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`bootstrap ĉ* = </span><span class="sc">${</span>cStar<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">8</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})<span class="op">,</span></span>
+<span id="cb3-650"><a href="" aria-label="650"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`true c = </span><span class="sc">${</span>truthN<span class="op">.</span><span class="at">c</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">36</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#2D3E50"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})<span class="op">,</span></span>
+<span id="cb3-651"><a href="" aria-label="651"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`limit = </span><span class="sc">${</span>poll_c_limit<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">64</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#888888"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})<span class="op">,</span></span>
+<span id="cb3-652"><a href="" aria-label="652"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`TV: 1.96 covers all 18 only </span><span class="sc">${</span><span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>(<span class="dv">100</span> <span class="op">*</span> truthN<span class="op">.</span><span class="at">cov196</span>)<span class="sc">}</span><span class="vs">% of the time`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">92</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})</span>
+<span id="cb3-653"><a href="" aria-label="653"></a>  ]</span>
+<span id="cb3-654"><a href="" aria-label="654"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-6" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-7" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-8" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-9" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-10" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-11" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-1" class="slide level2 standout" data-background-color="var(--slate)">
+<h2>&nbsp;</h2>
+<div class="standout-body">
+<p>Questions?</p>
+</div>
+</section></section>
+<section>
+<section id="why-it-works" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>Why It Works</h1>
+
+</section>
+<section id="consistency-the-general-recipe" class="slide level2">
+<h2>Consistency: The General Recipe</h2>
+<div class="thm">
+<div class="thmhead">
+<p>Theorem (L&amp;R 18.3.1)</p>
+</div>
+<p>Let <span class="math inline">\(\mathcal{C}_P\)</span> be a set of sequences <span class="math inline">\(\{P_n\}\)</span> that contains <span class="math inline">\(\{P, P, \dots\}\)</span>. Assume that, for every <span class="math inline">\(\{P_n\} \in \mathcal{C}_P\)</span>, <span class="math inline">\(J_n(\cdot, P_n)\)</span> converges weakly to the same <strong>continuous</strong> limit <span class="math inline">\(J(\cdot, P)\)</span>. If <span class="math inline">\(\{\hat P_n\} \in \mathcal{C}_P\)</span> with probability one, then:</p>
+<ol type="i">
+<li><p><span class="math inline">\(\ \sup_x \left|J_n(x, \hat P_n) - J_n(x, P)\right| \to 0\)</span> almost surely</p></li>
+<li><p><span class="math inline">\(\ J_n^{-1}(1-\alpha, \hat P_n) \to J^{-1}(1-\alpha, P)\)</span> almost surely, if <span class="math inline">\(J(\cdot, P)\)</span> is strictly increasing at <span class="math inline">\(J^{-1}(1-\alpha, P)\)</span></p></li>
+<li><p><span class="math inline">\(\ P\left\{R_n(X^n, \theta(P)) \le J_n^{-1}(1-\alpha, \hat P_n)\right\} \to 1-\alpha\)</span></p></li>
+</ol>
+</div>
+<ul>
+<li>Think of <span class="math inline">\(\mathcal{C}_P\)</span> as the sequences with <span class="math inline">\(d(P_n, P) \to 0\)</span>, for some metric <span class="math inline">\(d\)</span></li>
+<li>Part (iii): the bootstrap confidence set has asymptotically correct coverage</li>
+</ul>
+</section>
+<section id="proof-of-i-and-ii" class="slide level2 tightmath">
+<h2>Proof of (i) and (ii)</h2>
+<ul>
+<li>Fix a nonrandom <span class="math inline">\(\{P_n\} \in \mathcal{C}_P\)</span>. Since <span class="math inline">\(J(\cdot, P)\)</span> is continuous, Pólya’s theorem gives <span class="math display">\[
+\sup_x |J_n(x, P_n) - J(x, P)| \to 0
+\quad\text{and}\quad
+\sup_x |J_n(x, P) - J(x, P)| \to 0
+\]</span></li>
+<li>The second one uses the constant sequence <span class="math inline">\(\{P, P, \dots\} \in \mathcal{C}_P\)</span>. By the triangle inequality: <span class="math display">\[
+\sup_x |J_n(x, P_n) - J_n(x, P)| \le \sup_x |J_n(x, P_n) - J(x, P)| + \sup_x |J(x, P) - J_n(x, P)| \to 0
+\]</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Now the randomness: fix an <span class="math inline">\(\omega\)</span> in the probability-one event where <span class="math inline">\(\{\hat P_n(\omega)\} \in \mathcal{C}_P\)</span></li>
+<li>Along that path, <span class="math inline">\(\{\hat P_n(\omega)\}\)</span> is just a nonrandom sequence in <span class="math inline">\(\mathcal{C}_P\)</span>: apply the above <span class="math inline">\(\implies\)</span> (i)</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>For (ii): if <span class="math inline">\(F_n \Rightarrow F\)</span>, then <span class="math inline">\(F_n^{-1}(1-\alpha) \to F^{-1}(1-\alpha)\)</span> (L&amp;R Lemma 11.2.1)</li>
+<li>This needs <span class="math inline">\(F\)</span> continuous and strictly increasing at <span class="math inline">\(F^{-1}(1-\alpha)\)</span></li>
+<li>Apply it path by path, with <span class="math inline">\(F_n = J_n(\cdot, \hat P_n(\omega))\)</span> and <span class="math inline">\(F = J(\cdot, P)\)</span> <span class="math inline">\(\implies\)</span> (ii)</li>
+</ul>
+</div>
+</section>
+<section id="proof-of-iii" class="slide level2">
+<h2>Proof of (iii)</h2>
+<ul>
+<li>Under <span class="math inline">\(P\)</span>, <span class="math inline">\(R_n(X^n, \theta(P)) \xrightarrow{d} J(\cdot, P)\)</span>: take <span class="math inline">\(\{P, P, \dots\}\)</span> in the assumption</li>
+<li>By (ii), <span class="math inline">\(\hat c_n \equiv J_n^{-1}(1-\alpha, \hat P_n) \to c \equiv J^{-1}(1-\alpha, P)\)</span> almost surely</li>
+<li>By Slutsky, <span class="math inline">\(R_n(X^n, \theta(P)) - \hat c_n \xrightarrow{d} J(\cdot + c, P)\)</span>, which is continuous at zero, so <span class="math display">\[
+P\left\{R_n(X^n, \theta(P)) \le \hat c_n\right\}
+= P\left\{R_n(X^n, \theta(P)) - \hat c_n \le 0\right\}
+\to J(c, P) = 1 - \alpha
+\]</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Bonus: (iii) still holds if (i) and (ii) hold only in probability (L&amp;R Problem 18.3)</li>
+<li>Almost sure: <strong>strongly</strong> consistent bootstrap. In probability: <strong>weakly</strong> consistent</li>
+</ul>
+</div>
+</section>
+<section id="reading-the-theorem" class="slide level2">
+<h2>Reading the Theorem</h2>
+<ul>
+<li>All the work is in the assumption: <span class="math inline">\(J_n(\cdot, P_n) \to J(\cdot, P)\)</span> along <strong>every</strong> sequence in <span class="math inline">\(\mathcal{C}_P\)</span></li>
+<li>That is a form of continuity of <span class="math inline">\(J_n\)</span> in <span class="math inline">\(P\)</span>, uniformly in <span class="math inline">\(n\)</span>: “local uniformity”</li>
+<li>Why sequences? <span class="math inline">\(\hat P_n\)</span> is random, but each realized path is a nonrandom sequence</li>
+<li>So: first study nonrandom <span class="math inline">\(\{P_n\}\)</span>, then plug in <span class="math inline">\(\{\hat P_n\}\)</span> path by path</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>The right notion of “<span class="math inline">\(P_n \to P\)</span>”, i.e., the set <span class="math inline">\(\mathcal{C}_P\)</span>, depends on the root</li>
+<li>The bigger <span class="math inline">\(\mathcal{C}_P\)</span> can be, the easier it is to show that <span class="math inline">\(\{\hat P_n\} \in \mathcal{C}_P\)</span></li>
+<li>Recipe for a new root: (1) find <span class="math inline">\(\mathcal{C}_P\)</span> with <span class="math inline">\(J_n(\cdot, P_n) \to J(\cdot, P)\)</span>; (2) show <span class="math inline">\(\{\hat P_n\} \in \mathcal{C}_P\)</span></li>
+</ul>
+</div>
+</section>
+<section id="the-nonparametric-mean" class="slide level2">
+<h2>The Nonparametric Mean</h2>
+<div class="thm">
+<div class="thmhead">
+<p>Theorem (L&amp;R 18.3.3)</p>
+</div>
+<p>Let <span class="math inline">\(F\)</span> have finite, nonzero variance <span class="math inline">\(\sigma^2(F)\)</span> and mean <span class="math inline">\(\theta(F)\)</span>. Let <span class="math inline">\(J_n(\cdot, F)\)</span> be the distribution of <span class="math inline">\(R_n = \sqrt n\,(\bar X_n - \theta(F))\)</span> under <span class="math inline">\(F\)</span>.</p>
+<ol type="i">
+<li><p>Let <span class="math inline">\(\mathcal{C}_F\)</span> be the set of sequences <span class="math inline">\(\{F_n\}\)</span> such that <span class="math inline">\(F_n \Rightarrow F\)</span>, <span class="math inline">\(\theta(F_n) \to \theta(F)\)</span> and <span class="math inline">\(\sigma^2(F_n) \to \sigma^2(F)\)</span>. For every <span class="math inline">\(\{F_n\} \in \mathcal{C}_F\)</span>, <span class="math inline">\(J_n(\cdot, F_n)\)</span> converges weakly to <span class="math inline">\(N(0, \sigma^2(F))\)</span>.</p></li>
+<li><p>If <span class="math inline">\(X_1, \dots, X_n\)</span> are iid <span class="math inline">\(F\)</span>, then the bootstrap <span class="math inline">\(J_n(\cdot, \hat F_n)\)</span> is strongly consistent: (i)–(iii) of the previous theorem hold.</p></li>
+</ol>
+</div>
+<ul>
+<li>Part (i) is a CLT for a <strong>triangular array</strong>: row <span class="math inline">\(n\)</span> is iid from <span class="math inline">\(F_n\)</span>, which changes with <span class="math inline">\(n\)</span></li>
+<li>That’s exactly what resampling from <span class="math inline">\(\hat F_n\)</span> looks like: a new distribution for each <span class="math inline">\(n\)</span></li>
+</ul>
+</section>
+<section id="proof-of-i-setup" class="slide level2">
+<h2>Proof of (i): Setup</h2>
+<ul>
+<li>For each <span class="math inline">\(n\)</span>, let <span class="math inline">\(X_{n,1}, \dots, X_{n,n}\)</span> be iid <span class="math inline">\(F_n\)</span>, and let <span class="math inline">\(Y_{n,i} \equiv X_{n,i} - \theta(F_n)\)</span></li>
+<li>Since <span class="math inline">\(\sigma^2(F_n) \to \sigma^2(F) &gt; 0\)</span>, Lindeberg–Feller gives <span class="math inline">\(\sqrt n\, \bar Y_n \xrightarrow{d} N(0, \sigma^2(F))\)</span> as long as <span class="math display">\[
+\E\left[Y_{n,1}^2\, I\{Y_{n,1}^2 &gt; \epsilon^2 n\}\right] \to 0 \qquad \text{for every } \epsilon &gt; 0
+\]</span></li>
+<li>The rows are iid, so the Lindeberg condition only involves <span class="math inline">\(Y_{n,1}\)</span></li>
+</ul>
+<div class="fragment">
+<p>What we know about <span class="math inline">\(Y_{n,1}\)</span>:</p>
+<ul>
+<li><span class="math inline">\(Y_{n,1} \xrightarrow{d} Y \equiv X - \theta(F)\)</span>, with <span class="math inline">\(X \sim F\)</span>: because <span class="math inline">\(F_n \Rightarrow F\)</span> and <span class="math inline">\(\theta(F_n) \to \theta(F)\)</span></li>
+<li><span class="math inline">\(\E[Y_{n,1}^2] = \sigma^2(F_n) \to \sigma^2(F) = \E[Y^2]\)</span></li>
+<li>By the continuous mapping theorem, <span class="math inline">\(Y_{n,1}^2 \xrightarrow{d} Y^2\)</span></li>
+</ul>
+</div>
+</section>
+<section id="proof-of-i-lindeberg" class="slide level2 tightmath">
+<h2>Proof of (i): Lindeberg</h2>
+<ul>
+<li>Fix <span class="math inline">\(\beta &gt; 0\)</span>, a continuity point of the distribution of <span class="math inline">\(Y^2\)</span>. For all <span class="math inline">\(n &gt; \beta/\epsilon^2\)</span>: <span class="math display">\[
+\E\left[Y_{n,1}^2\, I\{Y_{n,1}^2 &gt; \epsilon^2 n\}\right]
+\le \E\left[Y_{n,1}^2\, I\{Y_{n,1}^2 &gt; \beta\}\right]
+= \E\left[Y_{n,1}^2\right] - \E\left[Y_{n,1}^2\, I\{Y_{n,1}^2 \le \beta\}\right]
+\]</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li><span class="math inline">\(Y_{n,1}^2 I\{Y_{n,1}^2 \le \beta\} \xrightarrow{d} Y^2 I\{Y^2 \le \beta\}\)</span>: continuous mapping, since <span class="math inline">\(P\{Y^2 = \beta\} = 0\)</span></li>
+<li>These variables live in <span class="math inline">\([0, \beta]\)</span>, so their expectations converge too. Hence <span class="math display">\[
+\E\left[Y_{n,1}^2\, I\{Y_{n,1}^2 &gt; \beta\}\right] \to \E[Y^2] - \E\left[Y^2 I\{Y^2 \le \beta\}\right] = \E\left[Y^2 I\{Y^2 &gt; \beta\}\right]
+\]</span></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>So <span class="math inline">\(\limsup_n \E\left[Y_{n,1}^2 I\{Y_{n,1}^2 &gt; \epsilon^2 n\}\right] \le \E\left[Y^2 I\{Y^2 &gt; \beta\}\right]\)</span> for every such <span class="math inline">\(\beta\)</span></li>
+<li>Continuity points are dense, so we can let <span class="math inline">\(\beta \to \infty\)</span> along them</li>
+<li>Since <span class="math inline">\(\E[Y^2] &lt; \infty\)</span>, dominated convergence gives <span class="math inline">\(\E[Y^2 I\{Y^2 &gt; \beta\}] \downarrow 0\)</span> <span class="math inline">\(\blacksquare\)</span></li>
+</ul>
+</div>
+</section>
+<section id="proof-of-ii" class="slide level2">
+<h2>Proof of (ii)</h2>
+<ul>
+<li>By the previous theorem, it’s enough to show that <span class="math inline">\(\{\hat F_n\} \in \mathcal{C}_F\)</span> with probability one:</li>
+</ul>
+<ol type="1">
+<li><span class="math inline">\(\hat F_n \Rightarrow F\)</span> a.s.: Glivenko–Cantelli gives <span class="math inline">\(\sup_t |\hat F_n(t) - F(t)| \to 0\)</span> a.s.</li>
+<li><span class="math inline">\(\theta(\hat F_n) = \bar X_n \to \theta(F)\)</span> a.s.: the SLLN, since <span class="math inline">\(\E|X| &lt; \infty\)</span> when <span class="math inline">\(\sigma^2(F) &lt; \infty\)</span></li>
+<li><span class="math inline">\(\sigma^2(\hat F_n) = \frac{1}{n}\sum_i X_i^2 - \bar X_n^2 \to \sigma^2(F)\)</span> a.s.: the SLLN for <span class="math inline">\(X_i\)</span> and for <span class="math inline">\(X_i^2\)</span></li>
+</ol>
+<ul>
+<li>The intersection of three probability-one events has probability one <span class="math inline">\(\blacksquare\)</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>In one line: Mallows’ metric <span class="math inline">\(d_2(\hat F_n, F) \to 0\)</span> a.s. (Bickel and Freedman, 1981)</li>
+<li><span class="alert">Exercise: show that <span class="math inline">\(\theta(F_n) \to \theta(F)\)</span> follows from the other two conditions (L&amp;R 18.5)</span></li>
+</ul>
+</div>
+</section>
+<section id="beyond-the-mean" class="slide level2">
+<h2>Beyond the Mean</h2>
+<ul>
+<li><strong>Studentized mean</strong> (L&amp;R 18.3.4): <span class="math inline">\(\sqrt n\,(\bar X_n - \theta)/\hat\sigma_n\)</span> works too: the bootstrap-t</li>
+<li><strong>Multivariate mean</strong> (L&amp;R 18.3.5): <span class="math inline">\(\|\sqrt n\,(\bar X_n - \theta)\|\)</span> works for <strong>any</strong> norm <span class="math inline">\(\|\cdot\|\)</span></li>
+<li><strong>Smooth functions</strong> (L&amp;R 18.3.6): <span class="math inline">\(\sqrt n\,[f(\bar X_n) - f(\theta)]\)</span>, <span class="math inline">\(f\)</span> differentiable: delta method</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>The poll: <span class="math inline">\(p_{s,k} = P\{S = s, V = k\}/P\{S = s\}\)</span> is a ratio of means, a smooth function</li>
+<li>The max is continuous, and studentizing works as for the t-stat: our CI is valid</li>
+<li>OLS: <span class="math inline">\(\hat\beta = \left(\frac{1}{n}\sum_i X_iX_i'\right)^{-1}\frac{1}{n}\sum_i X_iY_i\)</span>, also a smooth function of means</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Reading Hansen? He writes these results as <span class="math inline">\(\sqrt n\,(\bar Y^* - \bar Y) \xrightarrow{d^*} N(0, \Sigma)\)</span>, same idea</li>
+</ul>
+</div>
+</section>
+<section id="section-2" class="slide level2 standout" data-background-color="var(--slate)">
+<h2>&nbsp;</h2>
+<div class="standout-body">
+<p>Questions?</p>
+</div>
+</section></section>
+<section>
+<section id="when-it-fails" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>When It Fails</h1>
+
+</section>
+<section id="the-maximum-of-a-uniform" class="slide level2">
+<h2>The Maximum of a Uniform</h2>
+<ul>
+<li><span class="math inline">\(X_i \iid U(0, \theta)\)</span>, estimator <span class="math inline">\(\hat\theta_n = X_{(n)} = \max_i X_i\)</span>, root <span class="math inline">\(R_n = n\,(X_{(n)} - \theta) \le 0\)</span></li>
+<li>For <span class="math inline">\(x \le 0\)</span>, the true distribution is <span class="math display">\[
+J_n(x, P) = P\left\{X_{(n)} \le \theta + \tfrac{x}{n}\right\} = \left(1 + \frac{x}{n\theta}\right)^n \to e^{x/\theta}
+\]</span></li>
+<li>So <span class="math inline">\(R_n \xrightarrow{d} -\theta \cdot \text{Exp}(1)\)</span>: a <strong>continuous</strong> limit, with no mass at any point</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Bootstrap root: <span class="math inline">\(R^*_n = n\,(X^*_{(n)} - X_{(n)}) \le 0\)</span>, which is zero if <span class="math inline">\(X_{(n)}\)</span> is ever drawn</li>
+<li>Each draw misses <span class="math inline">\(X_{(n)}\)</span> with probability <span class="math inline">\(1 - 1/n\)</span>, so, given the data, <span class="math display">\[
+P\left\{R^*_n = 0 \,\middle|\, X^n\right\} = 1 - \left(1 - \tfrac{1}{n}\right)^n \to 1 - e^{-1} \approx 0.632
+\]</span></li>
+<li>The bootstrap puts 63% of its mass on a single point, where the truth puts none!</li>
+</ul>
+</div>
+</section>
+<section id="in-pictures" class="slide level2">
+<h2>In Pictures</h2>
+
+<img data-src="lecture02_files/figure-revealjs/cell-8-output-1.svg" class="quarto-figure quarto-figure-center r-stretch"><ul>
+<li>More data does <strong>not</strong> help: the jump at zero is still there with <span class="math inline">\(n = 10{,}000\)</span></li>
+</ul>
+</section>
+<section id="what-went-wrong" class="slide level2">
+<h2>What Went Wrong?</h2>
+<ul>
+<li>Ingredient 2 failed: <span class="math inline">\(J_n(\cdot, P_n) \to J(\cdot, P)\)</span> breaks for sequences <span class="math inline">\(P_n\)</span> that look like <span class="math inline">\(\hat P_n\)</span></li>
+<li>E.g., <span class="math inline">\(P_n\)</span> uniform on <span class="math inline">\(n\)</span> points in <span class="math inline">\([0, \theta]\)</span>, just like <span class="math inline">\(\hat P_n\)</span>: you will prove this in the problem set</li>
+<li>The known counterexamples share the culprit: a lack of uniformity in <span class="math inline">\(P\)</span></li>
+</ul>
+<div class="fragment">
+<p>Other failures, all with iid data:</p>
+<ul>
+<li>Infinite variance: for the mean, it works a.s. <strong>iff</strong> <span class="math inline">\(\sigma^2 &lt; \infty\)</span> (Giné and Zinn, 1989)</li>
+<li>Parameter on the boundary: <span class="math inline">\(\hat\mu_n = \max(\bar X_n, 0)\)</span> when <span class="math inline">\(\mu = 0\)</span> (L&amp;R Problem 18.10)</li>
+<li>Degenerate smooth functions: <span class="math inline">\(\sqrt n\,(\bar X_n^2 - \mu^2)\)</span> when <span class="math inline">\(\mu = 0\)</span> (L&amp;R Problem 18.17)</li>
+<li>Superefficient estimators (Hodges): not even the parametric bootstrap works (Beran, 1984)</li>
+</ul>
+</div>
+</section>
+<section id="handle-with-care" class="slide level2">
+<h2>Handle With Care</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>If it fails</strong></p>
+<ul>
+<li><span class="math inline">\(m\)</span>-out-of-<span class="math inline">\(n\)</span>: resample only <span class="math inline">\(m \ll n\)</span></li>
+<li>Subsampling (L&amp;R Section 18.7)</li>
+<li>Find a theorem for <strong>your</strong> root</li>
+<li>Bootstrap a pivot when you can</li>
+</ul>
+</div><div class="column polecol" style="width:50%;">
+<p><strong>Other bootstraps</strong></p>
+<ul>
+<li>Parametric: draw from <span class="math inline">\(P_{\hat\psi}\)</span></li>
+<li>Residual: resample OLS residuals</li>
+<li>Wild: robust to heteroskedasticity</li>
+<li>Block: dependent data (soon!)</li>
+<li>Cluster: resample whole clusters</li>
+</ul>
+</div></div>
+<div class="thm takeaway">
+<div class="thmhead">
+<p>The bottom line</p>
+</div>
+<p>The bootstrap is not magic. Like any asymptotic approximation, it needs a theorem.</p>
+</div>
+</section>
+<section id="section-3" class="slide level2 standout" data-background-color="var(--slate)">
+<h2>&nbsp;</h2>
+<div class="standout-body">
+<p>Questions?</p>
+</div>
+</section>
+<section id="references" class="slide level2">
+<h2>References</h2>
+<ul>
+<li>Chapter 18 of <em>Testing Statistical Hypotheses</em>, by Erich Lehmann and Joseph Romano (Sections 18.1 to 18.3 and Example 18.7.2)</li>
+<li>Chapter 10 of <em>Econometrics</em>, by Bruce Hansen</li>
+<li>Efron (1979), “Bootstrap Methods: Another Look at the Jackknife”, <em>Annals of Statistics</em></li>
+<li>Bickel and Freedman (1981), “Some Asymptotic Theory for the Bootstrap”, <em>Annals of Statistics</em></li>
+<li>Beran (1984), “Bootstrap Methods in Statistics”, <em>Jahresbericht der Deutschen Mathematiker-Vereinigung</em></li>
+<li>Giné and Zinn (1989), “Necessary Conditions for the Bootstrap of the Mean”, <em>Annals of Statistics</em></li>
+</ul>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="lecture02_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="lecture02_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="lecture02_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="lecture02_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="lecture02_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="lecture02_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="lecture02_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="lecture02_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="lecture02_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="lecture02_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 4.0e-2,
+
+        // Bounds for smallest/largest possible scale to apply to content
+        minScale: 0.2,
+
+        maxScale: 2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script type="ojs-module-contents">
+    eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6InZpZXdvZiBkZW1vID0gSW5wdXRzLmZvcm0oe1xuICBuOiBJbnB1dHMucmFkaW8oWzEwMDAsIDIwMDAsIDUwMDAsIDEwMDAwLCAyMDAwMF0sIHt2YWx1ZTogMTAwMCwgbGFiZWw6IFwiUG9sbCBzaXplIG5cIiwgZm9ybWF0OiBkID0+IGQudG9Mb2NhbGVTdHJpbmcoXCJlbi1VU1wiKX0pLFxuICBCOiBJbnB1dHMucmFuZ2UoWzUwLCAxMDAwMF0sIHt2YWx1ZTogMjAwLCBzdGVwOiAxLCB0cmFuc2Zvcm06IE1hdGgubG9nLCBsYWJlbDogXCJCb290c3RyYXAgZHJhd3MgQlwifSksXG4gIHBvbGw6IElucHV0cy5idXR0b24oXCJEcmF3IGEgbmV3IHBvbGxcIiwge3ZhbHVlOiAxLCByZWR1Y2U6IHYgPT4gdiArIDF9KVxufSwge3RlbXBsYXRlOiAoe24sIEIsIHBvbGx9KSA9PiB7XG4gIG4uc3R5bGUuc2V0UHJvcGVydHkoXCItLWlucHV0LXdpZHRoXCIsIFwiNTYwcHhcIilcbiAgbi5zdHlsZS5tYXhXaWR0aCA9IFwibm9uZVwiXG4gIEIuc3R5bGUuc2V0UHJvcGVydHkoXCItLWlucHV0LXdpZHRoXCIsIFwiMzAwcHhcIilcbiAgcmV0dXJuIGh0bWxgPGRpdiBzdHlsZT1cImRpc3BsYXk6IGZsZXg7IGZsZXgtZGlyZWN0aW9uOiBjb2x1bW47IGFsaWduLWl0ZW1zOiBjZW50ZXJcIj5cbiAgICAke259PGRpdiBzdHlsZT1cImRpc3BsYXk6IGZsZXg7IGFsaWduLWl0ZW1zOiBjZW50ZXI7IGNvbHVtbi1nYXA6IDMwcHhcIj4ke0J9JHtwb2xsfTwvZGl2PlxuICA8L2Rpdj5gXG59fSlcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMiIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6Ii8vIE11bHRpbm9taWFsIGRyYXcgYXMgYSBjaGFpbiBvZiBiaW5vbWlhbHMgKGV4YWN0KS4gV2l0aCBjYXRlZ29yaWNhbCBkYXRhLFxuLy8gcmVzYW1wbGluZyBuIHJvd3Mgd2l0aCByZXBsYWNlbWVudCBpcyBhIE11bHRpbm9taWFsKG4sIGNlbGwgZnJlcXVlbmNpZXMpIGRyYXcuXG5mdW5jdGlvbiBybXVsdGlub20obiwgcHIsIGJpbm9tKSB7XG4gIGNvbnN0IG91dCA9IG5ldyBBcnJheShwci5sZW5ndGgpLmZpbGwoMClcbiAgbGV0IGxlZnQgPSBuLCBtYXNzID0gMVxuICBmb3IgKGxldCBqID0gMDsgaiA8IHByLmxlbmd0aCAtIDEgJiYgbGVmdCA+IDA7IGorKykge1xuICAgIGNvbnN0IHEgPSBNYXRoLm1pbigxLCBNYXRoLm1heCgwLCBwcltqXSAvIG1hc3MpKVxuICAgIG91dFtqXSA9IHEgPiAwID8gYmlub20obGVmdCwgcSkoKSA6IDBcbiAgICBsZWZ0IC09IG91dFtqXVxuICAgIG1hc3MgLT0gcHJbal1cbiAgfVxuICBvdXRbcHIubGVuZ3RoIC0gMV0gKz0gbGVmdFxuICByZXR1cm4gb3V0XG59XG5cbi8vIG1heF97cyxrfSB8dF97cyxrfXwgZm9yIDYgc3RhdGVzIHggNCB2b3RlcyAodGhlIGZpcnN0IDMgdm90ZXMgYXJlIGNhbmRpZGF0ZXMpXG5mdW5jdGlvbiBtYXhUKGNvdW50cywgcFJlZikge1xuICBsZXQgbSA9IDBcbiAgZm9yIChsZXQgcyA9IDA7IHMgPCA2OyBzKyspIHtcbiAgICBjb25zdCBOID0gY291bnRzWzQgKiBzXSArIGNvdW50c1s0ICogcyArIDFdICsgY291bnRzWzQgKiBzICsgMl0gKyBjb3VudHNbNCAqIHMgKyAzXVxuICAgIGZvciAobGV0IGsgPSAwOyBrIDwgMzsgaysrKSB7XG4gICAgICBjb25zdCBwID0gY291bnRzWzQgKiBzICsga10gLyBOXG4gICAgICBjb25zdCB0ID0gTWF0aC5hYnMocCAtIHBSZWZbMyAqIHMgKyBrXSkgLyBNYXRoLnNxcnQocCAqICgxIC0gcCkgLyBOKVxuICAgICAgbSA9IE1hdGgubWF4KG0sIE51bWJlci5pc05hTih0KSA/IEluZmluaXR5IDogdClcbiAgICB9XG4gIH1cbiAgcmV0dXJuIG1cbn1cblxucG9sbENvdW50cyA9IHJtdWx0aW5vbShkZW1vLm4sIHBvbGxfcHJvYnMsIGQzLnJhbmRvbUJpbm9taWFsLnNvdXJjZShkMy5yYW5kb21MY2coMTAwMCArIGRlbW8ucG9sbCkpKVxucG9sbFNoYXJlcyA9IGQzLnJhbmdlKDE4KS5tYXAoaSA9PiB7XG4gIGNvbnN0IHMgPSBNYXRoLmZsb29yKGkgLyAzKSwgayA9IGkgJSAzXG4gIGNvbnN0IGMgPSBwb2xsQ291bnRzLnNsaWNlKDQgKiBzLCA0ICogcyArIDQpXG4gIHJldHVybiBjW2tdIC8gZDMuc3VtKGMpXG59KVxuXG5ib290UiA9IHtcbiAgY29uc3QgYmlub20gPSBkMy5yYW5kb21CaW5vbWlhbC5zb3VyY2UoZDMucmFuZG9tTGNnKDcgKyAzMSAqIGRlbW8ucG9sbCkpXG4gIGNvbnN0IGZyZXEgPSBwb2xsQ291bnRzLm1hcChjID0+IGMgLyBkZW1vLm4pXG4gIHJldHVybiBGbG9hdDY0QXJyYXkuZnJvbSh7bGVuZ3RoOiBkZW1vLkJ9LCAoKSA9PiBtYXhUKHJtdWx0aW5vbShkZW1vLm4sIGZyZXEsIGJpbm9tKSwgcG9sbFNoYXJlcykpXG59XG5cbmNTdGFyID0gZDMucXVhbnRpbGUoYm9vdFIsIDAuOTUpXG50cnV0aE4gPSBwb2xsX3RydXRoW1N0cmluZyhkZW1vLm4pXVxuYncgPSBwb2xsX2VkZ2VzWzFdIC0gcG9sbF9lZGdlc1swXVxuaGlzdEJvb3QgPSBwb2xsX2VkZ2VzLnNsaWNlKDAsIC0xKS5tYXAoKHgwLCBpKSA9PiB7XG4gIGNvbnN0IHgxID0gcG9sbF9lZGdlc1tpICsgMV1cbiAgY29uc3QgaW5CaW4gPSBib290Ui5maWx0ZXIociA9PiAoaSA9PT0gMCA/IHRydWUgOiByID49IHgwKSAmJiAoaSA9PT0gcG9sbF9lZGdlcy5sZW5ndGggLSAyID8gdHJ1ZSA6IHIgPCB4MSkpLmxlbmd0aFxuICByZXR1cm4ge3gwLCB4MSwgZGVuczogaW5CaW4gLyAoZGVtby5CICogYncpfVxufSlcbnRydXRoTGluZSA9IHRydXRoTi5kZW5zLm1hcCgoZCwgaSkgPT4gKHt4OiAocG9sbF9lZGdlc1tpXSArIHBvbGxfZWRnZXNbaSArIDFdKSAvIDIsIGRlbnM6IGR9KSlcblxuUGxvdC5wbG90KHtcbiAgd2lkdGg6IDExNTAsIGhlaWdodDogMzkwLCBtYXJnaW5MZWZ0OiA1MCwgbWFyZ2luQm90dG9tOiA0NSxcbiAgc3R5bGU6IHtmb250U2l6ZTogXCIyMHB4XCIsIGZvbnRGYW1pbHk6IFwiQXJpYWwsIEFyaW1vLCBzYW5zLXNlcmlmXCJ9LFxuICB4OiB7bGFiZWw6IFwibWF4IHx0fFwiLCBkb21haW46IFsxLCA1LjVdLCBsYWJlbEFuY2hvcjogXCJjZW50ZXJcIiwgbGFiZWxBcnJvdzogXCJub25lXCJ9LFxuICB5OiB7bGFiZWw6IG51bGwsIGRvbWFpbjogWzAsIDEuNl0sIHRpY2tzOiA0fSxcbiAgZ3JpZDogdHJ1ZSxcbiAgbWFya3M6IFtcbiAgICBQbG90LnJlY3RZKGhpc3RCb290LCB7eDE6IFwieDBcIiwgeDI6IFwieDFcIiwgeTogXCJkZW5zXCIsIGZpbGw6IFwiIzAwNzJCQ1wiLCBmaWxsT3BhY2l0eTogMC4zNSwgaW5zZXQ6IDAuNX0pLFxuICAgIFBsb3QubGluZSh0cnV0aExpbmUsIHt4OiBcInhcIiwgeTogXCJkZW5zXCIsIHN0cm9rZTogXCIjMkQzRTUwXCIsIHN0cm9rZVdpZHRoOiAzLCBjdXJ2ZTogXCJiYXNpc1wifSksXG4gICAgUGxvdC5ydWxlWChbMS45Nl0sIHtzdHJva2U6IFwiI0VCODExQlwiLCBzdHJva2VXaWR0aDogMywgc3Ryb2tlRGFzaGFycmF5OiBcIjcsNVwifSksXG4gICAgUGxvdC5ydWxlWChbcG9sbF9jX2xpbWl0XSwge3N0cm9rZTogXCIjODg4ODg4XCIsIHN0cm9rZVdpZHRoOiAyLCBzdHJva2VEYXNoYXJyYXk6IFwiMyw0XCJ9KSxcbiAgICBQbG90LnJ1bGVYKFt0cnV0aE4uY10sIHtzdHJva2U6IFwiIzJEM0U1MFwiLCBzdHJva2VXaWR0aDogM30pLFxuICAgIFBsb3QucnVsZVgoW2NTdGFyXSwge3N0cm9rZTogXCIjMDA3MkJDXCIsIHN0cm9rZVdpZHRoOiAzfSksXG4gICAgUGxvdC50ZXh0KFtgYm9vdHN0cmFwIMSJKiA9ICR7Y1N0YXIudG9GaXhlZCgyKX1gXSwge2ZyYW1lQW5jaG9yOiBcInRvcC1yaWdodFwiLCBkeDogLTEwLCBkeTogOCwgZmlsbDogXCIjMDA3MkJDXCIsIGZvbnRXZWlnaHQ6IFwiYm9sZFwiLCBmb250U2l6ZTogMjEsIHN0cm9rZTogXCJ3aGl0ZVwiLCBzdHJva2VXaWR0aDogNn0pLFxuICAgIFBsb3QudGV4dChbYHRydWUgYyA9ICR7dHJ1dGhOLmMudG9GaXhlZCgyKX1gXSwge2ZyYW1lQW5jaG9yOiBcInRvcC1yaWdodFwiLCBkeDogLTEwLCBkeTogMzYsIGZpbGw6IFwiIzJEM0U1MFwiLCBmb250V2VpZ2h0OiBcImJvbGRcIiwgZm9udFNpemU6IDIxLCBzdHJva2U6IFwid2hpdGVcIiwgc3Ryb2tlV2lkdGg6IDZ9KSxcbiAgICBQbG90LnRleHQoW2BsaW1pdCA9ICR7cG9sbF9jX2xpbWl0LnRvRml4ZWQoMil9YF0sIHtmcmFtZUFuY2hvcjogXCJ0b3AtcmlnaHRcIiwgZHg6IC0xMCwgZHk6IDY0LCBmaWxsOiBcIiM4ODg4ODhcIiwgZm9udFdlaWdodDogXCJib2xkXCIsIGZvbnRTaXplOiAyMSwgc3Ryb2tlOiBcIndoaXRlXCIsIHN0cm9rZVdpZHRoOiA2fSksXG4gICAgUGxvdC50ZXh0KFtgVFY6IDEuOTYgY292ZXJzIGFsbCAxOCBvbmx5ICR7TWF0aC5yb3VuZCgxMDAgKiB0cnV0aE4uY292MTk2KX0lIG9mIHRoZSB0aW1lYF0sIHtmcmFtZUFuY2hvcjogXCJ0b3AtcmlnaHRcIiwgZHg6IC0xMCwgZHk6IDkyLCBmaWxsOiBcIiNFQjgxMUJcIiwgZm9udFdlaWdodDogXCJib2xkXCIsIGZvbnRTaXplOiAyMSwgc3Ryb2tlOiBcIndoaXRlXCIsIHN0cm9rZVdpZHRoOiA2fSlcbiAgXVxufSlcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldFF1aWV0Iiwic291cmNlIjoic2hpbnlJbnB1dCgnZGVtbycpIn1dfQ==
+    </script>
+    <script type="module">
+    if (window.location.protocol === "file:") { alert("The OJS runtime does not work with file:// URLs. Please use a web server to view this document."); }
+    window._ojs.paths.runtimeToDoc = "../../..";
+    window._ojs.paths.runtimeToRoot = "../../../..";
+    window._ojs.paths.docToRoot = "..";
+    window._ojs.selfContained = false;
+    window._ojs.runtime.interpretFromScriptTags();
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+                // target, if specified
+                link.setAttribute("target", "_blank");
+                if (link.getAttribute("rel") === null) {
+                  link.setAttribute("rel", "noopener");
+                }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
