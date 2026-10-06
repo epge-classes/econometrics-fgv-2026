@@ -49,7 +49,7 @@ def max_t_counts(counts, p_ref):
 
 # The truth J_n(., P) at n = 2,000, by simulating many polls from P
 np.random.seed(2026)
-R_true = max_t_counts(np.random.multinomial(n_tv, probs, size=40000), p_true)
+R_true = max_t_counts(np.random.multinomial(n_tv, probs, size=100000), p_true)
 cover_196 = f'{100 * np.mean(R_true <= 1.96):.0f}%'
 c_true = f'{np.quantile(R_true, 0.95):.2f}'
 
@@ -93,7 +93,7 @@ p_hat = np.array([[np.mean(V[S == s] == k) for k in range(3)] for s in range(6)]
 N_s = np.bincount(S, minlength=6)[:, None]
 se_hat = np.sqrt(p_hat * (1 - p_hat) / N_s)
 
-def poll_plot(c_joint=None):
+def poll_plot(c_joint=None, title=None):
     fig, ax = plt.subplots(figsize=(11, 4.1))
     for k, (col, dx) in enumerate(zip([blue, orange, slate], [-0.24, 0, 0.24])):
         x = np.arange(6) + dx
@@ -114,6 +114,8 @@ def poll_plot(c_joint=None):
     ax.set_ylim(0, 0.62)
     ax.grid(alpha=0.3, axis='y')
     ax.legend(ncol=4, loc='upper center', frameon=False, fontsize=13)
+    if title:
+        ax.set_title(title, fontsize=15)
     plt.tight_layout()
 
 poll_plot()
@@ -268,7 +270,7 @@ We want a confidence set for $\theta(P)$. For that, all we need is $J_n(\cdot, P
 ::: {.thmhead}
 Definition (Pivot)
 :::
-The root $R_n(X^n, \theta(P))$ is a **pivot** if $J_n(x, P)$ does not depend on $P$: $J_n(x, P) = J_n(x)$ for all $P \in \mathcal{P}$.
+The root $R_n(X^n, \theta(P))$ is a **pivot** if $J_n(x, P) = J_n(x)$ for all $x$ and all $P \in \mathcal{P}$.
 :::
 
 Examples:
@@ -288,8 +290,6 @@ Not pivots:
 - Coverage is **exact**: $P\{\theta(P) \in C_n\} = 1-\alpha$ for every $n$ and every $P \in \mathcal{P}$
 - No asymptotics at all: $n = 15$ is as good as $n = 15{,}000$
 - Only **one** distribution to learn: look it up once in a table (think $t_{n-1}$)
-- No closed form? Simulate it under any convenient $P_0 \in \mathcal{P}$, e.g., $\mu = 0$ and $\sigma = 1$
-- Since $J_n(\cdot, P_0) = J_n(\cdot, P)$, that gives the exact quantiles for the true $P$ too
 
 . . .
 
@@ -299,7 +299,7 @@ Not pivots:
 
 . . .
 
-- Location-scale model: $X_i = \theta + \sigma\varepsilon_i$, with $\varepsilon_i \iid F$ and $F$ known
+- Location-scale model: $X_i = \theta + \sigma\varepsilon_i$, with $\varepsilon_i \iid F$ and $F$ _known_, but $(\theta, \sigma)$ _unknown_
 - [Exercise: show that $(\bar X_n - \theta)/S_n$ is a pivot]{.alert} [(L&R Problem 18.1)]{.fgv}
 
 ## Not Pivots
@@ -311,12 +311,10 @@ $$
 T = \frac{(\bar X - \bar Y) - (\mu_X - \mu_Y)}{\sqrt{S_X^2/n_X + S_Y^2/n_Y}}
 $$
 - Proportions: the law of $\sqrt n\,(\hat p - p)/\sqrt{\hat p(1-\hat p)}$ is discrete and depends on $p$
-- Median: $\sqrt n\,(\hat m_n - m) \xrightarrow{d} N(0, 1/4f(m)^2)$: depends on the density at $m$
-- $U(0,\theta)$: $X_{(n)}/\theta$ is a pivot, but $n\,(X_{(n)} - \theta)$ is not: its law scales with $\theta$
 
 . . .
 
-- The TV margin of error is not a pivot: its true coverage swings with $p$ and $n$
+- That's the root behind the TV margin of error, so its coverage swings with $p$ and $n$
 - See [Brown, Cai and DasGupta (2001)]{.fgv} for how erratic it gets
 
 ## Asymptotic Pivots
@@ -325,12 +323,12 @@ $$
 ::: {.thmhead}
 Definition (Asymptotic Pivot)
 :::
-The root is an **asymptotic pivot** if $J_n(\cdot, P)$ converges weakly to a limit $J$ that does not depend on $P$.
+The root is an **asymptotic pivot** if, for every $P \in \mathcal{P}$, $J_n(\cdot, P)$ converges weakly to the same limit $J$, which does not depend on $P$.
 :::
 
 - The t-statistic: if $0 < \sigma^2(P) < \infty$, then $\sqrt n\,(\bar X_n - \theta(P))/S_n \xrightarrow{d} N(0,1)$
 - That's the TV margin of error: it holds for **every** $P$ with finite variance
-- Parametric models: $n(\hat\theta_n - \theta)'I(\hat\theta_n)(\hat\theta_n - \theta) \xrightarrow{d} \chi^2_k$ (Wald)
+- Parametric models where $\hat{\theta}_n$ is the MLE: $n(\hat\theta_n - \theta)'I(\hat\theta_n)(\hat\theta_n - \theta) \xrightarrow{d} \chi^2_k$ (Wald)
 
 . . .
 
@@ -345,10 +343,7 @@ The root is an **asymptotic pivot** if $J_n(\cdot, P)$ converges weakly to a lim
 . . .
 
 - This only works if you **know** $J(\cdot, P)$ and can estimate whatever it depends on
-- The $\alpha$-trimmed mean, for a symmetric $F$: good luck estimating its asymptotic variance
-$$
-\sigma^2(\alpha, F) = \frac{1}{(1-2\alpha)^2}\left[\int_{F^{-1}(\alpha)}^{F^{-1}(1-\alpha)} \left(t - \theta(F)\right)^2 dF(t) + 2\alpha\left(F^{-1}(\alpha) - \theta(F)\right)^2\right]
-$$
+- Median: $\sqrt n\,(\hat m_n - m) \xrightarrow{d} N\big(0, 1/(4f(m)^2)\big)$: needs $\hat f(m)$ (Lecture 1!)
 - In the poll, $J(\cdot, P)$ is the law of $\max_{s,k}|Z_{s,k}|$: no closed form at all
 
 . . .
@@ -360,21 +355,25 @@ $$
 $$
 \begin{aligned}
 \textbf{Asymptotics:}&\quad J_n(x, P) \;\underset{n \to \infty}{\approx}\; J(x, P) \;\approx\; J(x, \hat P_n)\\[10pt]
-\textbf{Bootstrap:}&\quad J_n(x, P) \;\underset{n \to \infty}{\approx}\; J_n(x, \hat P_n) \;\underset{B \to \infty}{\approx}\; L_n(x)
+\textbf{Bootstrap:}&\quad J_n(x, P) \;\underset{n \to \infty}{\approx}\; J_n(x, \hat P_n)
 \end{aligned}
 $$
 
-- Asymptotics: you must know the limit $J(\cdot, P)$, and then estimate it
-- Bootstrap: estimate $J_n(\cdot, P)$ directly, by plugging $\hat P_n$ into $J_n$ itself
-- $L_n$ is a simulation-based approximation (more soon): $B$ is up to you, $n$ is not
+- Asymptotics: replace $J_n$ by its limit $J$, whose formula you must derive
+- If $J$ depends on $P$ (not an asymptotic pivot), also estimate it: $J(x, \hat P_n)$
+
+. . .
+
+- Bootstrap: keep $J_n$, and plug $\hat P_n$ into $J_n$ itself
+- $J$ never shows up: no limit to derive, no nuisance parameter to estimate
 
 . . .
 
 ::: {.thm .takeaway}
 ::: {.thmhead}
-Read this twice
+[Read this twice]{.underline} (and then maybe get a tattoo!)
 :::
-The bootstrap does **not** avoid asymptotics: it is justified as $n \to \infty$. What it avoids is having to **know** $J(\cdot, P)$.
+The bootstrap does **not** avoid asymptotics. What it avoids is having to **know** $J$.
 :::
 
 ## &nbsp; {.standout background-color="var(--slate)"}
@@ -418,30 +417,99 @@ $$
 $$
 :::
 
-- And fast: $P\left\{\sup_t |\hat F_n(t) - F(t)| > d\right\} \le 2e^{-2nd^2}$ for every $n$ (DKW inequality)
-- In the poll, $\hat P_n$ is just 24 cell frequencies: the SLLN alone does the job
+- And fast: $P\left\{\sup_t |\hat F_n(t) - F(t)| > d\right\} \le 2e^{-2nd^2}$ for every $n$ ([DKW inequality](https://en.wikipedia.org/wiki/Dvoretzky%E2%80%93Kiefer%E2%80%93Wolfowitz_inequality))
 
 ## Glivenko–Cantelli Works, Baby!
 
-$X_i \iid U[0,1]$, two independent samples for each $n$: $\hat F_n$ is a **random** function
+$X_i \iid U[0,1]$, so $F(t) = t$ (dashed). Raising $n$ adds draws to the **same** samples
 
-```{python}
-#| fig-align: center
-np.random.seed(42)
-fig, axes = plt.subplots(1, 2, figsize=(11, 4.4))
-for ax, n_gc in zip(axes, [10, 1000]):
-    ax.plot([0, 1], [0, 1], color='black', ls='--', lw=1.5, label='True $F(t) = t$')
-    for col, lab in zip([blue, orange], ['Sample 1', 'Sample 2']):
-        x = np.sort(np.random.uniform(0, 1, n_gc))
-        i = np.arange(1, n_gc + 1)
-        sup_gap = max(np.max(i / n_gc - x), np.max(x - (i - 1) / n_gc))
-        ax.step(np.r_[0, x, 1], np.r_[0, i / n_gc, 1], where='post', color=col, lw=2,
-                label=f'{lab}: sup gap = {sup_gap:.3f}')
-    ax.set_title(f'$n$ = {n_gc:,}', fontsize=15)
-    ax.set_xlabel('$t$', fontsize=13)
-    ax.grid(alpha=0.3)
-    ax.legend(loc='upper left', fontsize=12)
-plt.tight_layout()
+```{ojs}
+//| echo: false
+viewof gc = Inputs.form({
+  n: Inputs.range([5, 10000], {value: 10, step: 1, transform: Math.log, label: "Sample size n"}),
+  seed: Inputs.button("Draw new samples", {value: 1, reduce: v => v + 1})
+}, {template: ({n, seed}) => {
+  n.style.setProperty("--input-width", "420px")
+  n.style.maxWidth = "none"
+  return html`<div style="display: flex; justify-content: center; align-items: center; column-gap: 30px">${n}${seed}</div>`
+}})
+```
+
+```{ojs}
+//| echo: false
+// 2 + 100 nested streams of U[0,1] draws: the first n of each stream is the sample of size n,
+// so moving the slider follows one path per sample. Cached by seed so the slider does not redraw them.
+gcMaxN = 10000
+gcCloud = 100
+gcCache = new Map()
+gcStreams = {
+  if (!gcCache.has(gc.seed)) {
+    const unif = d3.randomLcg(gc.seed)
+    gcCache.clear()
+    gcCache.set(gc.seed, d3.range(gcCloud + 2).map(() => Float64Array.from({length: gcMaxN}, unif)))
+  }
+  return gcCache.get(gc.seed)
+}
+
+// sup_t |F_n(t) - t| from a sorted sample (the Kolmogorov-Smirnov distance)
+function supGap(xs) {
+  const n = xs.length
+  let d = 0
+  for (let i = 0; i < n; i++) d = Math.max(d, (i + 1) / n - xs[i], xs[i] - i / n)
+  return d
+}
+
+// ECDF as points for a step-after line: exact jumps for small n, a fine grid for large n
+function ecdfPoints(xs) {
+  const n = xs.length
+  if (n <= 400) return [[0, 0], ...Array.from(xs, (x, i) => [x, (i + 1) / n]), [1, 1]]
+  const pts = []
+  for (let g = 0, j = 0; g <= 500; g++) {
+    while (j < n && xs[j] <= g / 500) j++
+    pts.push([g / 500, j / n])
+  }
+  return pts
+}
+
+gcSorted = gcStreams.map(s => s.slice(0, gc.n).sort())
+gcGaps = gcSorted.map(supGap)
+dkw = Math.sqrt(Math.log(2 / 0.05) / (2 * gc.n))
+gcInside = gcGaps.slice(2).filter(d => d <= dkw).length
+
+gcStyle = ({
+  width: 560, height: 450, marginLeft: 45, marginRight: 15, marginBottom: 45,
+  style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {label: "t", domain: [0, 1], ticks: 5, labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: [0, 1], ticks: 5},
+  grid: true
+})
+gcLabel = (text, dy, fill) => Plot.text([text], {frameAnchor: "top-left", dx: 10, dy, fill, fontWeight: "bold", fontSize: 19, stroke: "white", strokeWidth: 6})
+gcTitle = text => html`<div style="text-align: center; font-weight: bold; font-size: 22px; color: #2D3E50">${text}</div>`
+
+gcLeft = Plot.plot({...gcStyle, marks: [
+  Plot.line([[0, 0], [1, 1]], {stroke: "black", strokeWidth: 1.5, strokeDasharray: "6,5"}),
+  Plot.line(ecdfPoints(gcSorted[0]), {curve: "step-after", stroke: "#0072BC", strokeWidth: 2.5}),
+  Plot.line(ecdfPoints(gcSorted[1]), {curve: "step-after", stroke: "#EB811B", strokeWidth: 2.5}),
+  gcLabel(`Sample 1: sup gap = ${gcGaps[0].toFixed(3)}`, 8, "#0072BC"),
+  gcLabel(`Sample 2: sup gap = ${gcGaps[1].toFixed(3)}`, 36, "#EB811B")
+]})
+
+gcRight = {
+  const band = d3.range(0, 1.0001, 0.005).map(t => ({t, lo: Math.max(0, t - dkw), hi: Math.min(1, t + dkw)}))
+  const cloud = gcSorted.slice(2).flatMap((xs, id) => ecdfPoints(xs).map(([t, y]) => ({t, y, id})))
+  return Plot.plot({...gcStyle, marks: [
+    Plot.areaY(band, {x: "t", y1: "lo", y2: "hi", fill: "#2D3E50", fillOpacity: 0.12}),
+    Plot.line(cloud, {x: "t", y: "y", z: "id", curve: "step-after", stroke: "#0072BC", strokeOpacity: 0.25, strokeWidth: 1.2}),
+    Plot.line([[0, 0], [1, 1]], {stroke: "black", strokeWidth: 1.5, strokeDasharray: "6,5"}),
+    gcLabel(`DKW 95% band: ± ${dkw.toFixed(3)}`, 8, "#2D3E50"),
+    gcLabel(`${gcInside} of ${gcCloud} samples inside it`, 36, "#0072BC")
+  ]})
+}
+
+html`<div style="display: flex; justify-content: center; column-gap: 30px">
+  <div>${gcTitle("Two samples, one path each")}${gcLeft}</div>
+  <div>${gcTitle(`${gcCloud} samples`)}${gcRight}</div>
+</div>`
 ```
 
 ## Is That Enough?
@@ -455,46 +523,79 @@ plt.tight_layout()
 Two ingredients, which we will make precise soon:
 
 1. $\hat P_n \to P$ in some sense (Glivenko–Cantelli, the SLLN)
-2. Whenever $P_n \to P$ in that sense, $J_n(\cdot, P_n) \to J(\cdot, P)$
+2. Whenever a sequence ${P_n}$ converges to $P$ in that sense, $J_n(\cdot, P_n) \to J(\cdot, P)$
 
 . . .
 
 - Ingredient 2 is the delicate one. We will meet a root for which it fails: the maximum!
+- Notice that item 2) is a **continuity property of the root**, not of the estimator $\hat P_n$
 
 # In Practice {visibility="uncounted"}
 
+## How Many Bootstrap Samples Are There?
+
+- Goal: compute $J_n(x, \hat P_n)$, the law of the root when the data come from $\hat P_n$
+- Under $\hat P_n$, each of the $n$ draws picks one of $X_1, \dots, X_n$ with probability $1/n$
+- [Exercise: how many ordered samples of size $n$ can we draw from $\hat P_n$?]{.alert}
+
+. . .
+
+- $n^n$, all equally likely: $J_n(x, \hat P_n)$ is an average over $n^n$ samples
+- For $n = 100$, that's $10^{200}$ samples. Atoms in the universe: about $10^{80}$
+
+. . .
+
+- Exact computation is hopeless for any realistic $n$
+
 ## Computing $J_n(x, \hat P_n)$
 
-- Exact computation averages over all $n^n$ equally likely resamples: hopeless
-- So we simulate. Conditional on the data, for each $b = 1, \dots, B$:
+- So we simulate. Conditional on the data:
 
+::: {.thm}
+::: {.thmhead}
+Algorithm: repeat steps 1 and 2 for $b = 1, \dots, B$
+:::
 1. Draw $n$ observations **with replacement** from the data: $X^{n*}_b = (X^*_{1,b}, \dots, X^*_{n,b})$
 2. Compute the root at the plug-in parameter: $R^*_{n,b} = R_n(X^{n*}_b, \hat\theta_n)$, with $\hat\theta_n = \theta(\hat P_n)$
 3. Compute the empirical CDF of the $B$ roots: $L_n(x) \equiv \frac{1}{B}\sum_{b=1}^B I\{R^*_{n,b} \le x\}$
 4. Use the quantiles of $L_n$ in place of those of $J_n(\cdot, P)$
+:::
 
 . . .
 
 - Two sources of randomness are floating around here. Which ones?
 
-## Two Details That Matter
+## Bootstrapping the Poll, Step by Step
 
-- Why center at $\hat\theta_n$? Under $\hat P_n$, the "true" parameter **is** $\theta(\hat P_n) = \hat\theta_n$
-- In the poll: bootstrap shares are centered at $\hat p_{s,k}$, not at the unknown $p_{s,k}$
+- In general, swap the quantiles of $J_n(\cdot, P)$ for the left and right quantiles of $L_n$:
+$$
+C_n^* = \left\{\theta \in \Theta : L_n^{-1}(\tfrac{\alpha}{2}) \le R_n(X^n, \theta) \le L_n^{-1}(1 - \tfrac{\alpha}{2})\right\}
+$$
 
 . . .
 
-- How large should $B$ be? For a fixed sample, $L_n \to J_n(\cdot, \hat P_n)$ as $B \to \infty$
-- $B$ only kills the **simulation** error, which is under your control
-- $n$ drives the **statistical** error, $J_n(\cdot, \hat P_n) - J_n(\cdot, P)$: nothing to do about it
-- Tail quantiles need many draws: $B \ge 1{,}000$ is a reasonable start
+- In the poll, $R_n \ge 0$ and only large values are bad news: we need just $L_n^{-1}(1-\alpha)$
 
-## In Code
+. . .
 
-`S[i]` is the state (0 to 5) and `V[i]` the vote (0 = A, 1 = B, 2 = C, 3 = other) of respondent `i`
+::: {.thm}
+::: {.thmhead}
+The poll, with $B = 1{,}000$
+:::
+1. Draw 2,000 respondents (state and vote) with replacement from our poll
+2. Recompute the 18 shares $\hat p^*_{s,k}$ and their standard errors $\widehat{se}^*_{s,k}$
+3. Store $R^*_{n,b} = \max_{s,k}|\hat p^*_{s,k} - \hat p_{s,k}|/\widehat{se}^*_{s,k}$, and repeat steps 1 to 3 $B$ times
+4. Set $\hat c^{\,*} = L_n^{-1}(1-\alpha)$ and report $\hat p_{s,k} \pm \hat c^{\,*}\,\widehat{se}_{s,k}$ for all 18 shares
+:::
+
+. . .
+
+- Step 3 centers at $\hat p_{s,k}$, not $p_{s,k}$: under $\hat P_n$, the true shares **are** $\hat p_{s,k}$
+
+## Back to the Poll
 
 ```{python}
-#| echo: true
+#| fig-align: center
 def shares(S, V):                     # 6 x 3 array with p_hat[s, k]
     return np.array([[np.mean(V[S == s] == k) for k in range(3)] for s in range(6)])
 
@@ -508,43 +609,7 @@ def bootstrap_c(S, V, B=1000, alpha=0.05):
     R_star = [max_t(S[i], V[i], p_hat)
               for i in np.random.randint(0, n, size=(B, n))]  # resample rows
     return np.quantile(R_star, 1 - alpha)
-```
 
-- The joint interval is then `p_hat ± bootstrap_c(S, V) * se_hat`. That's it!
-
-## Building the Interval
-
-- Bootstrap quantiles: $\hat c_q \equiv L_n^{-1}(q)$, from the $B$ draws of $R^*_{n,b} = \sqrt n\,(\hat\theta^*_{n,b} - \hat\theta_n)$
-- Equi-tailed interval, flip included:
-$$
-\left[\hat\theta_n - \hat c_{1-\alpha/2}/\sqrt n,\ \ \hat\theta_n - \hat c_{\alpha/2}/\sqrt n\right]
-$$
-- Symmetric interval: bootstrap $|R_n|$ instead, then use $\hat\theta_n \pm L_n^{-1}(1-\alpha)/\sqrt n$
-- Joint rectangle (the poll): $\hat p_{s,k} \pm \hat c^{\,*}\,\widehat{se}_{s,k}$, with $\hat c^{\,*}$ the $1-\alpha$ quantile of $\max_{s,k}|t^*_{s,k}|$
-
-. . .
-
-- Efron's **percentile** interval uses the quantiles of $\hat\theta^*_{n,b}$ directly: no flip!
-- It's popular in software, but it is **not** the interval above
-- [Exercise: when does the percentile interval work?]{.alert} [(L&R Problem 18.11)]{.fgv}
-
-## What Is an Observation?
-
-- In a regression, the unit is the pair $Z_i = (Y_i, X_i)$: resample **rows**
-- Pairs bootstrap: draw $Z^*_1, \dots, Z^*_n$ with replacement, run OLS, store $\hat\beta^*_b$
-- Root: $\sqrt n\,(\hat\beta^*_{b,j} - \hat\beta_j)$ or the t-statistic, exactly as before
-- Bootstrap standard error: the standard deviation of $\hat\beta^*_{1,j}, \dots, \hat\beta^*_{B,j}$
-
-. . .
-
-- Never resample $Y$ and $X$ separately: that destroys the relation you want to learn!
-- The pairs bootstrap is robust to heteroskedasticity: it mimics the sandwich formula
-- Why it works: $\hat\beta = \left(\frac{1}{n}\sum_i X_iX_i'\right)^{-1}\frac{1}{n}\sum_i X_iY_i$ is a smooth function of means (soon)
-
-## Back to the Poll
-
-```{python}
-#| fig-align: center
 np.random.seed(123)
 c_star = bootstrap_c(S, V, B=1000)
 c_star_txt = f'{c_star:.2f}'
@@ -561,15 +626,15 @@ for m in range(M):
     hits_boot += R <= c_m
 cov_196_txt, cov_boot_txt = f'{100 * hits_196 / M:.0f}%', f'{100 * hits_boot / M:.0f}%'
 
-poll_plot(c_joint=c_star)
+poll_plot(c_joint=c_star, title='Bootstrap joint 95% confidence set, $B$ = 1,000')
 ```
 
-- Thin bars: $\pm 1.96\,\widehat{se}$. Shaded bars: the joint rectangle, $\pm \hat c^{\,*}\widehat{se}$ with $\hat c^{\,*} =$ `{python} c_star_txt` ($B = 1{,}000$)
-- Over `{python} f"{M}"` simulated polls, all 18 covered: `{python} cov_196_txt` with $\pm 1.96$, `{python} cov_boot_txt` with $\pm \hat c^{\,*}$
+- Thin bars: $\pm 1.96\,\widehat{se}$. Shaded bars: the joint rectangle, $\pm \hat c^{\,*}\widehat{se}$ with $\hat c^{\,*} =$ `{python} c_star_txt`
+- Over `{python} f"{M}"` (newly simulated) polls, each with its own $\hat c^{\,*}$, all 18 covered: `{python} cov_196_txt` with $\pm 1.96$, `{python} cov_boot_txt` with $\pm \hat c^{\,*}$
 
 ## Play With $n$ and $B$
 
-Bars: $B$ bootstrap draws from **one** poll. Curve: the true $J_n$ (40,000 polls from $P$)
+Bars: $B$ bootstrap draws from **one** poll. Curve: the true $J_n$ (100,000 polls from $P$)
 
 ```{python}
 # Hand the poll design and the truth J_n(., P) for a few poll sizes to the Observable JS cells below
@@ -578,7 +643,7 @@ edges = np.linspace(1, 5.5, 46)
 truth = {}
 np.random.seed(2028)
 for n_g in n_grid:
-    R = max_t_counts(np.random.multinomial(n_g, probs, size=40000), p_true)
+    R = max_t_counts(np.random.multinomial(n_g, probs, size=100000), p_true)
     dens, _ = np.histogram(np.clip(R, edges[0], edges[-1] - 1e-9), bins=edges, density=True)
     truth[str(n_g)] = {'dens': dens.tolist(), 'c': float(np.quantile(R, 0.95)), 'cov196': float(np.mean(R <= 1.96))}
 ojs_define(poll_probs=probs.tolist(), poll_truth=truth, poll_edges=edges.tolist(), poll_c_limit=float(c_limit))
@@ -840,6 +905,92 @@ $$
 . . .
 
 - Reading [Hansen]{.fgv}? He writes these results as $\sqrt n\,(\bar Y^* - \bar Y) \xrightarrow{d^*} N(0, \Sigma)$, same idea
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# Bootstrapping Regressions {visibility="uncounted"}
+
+## What Is an Observation?
+
+- Data: $Z_i = (Y_i, X_i)$ iid $P$, with $X_i \in \R^k$
+- Parameter: the linear projection $\beta(P) \equiv \E[X_iX_i']^{-1}\E[X_iY_i]$, no model needed
+- OLS is a plug-in estimator: $\hat\beta_n = \beta(\hat P_n)$
+
+. . .
+
+- So resample **rows** $Z_i$: the **pairs bootstrap** is our bootstrap, with $Z_i$ as the data
+- Never resample $Y$ and $X$ separately: that kills their relation, and all slopes become 0!
+- Why it works: $\hat\beta_n$ is a smooth function of means of the $Z_i$ [(L&R 18.3.6)]{.fgv}
+
+## The Pairs Bootstrap, Step by Step
+
+- Root: the robust t-statistic $R_n = |\hat\beta_{n,j} - \beta_j|/\widehat{se}_j$, an asymptotic pivot
+
+::: {.thm}
+::: {.thmhead}
+Same recipe as the poll: the pairs bootstrap-t for $\beta_j$
+:::
+1. Draw $n$ rows $Z^*_1, \dots, Z^*_n$ with replacement from the data
+2. Run OLS on them: get $\hat\beta^*_{b,j}$ and its robust standard error $\widehat{se}^*_{b,j}$
+3. Store $R^*_{n,b} = |\hat\beta^*_{b,j} - \hat\beta_{n,j}|/\widehat{se}^*_{b,j}$, and repeat steps 1 to 3 $B$ times
+4. Set $\hat c = L_n^{-1}(1-\alpha)$ and report $\hat\beta_{n,j} \pm \hat c\,\widehat{se}_j$
+:::
+
+. . .
+
+- Step 3 centers at $\hat\beta_{n,j}$: under $\hat P_n$, the true coefficient **is** $\hat\beta_{n,j}$
+- Software shortcut: $\pm 1.96 \times$ the sd of the $\hat\beta^*_{b,j}$. That's the normal limit again!
+
+## Heteroskedasticity Comes Along for Free
+
+- A resampled row keeps its $X_i$ **and** its own error, so $\Var(U_i \mid X_i)$ comes along
+- The spread of the $\hat\beta^*_b$ mimics the sandwich, not $\sigma^2\,\E[X_iX_i']^{-1}$
+- Residual bootstrap: keep each $X_i$, resample the $\hat U_i$. That imposes homoskedasticity
+
+```{python}
+# Coverage of 95% intervals for the slope: Y = 1 + X + |X| e, X and e iid N(0,1), n = 30
+def ols(X, Y):                        # batched OLS: X is (..., n, k), Y is (..., n)
+    XtX_inv = np.linalg.inv(X.swapaxes(-1, -2) @ X)
+    b = (XtX_inv @ (X.swapaxes(-1, -2) @ Y[..., None]))[..., 0]
+    U = Y - (X @ b[..., None])[..., 0]
+    n_r, k_r = X.shape[-2:]
+    se_ols = np.sqrt(np.sum(U**2, -1, keepdims=True) / (n_r - k_r) * np.diagonal(XtX_inv, axis1=-2, axis2=-1))
+    V_rob = XtX_inv @ (X.swapaxes(-1, -2) @ (X * U[..., None]**2)) @ XtX_inv
+    return b, U, se_ols, np.sqrt(np.diagonal(V_rob, axis1=-2, axis2=-1))
+
+np.random.seed(2026)
+n_reg, M_reg, B_reg = 30, 2000, 499
+hits = np.zeros(4)
+for m in range(M_reg):
+    x = np.random.standard_normal(n_reg)
+    X = np.c_[np.ones(n_reg), x]
+    Y = 1 + x + np.abs(x) * np.random.standard_normal(n_reg)
+    b, U, se_ols, se_rob = ols(X, Y)
+    err = abs(b[1] - 1)
+    idx = np.random.randint(0, n_reg, size=(B_reg, n_reg))
+    b_p, _, _, se_p = ols(X[idx], Y[idx])                                   # pairs: resample rows
+    b_r, _, se_r, _ = ols(np.broadcast_to(X, (B_reg, n_reg, 2)), X @ b + U[idx])  # residuals only
+    hits += [err <= 1.96 * se_ols[1],
+             err <= 1.96 * se_rob[1],
+             err <= np.quantile(np.abs(b_r[:, 1] - b[1]) / se_r[:, 1], 0.95) * se_ols[1],
+             err <= np.quantile(np.abs(b_p[:, 1] - b[1]) / se_p[:, 1], 0.95) * se_rob[1]]
+cov_reg = [f'{100 * h / M_reg:.0f}%' for h in hits]
+```
+
+. . .
+
+$Y_i = 1 + X_i + |X_i|\,\varepsilon_i$, $X_i, \varepsilon_i \iid N(0,1)$, $n = 30$. Coverage of 95% CIs for the slope:
+
+| Interval | Coverage |
+|:--|:--:|
+| $\pm 1.96 \times$ usual OLS standard error | `{python} cov_reg[0]` |
+| $\pm 1.96 \times$ robust standard error | `{python} cov_reg[1]` |
+| Residual bootstrap-t, usual standard error | `{python} cov_reg[2]` |
+| Pairs bootstrap-t, robust standard error | `{python} cov_reg[3]` |
 
 ## &nbsp; {.standout background-color="var(--slate)"}
 
