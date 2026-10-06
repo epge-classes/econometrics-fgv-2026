@@ -173,7 +173,7 @@ $$
 $$
 :::
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?
@@ -229,7 +229,7 @@ In Python:
 - `np.roots` expects the coefficients from the **highest** power down: `[-ap, ..., -a1, 1]`
 - `statsmodels`: `ArmaProcess(ar=[1, -a1, ..., -ap])` has `.arroots` and `.isstationary`
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?
@@ -614,7 +614,7 @@ $$
 - This generates a system of equations that can be solved recursively (a computer will do it)
 - [Exercise: derive the Yule–Walker equations]{.alert}
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?
@@ -626,7 +626,7 @@ Questions?
 The End
 :::
 
-## References
+## References {visibility="uncounted"}
 
 - Chapter 2 of _Time Series Analysis_, by James Hamilton, for the lag operator
 - Chapter 3 of _Time Series Analysis_, by James Hamilton, for AR and MA models

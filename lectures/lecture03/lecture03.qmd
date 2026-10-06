@@ -168,7 +168,7 @@ Example: inflation in Brazil in 1989
 
 We will need to impose a lot of structure! Without structure, we are lost!
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?
@@ -539,7 +539,7 @@ If, in addition, $\E[Y_t^4] < \infty$ and the fourth-order cumulants of $Y_t$ ar
 
 - Recall: $L_2$ convergence implies convergence in probability, but it neither implies nor is implied by a.s. convergence
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?
@@ -619,7 +619,7 @@ True or false?
 The End
 :::
 
-## References
+## References {visibility="uncounted"}
 
 - Hannan, E. J. (1970). _Multiple Time Series_. Wiley
 - Chapters 3 and 4 of _Time Series Analysis_, by James Hamilton. MDS are covered in Chapter 7
