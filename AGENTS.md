@@ -28,6 +28,10 @@ lectures/                 Quarto project; its contents become the site root
     macros.html           shared math macros: \E \Var \Cov \Corr \Pr \R \N \plim \iid \symbf
   index.qmd               landing page (plain HTML): links + one row per lecture
   lectureNN/lectureNN.qmd one deck per folder, zero-padded 00..10
+problem_sets/             LaTeX problem sets, browsed on GitHub (not on Pages)
+  README.md               student-facing index: PDF, source, data, Classroom link, due date
+  _template/problem_set_template.tex   the fixed preamble and title block
+  PSN/problem_set_N.tex   one folder per set, with its .pdf and data files
 extra-stuff/              gitignored, not part of the class
 ```
 
@@ -58,6 +62,17 @@ Page URLs follow the folders: `…/econometrics-fgv-2026/lecture03/lecture03.htm
 **Releasing a lecture:** in `lectures/index.qmd`, replace that row's `[coming soon]{.soon}` with the Slides/PDF link span copied from the lecture 00 row, and fix the folder names. Then re-render `index.qmd` and publish. The PDF link is the deck URL plus `?print-pdf`; students use the browser's Print → Save as PDF, and nobody produces PDF files.
 
 Pages is set to "GitHub Actions" mode. Don't switch it to branch mode.
+
+## Problem sets
+
+Written in LaTeX. Each `PSN/` folder commits the `.tex`, the compiled `.pdf` and the data; build files are gitignored.
+
+- **Start from the template.** Copy `_template/problem_set_template.tex` to `PSN/problem_set_N.tex` and change only the title (`Problem Set I`, `II`, ... in Roman numerals) and the problems. Don't edit the preamble per set; if it must change, change the template and every set.
+- **Problems** use `\problem{points}` (it numbers itself) and items use `\begin{enumerate}[a)]`.
+- **Build** from `problem_sets/`: `latexmk -pdf -cd PS1/problem_set_1.tex && latexmk -c -cd PS1/problem_set_1.tex`.
+- **Release:** add the set's entry to `problem_sets/README.md` with the GitHub Classroom link and due date. Pushing `problem_sets/**` doesn't trigger Pages, and nothing else is needed.
+- **Ask before committing solutions** (the repo is public). 2025 solutions live in `../econometrics-fgv-2025/solutions/`.
+- Link papers by DOI instead of committing their PDFs.
 
 ## Style contract
 
