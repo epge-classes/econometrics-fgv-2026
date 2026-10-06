@@ -19,6 +19,14 @@ talkdate: "October 2026"
 [We will use GitHub for course materials, assignments, and so on.]{.alert}
 :::
 
+## Course Website
+
+::: {.center}
+![](course_website_qrcode.svg){height="520px" fig-alt="QR code linking to the course website"}
+
+<https://epge-classes.github.io/econometrics-fgv-2026/>
+:::
+
 ## Why Should You Take This Class Seriously?
 
 - Most students will engage in empirical research across diverse fields of Economics:
