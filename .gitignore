@@ -7,3 +7,13 @@ extra-stuff/
 # Never commit execution caches: code re-runs on every render.
 _freeze/
 .jupyter_cache/
+
+# LaTeX build files (problem sets commit only .tex, .pdf and data)
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg

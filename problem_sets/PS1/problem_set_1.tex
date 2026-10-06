@@ -1,0 +1,202 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=2cm]{geometry}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\linespread{1.3}
+\parskip=12pt
+\parindent=0pt
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage[section]{placeins}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{mathpazo}
+
+\usepackage[dvipsnames]{xcolor}
+\definecolor{slateblue}{RGB}{45, 62, 80}
+\definecolor{FGVBlue}{RGB}{0, 114, 188}
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=FGVBlue,
+	urlcolor=FGVBlue,
+	citecolor=FGVBlue,
+}
+
+% Defining the question styles
+\theoremstyle{definition}
+\newtheorem{prob}{Problem}
+
+% Custom commands
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\symbf}[1]{\boldsymbol{#1}}
+
+% Command to start a new section with the word "Problem" and enumerate automatically
+\newcounter{problem}
+\renewcommand{\theproblem}{\arabic{problem}}
+
+\newcommand{\problem}[1]{
+	\stepcounter{problem}
+	\section*{Problem \theproblem{} -- (points: #1)}
+}
+
+\begin{document}
+	\begin{center}
+		{\LARGE{\textbf{Problem Set I}}}\\
+		\vspace{0.2cm}
+		Econometrics I - \textcolor{FGVBlue}{FGV EPGE}\\
+		Instructor: Raul Guarini Riva \\
+		TA: Taric Latif Padovani
+	\end{center}
+
+\problem{1}
+Let $X$ be a scalar random variable with density $f(x)$. Let $K(\cdot)$ be a symmetric second-order kernel. For a given point $x$ in the interior of the support of $f(\cdot)$, define the density estimator as
+\[\hat{f}_n(x) \equiv \frac{1}{nh} \sum_{i=1}^n K\left(\frac{X_i - x}{h}\right),\]
+where \(h > 0\) is a bandwidth parameter and \(X_1, \ldots, X_n\) are independent and identically distributed (i.i.d.) random variables with density \(f(\cdot)\).
+
+This exercise will show you how to ensure that $\hat{f}_n(x) \xrightarrow{p} f(x)$ as \(n \rightarrow \infty\), $h \rightarrow 0$, and $nh \rightarrow \infty$. This is the same asymptotic framework as in the slides.
+
+\begin{enumerate}[a)]
+	\item Show that $\hat{f}_n(x) \geq 0$ for all $x$, and that $\int_{-\infty}^{\infty} \hat{f}_n(x) dx = 1$ for all $n$.
+	\item Assume from now on that $f$ is continuous at $x$. Show that $\mathbb{E}[\hat{f}_n(x)] = f(x) + o(1)$.
+	\item Show that $\Var(\hat{f}_n(x)) = \frac{1}{nh}\cdot f(x)R(K) + o\left(\frac{1}{nh}\right)$, where \(R(K) = \int_{-\infty}^{\infty} K^2(u) du\).
+	\item Argue that these results imply that $\hat{f}_n(x)$ is consistent for $f(x)$.
+	\item Now, assume that $f$ is twice continuously differentiable at $x$. Show that 
+	\begin{equation*}
+		\mathbb{E}[\hat{f}_n(x)] = f(x) + \frac{h^2}{2}f''(x) + o(h^2)
+	\end{equation*}
+	\item Explain in words how the local convexity of $f$ might (or might not) affect this finite-sample bias.
+\end{enumerate}
+
+Hint: A very useful resource for this question is Chapter 17 from \textit{Probability and Statistics for Economists} by Bruce Hansen.
+
+\problem{1}
+Consider the nonparametric regression model:
+\[
+Y_i = m(X_i) + u_i, \quad i = 1, \ldots, n
+\]
+where $\E[u_i|X_i] = 0$ and $m(\cdot)$ is an unknown smooth function. The \textbf{local-linear estimator} of $(m(x_0); m'(x_0))$ at a point $x_0$ is defined as the solution to the weighted least squares problem:
+\[
+\{m_{LL}(x_0), m'_{LL}(x_0)\} \equiv \arg\min_{\alpha, \beta} \sum_{i=1}^{n} K_h(X_i - x_0) \left[Y_i - \alpha - \beta(X_i - x_0)\right]^2
+\]
+where $K_h(u) = \frac{1}{h}K\left(\frac{u}{h}\right)$ is a second-order continuous kernel function with bandwidth $h > 0$. You have a random sample of size $n$: $\{(Y_1, X_1), ..., (Y_n, X_n)\}$. We also assume that $X_i \in \mathbb{R}$.
+
+\begin{enumerate}[a)]
+	\item Show that the local-linear estimator can be written as a Generalized Least Squares (GLS) estimator. Specifically, show that there exists an $n\times 1$ vector $V$, an $n\times 2$ matrix $Z$, and an $n\times n$ matrix $W$ such that:
+	\[\begin{pmatrix}m_{LL}(x_0) \\ m'_{LL}(x_0)\end{pmatrix} = (Z' W^{-1} Z)^{-1} Z' W^{-1} V\]
+
+	\item What happens to this estimator if, for a given $n$, we have that $h \to \infty$?
+
+	\item When deriving the asymptotic theory for the local-constant estimator, we assumed the bandwidth was such that $h\to 0$ and $nh \to \infty$ as $n \to \infty$. Explain intuitively why each of these two conditions is necessary.
+
+	\item Are such conditions also needed for the asymptotic theory of the local-linear estimator? What are the main differences between these two estimators? Briefly explain.
+\end{enumerate}
+
+\problem{3}
+This is an empirical question based on Karlan and Zinman (2008), ``\href{https://doi.org/10.1257/aer.98.3.1040}{Credit Elasticities in Less-Developed Economies: Implications for Microfinance}'', \textit{American Economic Review}. The data, \texttt{karlan.csv}, is in the \texttt{problem\_sets/PS1} folder of the class GitHub repo.
+
+\begin{enumerate}[a)]
+	\item What is the main research question in the paper? What is the most striking finding? Answer in just a few sentences.
+	\item Your goal will be to estimate $\mathbb{P}(applied = 1 | offer4 = x)$. Note that \texttt{applied} is a binary variable, while \texttt{offer4} is continuous. These are the only variables you will need. Notice that 
+	\[
+	\mathbb{P}(applied = 1 | offer4 = x) = \mathbb{E}[applied | offer4 = x]
+	\]
+
+	\item Use a Gaussian kernel to estimate this probability and show a plot of your estimates for a range of values of \texttt{offer4}. Do this with three different bandwidths: 
+	\begin{itemize}
+		\item Silverman’s rule of thumb: $h = 1.06 \cdot \hat{\sigma} \cdot n^{-1/5}$, where $\hat{\sigma}$ is the standard deviation of \texttt{offer4} and $n$ is the number of observations;
+		\item A value much \textit{smaller} than that;
+		\item A value much \textit{larger} than that;
+	\end{itemize}
+	\item Do the same with the Epanechnikov kernel, using the same bandwidths as before.
+	\item Compare the results of the two kernels qualitatively.
+\end{enumerate}
+
+\problem{1}
+Let $X_i, i = 1, \dots, n$ be an i.i.d.\ sample of observations with distribution $U[0, \theta]$. A natural estimator (in fact, the MLE) of $\theta$ is $X_{(n)}$, where
+\[
+\min\{X_1, ..., X_n\} =  X_{(1)} \leq \cdots \leq X_{(n)} = \max\{X_1, ..., X_n\}
+\]
+denote the ordered values of the data. These statistics are sometimes referred to as the order statistics of the data. Consider the following root:
+\[
+R_n = n(X_{(n)} - \theta),
+\]
+
+\begin{enumerate}[a)]
+	\item Show that $R_n \leq 0$.
+    \item Let $J_n(x, P) = P(R_n \leq x)$ be the cdf of the root $R_n$ above. Show that $J_n(x, P)$ converges in distribution to $J(x, P) = P(-\theta X \leq x)$, where $X \sim \text{exp}(1)$, i.e.,
+    \[
+    J(x, P) =
+    \begin{cases}
+    e^{x/\theta}, & x \leq 0 \\
+    1 & \text{otherwise}
+    \end{cases}
+    \]
+	Hint: for every $r \in \mathbb{R}$, remember that $\left(1 + \frac{r}{n}\right)^{n} \xrightarrow{n \to \infty} e^r$.
+
+	\item We will now prove that the bootstrap will not work in this case. Consider a non-random sequence of probability distributions $\{P_n\}_{n=1}^{\infty}$ such that each distribution $P_n$ puts equal mass on $n$ distinct points in the interval $[0, \theta]$.
+	
+	For each $n$, let $\left\{X_{i, n}\right\}_{i=1}^{n}$ be an i.i.d. sample from $P_n$. Denote by $X_{(n), n}$ the maximum of this $n$-th sample. Also, denote by $\theta(P_n)$ the maximum of the support of $P_n$.
+	
+	Now, show that $\lim\limits_{n\rightarrow \infty}P\left(n (X_{(n), n} - \theta(P_n)) \leq - \epsilon\right) \leq e^{-1}, \forall \epsilon >0$.
+
+	\item Use this result to show that $J_n(x, P_n)$, which is the distribution of the bootstrapped root under the measure $P_n$ does \textit{not} converge to $J(x, P)$.
+	
+	Hint: pick $\epsilon < \theta$.
+
+	\item Argue, using the last item, that the bootstrap does not work in this case. Think about the relationship between the empirical distribution and the sequence of distributions $\{P_n\}_{n=1}^{\infty}$.
+\end{enumerate}
+
+
+\problem{2}
+This question is about the bootstrap. Suppose that $y_i = \alpha + \beta x_i + \epsilon_i$, where $\alpha = 2$, $\beta = 5$, $\epsilon_i|x_i \sim N(0, 2 + x_i^2)$, and $x \sim N(0, 3)$.
+\begin{enumerate}[a)]
+	\item Compute the conditional distribution of $y_i$ given $x_i$;
+	\item Simulate a random sample of size $n = 100$ and create a scatter plot of your data;
+	\item Estimate the parameters using OLS;
+	\item Report the estimates and three different symmetric confidence intervals for $\beta$ using different measures of standard errors:
+	\begin{itemize}
+		\item The usual OLS standard error that ignores heteroskedasticity;
+		\item A heteroskedasticity-robust standard error;
+		\item A bootstrap standard error, using $B = 1000$ bootstrap samples
+	You should also plot the histogram of $\hat{\beta}$ computed from the bootstrap samples.
+	\end{itemize}
+
+	It will be helpful for the next item if you structure your code so that it receives a certain sample $\{(y_1, x_1), (y_2, x_2), ..., (y_n, x_n)\}$ and spits out the three different confidence intervals.
+
+	\item Repeat the steps from items b), c), and d) for $m = 500$ times and check how frequently the three different confidence intervals cover the true value of $\beta = 5$. You can use the same code from item b) to do this, but you will need to modify it so that it runs $m$ times and stores the results.
+\end{enumerate}
+
+\problem{2}
+This question connects the bootstrap with the kernel density estimator from Problem 1. It is mostly about coding and explaining what you find. Let $X_1, \dots, X_n$ be i.i.d.\ $N(0, 1)$, so the true density is $f = \phi$, the standard normal density. At a point $x_0$, estimate $f(x_0)$ with
+\[
+\hat{f}_n(x_0) \equiv \frac{1}{nh} \sum_{i=1}^n \phi\left(\frac{X_i - x_0}{h}\right),
+\]
+a kernel density estimator with a Gaussian kernel and Silverman's rule of thumb, $h = 1.06 \cdot \hat{\sigma} \cdot n^{-1/5}$, where $\hat{\sigma}$ is the sample standard deviation.
+
+\begin{enumerate}[a)]
+	\item Write a function that receives a sample $\{X_1, \dots, X_n\}$ and a point $x_0$, and returns a 95\% bootstrap confidence interval for $f(x_0)$ based on the root $R_n = \hat{f}_n(x_0) - f(x_0)$. Specifically:
+	\begin{itemize}
+		\item Draw $B = 499$ bootstrap samples (with replacement) from the data;
+		\item In each bootstrap sample, recompute $\hat{f}^*_n(x_0)$, using the \textit{same} bandwidth $h$ as in the original sample;
+		\item Let $q_{0.025}$ and $q_{0.975}$ be the 2.5\% and 97.5\% quantiles of the $B$ values of $\hat{f}^*_n(x_0) - \hat{f}_n(x_0)$, and report the interval $\left[\hat{f}_n(x_0) - q_{0.975},\ \hat{f}_n(x_0) - q_{0.025}\right]$.
+	\end{itemize}
+
+	\item Set $n = 500$. Simulate $M = 500$ samples and, for each one, compute the confidence interval from item a) at $x_0 = 0$ and at $x_0 = 1$. Report how often each interval covers the true value $f(x_0)$.
+
+	\item Explain the difference in coverage between $x_0 = 0$ and $x_0 = 1$.
+
+	Hint: compute $f''(x)$ for the standard normal density and recall item e) from Problem 1.
+
+	\item Let $\E^*[\cdot]$ denote the expectation over bootstrap samples, holding the original data fixed. Show that $\E^*[\hat{f}^*_n(x_0)] = \hat{f}_n(x_0)$. What does this tell you about the ability of the bootstrap to detect the bias of $\hat{f}_n(x_0)$?
+
+	\item Redo item b) at $x_0 = 0$ with $n = 2{,}000$. Does more data fix the coverage? Explain why, comparing how the bias and the standard deviation of $\hat{f}_n(x_0)$ shrink with $n$ when $h$ follows Silverman's rule.
+
+	\item Go back to $n = 500$ and $x_0 = 0$, but now use a smaller bandwidth, $h/3$, both in the original sample and in the bootstrap samples. What happens to the coverage and to the average width of the confidence interval? Explain the trade-off.
+\end{enumerate}
+\end{document}
