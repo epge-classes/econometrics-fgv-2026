@@ -6,8 +6,8 @@
 <script src="lecture02_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="lecture02_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="lecture02_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="lecture02_files/libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.10.18">
+<link href="lecture02_files/libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.19">
 
   <title>Lecture 2: Bootstrap 101</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -574,7 +574,7 @@ T = \frac{(\bar X - \bar Y) - (\mu_X - \mu_Y)}{\sqrt{S_X^2/n_X + S_Y^2/n_Y}}
 </div>
 </div>
 </section>
-<section id="section" class="slide level2 standout" data-background-color="var(--slate)">
+<section id="section" class="slide level2 standout" data-background-color="var(--slate)" data-visibility="uncounted">
 <h2>&nbsp;</h2>
 <div class="standout-body">
 <p>Questions?</p>
@@ -935,7 +935,7 @@ C_n^* = \left\{\theta \in \Theta : L_n^{-1}(\tfrac{\alpha}{2}) \le R_n(X^n, \the
 <section id="play-with-n-and-b" class="slide level2">
 <h2>Play With <span class="math inline">\(n\)</span> and <span class="math inline">\(B\)</span></h2>
 <p>Bars: <span class="math inline">\(B\)</span> bootstrap draws from <strong>one</strong> poll. Curve: the true <span class="math inline">\(J_n\)</span> (100,000 polls from <span class="math inline">\(P\)</span>)</p>
-<div id="6a2d1865" class="cell" data-execution_count="4">
+<div id="442a0daa" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <script type="ojs-define">{"contents": [{"name": "poll_probs", "value": [0.1406, 0.1221, 0.0629, 0.044399999999999995, 0.061200000000000004, 0.0702, 0.027, 0.021599999999999998, 0.05600000000000001, 0.049, 0.019600000000000003, 0.015400000000000002, 0.0396, 0.05039999999999999, 0.016800000000000002, 0.0132, 0.03705, 0.0323, 0.0152, 0.010450000000000001, 0.033249999999999995, 0.03515, 0.01615, 0.010450000000000001]}, {"name": "poll_truth", "value": {"1000": {"dens": [0.07589999999999994, 0.09510000000000013, 0.16049999999999986, 0.26340000000000036, 0.3759999999999996, 0.49159999999999954, 0.6168999999999994, 0.6833000000000009, 0.738700000000001, 0.7673999999999993, 0.7523999999999993, 0.7087999999999994, 0.6760000000000025, 0.5902999999999968, 0.5167000000000018, 0.4298999999999996, 0.3865999999999996, 0.3149000000000011, 0.2674999999999986, 0.20090000000000072, 0.16459999999999986, 0.13369999999999987, 0.1109999999999999, 0.0950999999999999, 0.07460000000000026, 0.05659999999999994, 0.047799999999999954, 0.03699999999999997, 0.031299999999999974, 0.02510000000000009, 0.017800000000000062, 0.017399999999999905, 0.01329999999999993, 0.012200000000000042, 0.010600000000000038, 0.006600000000000024, 0.005999999999999968, 0.004599999999999976, 0.0039000000000000137, 0.003000000000000011, 0.0025999999999999864, 0.0014000000000000052, 0.002000000000000007, 0.0011999999999999936, 0.007800000000000027], "c": 3.28169239507955, "cov196": 0.39576}, "2000": {"dens": [0.07879999999999993, 0.09590000000000012, 0.17939999999999987, 0.28360000000000035, 0.3925999999999996, 0.5273999999999995, 0.6268999999999995, 0.722400000000001, 0.788300000000001, 0.8132999999999992, 0.7535999999999993, 0.7567999999999993, 0.6807000000000025, 0.5981999999999968, 0.5153000000000019, 0.44619999999999965, 0.3540999999999997, 0.29790000000000105, 0.23329999999999876, 0.1905000000000007, 0.15809999999999985, 0.1223999999999999, 0.08939999999999992, 0.06829999999999993, 0.0571000000000002, 0.041899999999999965, 0.029699999999999973, 0.022399999999999982, 0.01929999999999998, 0.012200000000000042, 0.010500000000000037, 0.008999999999999952, 0.004899999999999974, 0.004100000000000015, 0.0031000000000000107, 0.0027000000000000097, 0.0024999999999999866, 0.001499999999999992, 0.0016000000000000057, 0.001100000000000004, 0.0005999999999999968, 0.0006000000000000021, 0.00030000000000000106, 0.0, 0.0015000000000000055], "c": 3.1055432684490083, "cov196": 0.41834}, "5000": {"dens": [0.08039999999999993, 0.09900000000000013, 0.18509999999999982, 0.2886000000000004, 0.4127999999999996, 0.5281999999999996, 0.6584999999999994, 0.743200000000001, 0.797200000000001, 0.8306999999999993, 0.8124999999999992, 0.7453999999999993, 0.6795000000000024, 0.6094999999999967, 0.5139000000000018, 0.43209999999999965, 0.3520999999999997, 0.28490000000000104, 0.2257999999999988, 0.1752000000000006, 0.14159999999999986, 0.10479999999999991, 0.08019999999999992, 0.05899999999999995, 0.04200000000000015, 0.03049999999999997, 0.025199999999999976, 0.018799999999999983, 0.011499999999999991, 0.010100000000000036, 0.007000000000000025, 0.004399999999999977, 0.0034999999999999814, 0.0016000000000000057, 0.0015000000000000055, 0.0008000000000000029, 0.0007999999999999957, 0.0004999999999999974, 0.00040000000000000143, 0.00040000000000000143, 0.00039999999999999785, 0.00020000000000000071, 0.0, 9.999999999999946e-05, 0.00010000000000000036], "c": 3.0285371776212267, "cov196": 0.42968}, "10000": {"dens": [0.08269999999999993, 0.10750000000000015, 0.18249999999999986, 0.2885000000000004, 0.4273999999999996, 0.5360999999999995, 0.6719999999999994, 0.747900000000001, 0.8229000000000012, 0.8090999999999993, 0.8083999999999992, 0.7799999999999992, 0.6915000000000024, 0.5990999999999967, 0.5138000000000018, 0.42069999999999963, 0.3425999999999997, 0.28350000000000103, 0.22029999999999883, 0.1678000000000006, 0.13399999999999987, 0.09589999999999992, 0.07299999999999994, 0.05449999999999995, 0.04020000000000014, 0.029099999999999973, 0.019499999999999983, 0.014099999999999986, 0.012299999999999988, 0.006800000000000024, 0.0050000000000000175, 0.0030999999999999834, 0.002699999999999986, 0.002300000000000008, 0.0010000000000000035, 0.0006000000000000021, 0.0002999999999999984, 0.00039999999999999785, 0.0005000000000000017, 0.00020000000000000071, 0.0, 0.0, 0.0, 0.0, 0.00020000000000000071], "c": 2.9973866605004384, "cov196": 0.43529}, "20000": {"dens": [0.07869999999999992, 0.10490000000000015, 0.18789999999999982, 0.2906000000000004, 0.42249999999999965, 0.5537999999999995, 0.6582999999999994, 0.769100000000001, 0.8201000000000012, 0.8295999999999992, 0.8206999999999993, 0.7777999999999993, 0.6781000000000025, 0.5978999999999968, 0.5090000000000018, 0.4182999999999996, 0.3403999999999997, 0.278400000000001, 0.22009999999999882, 0.16950000000000062, 0.1274999999999999, 0.0979999999999999, 0.07349999999999994, 0.05229999999999996, 0.03720000000000013, 0.02479999999999998, 0.018899999999999983, 0.013399999999999988, 0.010299999999999991, 0.0062000000000000215, 0.004000000000000014, 0.0024999999999999866, 0.0015999999999999914, 0.0012000000000000042, 0.0008000000000000029, 0.0008000000000000029, 0.0002999999999999984, 0.00019999999999999893, 0.00040000000000000143, 0.00010000000000000036, 9.999999999999946e-05, 0.00010000000000000036, 0.0, 0.0, 0.00010000000000000036], "c": 2.984697245965161, "cov196": 0.43799}}}, {"name": "poll_edges", "value": [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7000000000000002, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4000000000000004, 2.5, 2.6, 2.7, 2.8, 2.9000000000000004, 3.0, 3.1, 3.2, 3.3000000000000003, 3.4000000000000004, 3.5, 3.6, 3.7, 3.8000000000000003, 3.9000000000000004, 4.0, 4.1, 4.2, 4.300000000000001, 4.4, 4.5, 4.6, 4.7, 4.800000000000001, 4.9, 5.0, 5.1000000000000005, 5.2, 5.3, 5.4, 5.5]}, {"name": "poll_c_limit", "value": 2.9736550120861516}]}</script>
 </div>
@@ -1108,7 +1108,7 @@ C_n^* = \left\{\theta \in \Theta : L_n^{-1}(\tfrac{\alpha}{2}) \le R_n(X^n, \the
 </div>
 </div>
 </section>
-<section id="section-1" class="slide level2 standout" data-background-color="var(--slate)">
+<section id="section-1" class="slide level2 standout" data-background-color="var(--slate)" data-visibility="uncounted">
 <h2>&nbsp;</h2>
 <div class="standout-body">
 <p>Questions?</p>
@@ -1297,7 +1297,7 @@ P\left\{R_n(X^n, \theta(P)) \le \hat c_n\right\}
 </ul>
 </div>
 </section>
-<section id="section-2" class="slide level2 standout" data-background-color="var(--slate)">
+<section id="section-2" class="slide level2 standout" data-background-color="var(--slate)" data-visibility="uncounted">
 <h2>&nbsp;</h2>
 <div class="standout-body">
 <p>Questions?</p>
@@ -1308,12 +1308,30 @@ P\left\{R_n(X^n, \theta(P)) \le \hat c_n\right\}
 <h1>Bootstrapping Regressions</h1>
 
 </section>
+<section id="why-bootstrap-a-regression" class="slide level2">
+<h2>Why Bootstrap a Regression?</h2>
+<ul>
+<li>Example: for EPGE students who go on to the PhD, regress PhD grade on master’s grade</li>
+<li>One row per student, so iid is easy to believe</li>
+<li>But only about 5 students per year: ten cohorts give <span class="math inline">\(n = 50\)</span></li>
+<li>The spread of PhD grades likely varies with the master’s grade: heteroskedasticity</li>
+<li>The usual fix, robust standard errors and <span class="math inline">\(\pm 1.96\)</span>, is asymptotic. Is <span class="math inline">\(n = 50\)</span> enough?</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Spoiler: not really. The bootstrap does much better</li>
+</ul>
+</div>
+</section>
 <section id="what-is-an-observation" class="slide level2">
 <h2>What Is an Observation?</h2>
 <ul>
 <li>Data: <span class="math inline">\(Z_i = (Y_i, X_i)\)</span> iid <span class="math inline">\(P\)</span>, with <span class="math inline">\(X_i \in \R^k\)</span></li>
-<li>Parameter: the linear projection <span class="math inline">\(\beta(P) \equiv \E[X_iX_i']^{-1}\E[X_iY_i]\)</span>, no model needed</li>
-<li>OLS is a plug-in estimator: <span class="math inline">\(\hat\beta_n = \beta(\hat P_n)\)</span></li>
+<li>Parameter: the linear projection <span class="math inline">\(\beta(P) \equiv \E_P[X_iX_i']^{-1}\E_P[X_iY_i]\)</span>, no model needed</li>
+<li>Under <span class="math inline">\(\hat P_n\)</span>, expectations are sample averages: <span class="math inline">\(\E_{\hat P_n}[g(Z)] = \frac{1}{n}\sum_{i=1}^n g(Z_i)\)</span></li>
+<li>So OLS is a plug-in estimator: <span class="math display">\[
+\beta(\hat P_n) = \Big(\frac{1}{n}\sum_{i=1}^n X_iX_i'\Big)^{-1}\frac{1}{n}\sum_{i=1}^n X_iY_i = (\mathbf X'\mathbf X)^{-1}\mathbf X'\mathbf Y = \hat\beta_n
+\]</span></li>
 </ul>
 <div class="fragment">
 <ul>
@@ -1354,26 +1372,26 @@ P\left\{R_n(X^n, \theta(P)) \le \hat c_n\right\}
 <li>Residual bootstrap: keep each <span class="math inline">\(X_i\)</span>, resample the <span class="math inline">\(\hat U_i\)</span>. That imposes homoskedasticity</li>
 </ul>
 <div class="fragment">
-<p><span class="math inline">\(Y_i = 1 + X_i + |X_i|\,\varepsilon_i\)</span>, <span class="math inline">\(X_i, \varepsilon_i \iid N(0,1)\)</span>, <span class="math inline">\(n = 30\)</span>. Coverage of 95% CIs for the slope:</p>
+<p>Our <span class="math inline">\(n = 50\)</span> students, stylized: <span class="math inline">\(Y_i = 1 + X_i + |X_i|\,\varepsilon_i\)</span>, with <span class="math inline">\(X_i \sim t_{10}\)</span>, <span class="math inline">\(\varepsilon_i \sim N(0,1)\)</span></p>
 <table class="caption-top">
 <thead>
 <tr class="header">
-<th style="text-align: left;">Interval</th>
+<th style="text-align: left;">95% CI for the slope</th>
 <th style="text-align: center;">Coverage</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;"><span class="math inline">\(\pm 1.96 \times\)</span> usual OLS standard error</td>
-<td style="text-align: center;">73%</td>
+<td style="text-align: center;">68%</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><span class="math inline">\(\pm 1.96 \times\)</span> robust standard error</td>
-<td style="text-align: center;">87%</td>
+<td style="text-align: center;">89%</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Residual bootstrap-t, usual standard error</td>
-<td style="text-align: center;">74%</td>
+<td style="text-align: center;">69%</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Pairs bootstrap-t, robust standard error</td>
@@ -1383,7 +1401,7 @@ P\left\{R_n(X^n, \theta(P)) \le \hat c_n\right\}
 </table>
 </div>
 </section>
-<section id="section-3" class="slide level2 standout" data-background-color="var(--slate)">
+<section id="section-3" class="slide level2 standout" data-background-color="var(--slate)" data-visibility="uncounted">
 <h2>&nbsp;</h2>
 <div class="standout-body">
 <p>Questions?</p>
@@ -1397,27 +1415,125 @@ P\left\{R_n(X^n, \theta(P)) \le \hat c_n\right\}
 <section id="the-maximum-of-a-uniform" class="slide level2">
 <h2>The Maximum of a Uniform</h2>
 <ul>
-<li><span class="math inline">\(X_i \iid U(0, \theta)\)</span>, estimator <span class="math inline">\(\hat\theta_n = X_{(n)} = \max_i X_i\)</span>, root <span class="math inline">\(R_n = n\,(X_{(n)} - \theta) \le 0\)</span></li>
-<li>For <span class="math inline">\(x \le 0\)</span>, the true distribution is <span class="math display">\[
-J_n(x, P) = P\left\{X_{(n)} \le \theta + \tfrac{x}{n}\right\} = \left(1 + \frac{x}{n\theta}\right)^n \to e^{x/\theta}
-\]</span></li>
-<li>So <span class="math inline">\(R_n \xrightarrow{d} -\theta \cdot \text{Exp}(1)\)</span>: a <strong>continuous</strong> limit, with no mass at any point</li>
+<li><span class="math inline">\(X_i \iid U(0, \theta)\)</span>, estimator <span class="math inline">\(\hat\theta_n = X_{(n)} = \max_i X_i\)</span>, root <span class="math inline">\(R_n = n\,(X_{(n)} - \theta)\)</span></li>
+<li>Its limit is <span class="math inline">\(-\theta \cdot \text{Exp}(1)\)</span>: a <strong>continuous</strong> distribution, with no mass at any point</li>
 </ul>
 <div class="fragment">
 <ul>
-<li>Bootstrap root: <span class="math inline">\(R^*_n = n\,(X^*_{(n)} - X_{(n)}) \le 0\)</span>, which is zero if <span class="math inline">\(X_{(n)}\)</span> is ever drawn</li>
-<li>Each draw misses <span class="math inline">\(X_{(n)}\)</span> with probability <span class="math inline">\(1 - 1/n\)</span>, so, given the data, <span class="math display">\[
-P\left\{R^*_n = 0 \,\middle|\, X^n\right\} = 1 - \left(1 - \tfrac{1}{n}\right)^n \to 1 - e^{-1} \approx 0.632
-\]</span></li>
-<li>The bootstrap puts 63% of its mass on a single point, where the truth puts none!</li>
+<li>Bootstrap root: <span class="math inline">\(R^*_n = n\,(X^*_{(n)} - X_{(n)})\)</span>, exactly zero whenever <span class="math inline">\(X_{(n)}\)</span> is resampled</li>
+<li>That happens often, for every <span class="math inline">\(n\)</span>: the bootstrap puts a lump of mass at zero, the truth none!</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li><span class="alert">Exercise: you will work through this example, step by step, in the problem set</span></li>
 </ul>
 </div>
 </section>
 <section id="in-pictures" class="slide level2">
 <h2>In Pictures</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb5" data-startfrom="1036" data-source-offset="0"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 1035;"><span id="cb5-1036"><a href="" aria-label="1036"></a>viewof uf <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">form</span>({</span>
+<span id="cb5-1037"><a href="" aria-label="1037"></a>  <span class="dt">n</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="dv">10</span><span class="op">,</span> <span class="dv">100000</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">100</span><span class="op">,</span> <span class="dt">step</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">transform</span><span class="op">:</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">log</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Sample size n"</span>})<span class="op">,</span></span>
+<span id="cb5-1038"><a href="" aria-label="1038"></a>  <span class="dt">seed</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">button</span>(<span class="st">"Draw a new sample"</span><span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">reduce</span><span class="op">:</span> v <span class="kw">=&gt;</span> v <span class="op">+</span> <span class="dv">1</span>})</span>
+<span id="cb5-1039"><a href="" aria-label="1039"></a>}<span class="op">,</span> {<span class="dt">template</span><span class="op">:</span> ({n<span class="op">,</span> seed}) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-1040"><a href="" aria-label="1040"></a>  n<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="fu">setProperty</span>(<span class="st">"--input-width"</span><span class="op">,</span> <span class="st">"420px"</span>)</span>
+<span id="cb5-1041"><a href="" aria-label="1041"></a>  n<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">maxWidth</span> <span class="op">=</span> <span class="st">"none"</span></span>
+<span id="cb5-1042"><a href="" aria-label="1042"></a>  <span class="cf">return</span> <span class="fu">html</span><span class="vs">`&lt;div style="display: flex; justify-content: center; align-items: center; column-gap: 30px"&gt;</span><span class="sc">${</span>n<span class="sc">}${</span>seed<span class="sc">}</span><span class="vs">&lt;/div&gt;`</span></span>
+<span id="cb5-1043"><a href="" aria-label="1043"></a>}})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-5" data-nodetype="declaration">
 
-<img data-src="lecture02_files/figure-revealjs/cell-7-output-1.svg" class="quarto-figure quarto-figure-center r-stretch"><ul>
-<li>More data does <strong>not</strong> help: the jump at zero is still there with <span class="math inline">\(n = 10{,}000\)</span></li>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb6" data-startfrom="1051" data-source-offset="-200"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 1050;"><span id="cb6-1051"><a href="" aria-label="1051"></a>ufB <span class="op">=</span> <span class="dv">10000</span></span>
+<span id="cb6-1052"><a href="" aria-label="1052"></a>ufGrid <span class="op">=</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">451</span>)<span class="op">.</span><span class="fu">map</span>(k <span class="kw">=&gt;</span> (k <span class="op">-</span> <span class="dv">400</span>) <span class="op">/</span> <span class="dv">100</span>)            <span class="co">// x from -4 to 0.5, with 0 on the grid</span></span>
+<span id="cb6-1053"><a href="" aria-label="1053"></a>ufSample <span class="op">=</span> {</span>
+<span id="cb6-1054"><a href="" aria-label="1054"></a>  <span class="kw">const</span> unif <span class="op">=</span> d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="dv">97</span> <span class="op">*</span> uf<span class="op">.</span><span class="at">seed</span> <span class="op">+</span> uf<span class="op">.</span><span class="at">n</span>)</span>
+<span id="cb6-1055"><a href="" aria-label="1055"></a>  <span class="cf">return</span> <span class="bu">Float64Array</span><span class="op">.</span><span class="fu">from</span>({<span class="dt">length</span><span class="op">:</span> uf<span class="op">.</span><span class="at">n</span>}<span class="op">,</span> unif)<span class="op">.</span><span class="fu">sort</span>()</span>
+<span id="cb6-1056"><a href="" aria-label="1056"></a>}</span>
+<span id="cb6-1057"><a href="" aria-label="1057"></a>ufRoots <span class="op">=</span> {</span>
+<span id="cb6-1058"><a href="" aria-label="1058"></a>  <span class="kw">const</span> n <span class="op">=</span> uf<span class="op">.</span><span class="at">n</span><span class="op">,</span> xmax <span class="op">=</span> ufSample[n <span class="op">-</span> <span class="dv">1</span>]<span class="op">,</span> unif <span class="op">=</span> d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="dv">13</span> <span class="op">*</span> uf<span class="op">.</span><span class="at">seed</span> <span class="op">+</span> <span class="dv">7</span> <span class="op">*</span> uf<span class="op">.</span><span class="at">n</span>)</span>
+<span id="cb6-1059"><a href="" aria-label="1059"></a>  <span class="cf">return</span> <span class="bu">Float64Array</span><span class="op">.</span><span class="fu">from</span>({<span class="dt">length</span><span class="op">:</span> ufB}<span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb6-1060"><a href="" aria-label="1060"></a>    <span class="kw">const</span> j <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(<span class="dv">1</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">ceil</span>(n <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">pow</span>(<span class="fu">unif</span>()<span class="op">,</span> <span class="dv">1</span> <span class="op">/</span> n)))</span>
+<span id="cb6-1061"><a href="" aria-label="1061"></a>    <span class="cf">return</span> n <span class="op">*</span> (ufSample[j <span class="op">-</span> <span class="dv">1</span>] <span class="op">-</span> xmax)</span>
+<span id="cb6-1062"><a href="" aria-label="1062"></a>  })<span class="op">.</span><span class="fu">sort</span>()</span>
+<span id="cb6-1063"><a href="" aria-label="1063"></a>}</span>
+<span id="cb6-1064"><a href="" aria-label="1064"></a>ufJump <span class="op">=</span> ufRoots<span class="op">.</span><span class="fu">filter</span>(r <span class="kw">=&gt;</span> r <span class="op">===</span> <span class="dv">0</span>)<span class="op">.</span><span class="at">length</span> <span class="op">/</span> ufB</span>
+<span id="cb6-1065"><a href="" aria-label="1065"></a>ufCurves <span class="op">=</span> ufGrid<span class="op">.</span><span class="fu">flatMap</span>(x <span class="kw">=&gt;</span> [</span>
+<span id="cb6-1066"><a href="" aria-label="1066"></a>  {x<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> d3<span class="op">.</span><span class="fu">bisectRight</span>(ufRoots<span class="op">,</span> x) <span class="op">/</span> ufB<span class="op">,</span> <span class="dt">which</span><span class="op">:</span> <span class="st">"boot"</span>}<span class="op">,</span></span>
+<span id="cb6-1067"><a href="" aria-label="1067"></a>  {x<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> x <span class="op">&lt;=</span> <span class="dv">0</span> <span class="op">?</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">pow</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span> <span class="op">+</span> x <span class="op">/</span> uf<span class="op">.</span><span class="at">n</span>)<span class="op">,</span> uf<span class="op">.</span><span class="at">n</span>) <span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">which</span><span class="op">:</span> <span class="st">"true"</span>}</span>
+<span id="cb6-1068"><a href="" aria-label="1068"></a>])</span>
+<span id="cb6-1069"><a href="" aria-label="1069"></a></span>
+<span id="cb6-1070"><a href="" aria-label="1070"></a>Plot<span class="op">.</span><span class="fu">plot</span>({</span>
+<span id="cb6-1071"><a href="" aria-label="1071"></a>  <span class="dt">width</span><span class="op">:</span> <span class="dv">1150</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">450</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">50</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
+<span id="cb6-1072"><a href="" aria-label="1072"></a>  <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"20px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
+<span id="cb6-1073"><a href="" aria-label="1073"></a>  <span class="dt">x</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="op">-</span><span class="dv">4</span><span class="op">,</span> <span class="fl">0.5</span>]<span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
+<span id="cb6-1074"><a href="" aria-label="1074"></a>  <span class="dt">y</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="fl">1.04</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> <span class="dv">5</span>}<span class="op">,</span></span>
+<span id="cb6-1075"><a href="" aria-label="1075"></a>  <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb6-1076"><a href="" aria-label="1076"></a>  <span class="dt">marks</span><span class="op">:</span> [</span>
+<span id="cb6-1077"><a href="" aria-label="1077"></a>    Plot<span class="op">.</span><span class="fu">line</span>(ufCurves<span class="op">.</span><span class="fu">filter</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">which</span> <span class="op">===</span> <span class="st">"true"</span>)<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"y"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"black"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">2.5</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"8,6"</span>})<span class="op">,</span></span>
+<span id="cb6-1078"><a href="" aria-label="1078"></a>    Plot<span class="op">.</span><span class="fu">line</span>(ufCurves<span class="op">.</span><span class="fu">filter</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">which</span> <span class="op">===</span> <span class="st">"boot"</span>)<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"y"</span><span class="op">,</span> <span class="dt">curve</span><span class="op">:</span> <span class="st">"step-after"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span>})<span class="op">,</span></span>
+<span id="cb6-1079"><a href="" aria-label="1079"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([<span class="dv">0</span>]<span class="op">,</span> {<span class="dt">y1</span><span class="op">:</span> <span class="dv">1</span> <span class="op">-</span> ufJump<span class="op">,</span> <span class="dt">y2</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#C62828"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})<span class="op">,</span></span>
+<span id="cb6-1080"><a href="" aria-label="1080"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`True Jₙ(x, P): no jump anywhere`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-left"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="dv">12</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"black"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})<span class="op">,</span></span>
+<span id="cb6-1081"><a href="" aria-label="1081"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`Bootstrap Lₙ(x), B = 10,000`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-left"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="dv">12</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">38</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})<span class="op">,</span></span>
+<span id="cb6-1082"><a href="" aria-label="1082"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`jump at 0: </span><span class="sc">${</span>ufJump<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">3</span>)<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-left"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="dv">12</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">66</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#C62828"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">21</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})</span>
+<span id="cb6-1083"><a href="" aria-label="1083"></a>  ]</span>
+<span id="cb6-1084"><a href="" aria-label="1084"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-6-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-6-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-6-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-6-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-6-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-6-6" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-6-7" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</div>
+<ul>
+<li>More data does <strong>not</strong> help: push <span class="math inline">\(n\)</span> to 100,000 and the jump at zero is still there</li>
 </ul>
 </section>
 <section id="what-went-wrong" class="slide level2">
@@ -1433,45 +1549,35 @@ P\left\{R^*_n = 0 \,\middle|\, X^n\right\} = 1 - \left(1 - \tfrac{1}{n}\right)^n
 <li>Infinite variance: for the mean, it works a.s. <strong>iff</strong> <span class="math inline">\(\sigma^2 &lt; \infty\)</span> <span class="fgv">(Giné and Zinn, 1989)</span></li>
 <li>Parameter on the boundary: <span class="math inline">\(\hat\mu_n = \max(\bar X_n, 0)\)</span> when <span class="math inline">\(\mu = 0\)</span> <span class="fgv">(L&amp;R Problem 18.10)</span></li>
 <li>Degenerate smooth functions: <span class="math inline">\(\sqrt n\,(\bar X_n^2 - \mu^2)\)</span> when <span class="math inline">\(\mu = 0\)</span> <span class="fgv">(L&amp;R Problem 18.17)</span></li>
-<li>Superefficient estimators (Hodges): not even the parametric bootstrap works <span class="fgv">(Beran, 1984)</span></li>
 </ul>
 </div>
 </section>
-<section id="handle-with-care" class="slide level2">
-<h2>Handle With Care</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<p><strong>If it fails</strong></p>
+<section id="wrap-up" class="slide level2">
+<h2>Wrap-Up</h2>
 <ul>
-<li><span class="math inline">\(m\)</span>-out-of-<span class="math inline">\(n\)</span>: resample only <span class="math inline">\(m \ll n\)</span></li>
-<li>Subsampling <span class="fgv">(L&amp;R Section 18.7)</span></li>
-<li>Find a theorem for <strong>your</strong> root</li>
-<li>Bootstrap a pivot when you can</li>
+<li>Goal: a confidence set for <span class="math inline">\(\theta(P)\)</span>. All we need is <span class="math inline">\(J_n(\cdot, P)\)</span>, the law of the root</li>
+<li>Pivots: <span class="math inline">\(J_n\)</span> is free of <span class="math inline">\(P\)</span>. Asymptotics: swap <span class="math inline">\(J_n\)</span> for its limit <span class="math inline">\(J\)</span>, if you know it</li>
+<li>Bootstrap: plug <span class="math inline">\(\hat P_n\)</span> into <span class="math inline">\(J_n\)</span> itself, then simulate. No limit to derive</li>
+<li>Why it works: <span class="math inline">\(\hat P_n\)</span> is close to <span class="math inline">\(P\)</span> (Glivenko–Cantelli), and <span class="math inline">\(J_n\)</span> is continuous in <span class="math inline">\(P\)</span></li>
+<li>In action: joint coverage for the poll, and the pairs bootstrap-t for regressions</li>
+<li>It can fail, as with the maximum of a uniform: make sure a theorem covers your root</li>
 </ul>
-</div><div class="column polecol" style="width:50%;">
-<p><strong>Other bootstraps</strong></p>
-<ul>
-<li>Parametric: draw from <span class="math inline">\(P_{\hat\psi}\)</span></li>
-<li>Residual: resample OLS residuals</li>
-<li>Wild: robust to heteroskedasticity</li>
-<li>Block: dependent data (soon!)</li>
-<li>Cluster: resample whole clusters</li>
-</ul>
-</div></div>
+<div class="fragment">
 <div class="thm takeaway">
 <div class="thmhead">
 <p>The bottom line</p>
 </div>
-<p>The bootstrap is not magic. Like any asymptotic approximation, it needs a theorem.</p>
+<p>Plug <span class="math inline">\(\hat P_n\)</span> into <span class="math inline">\(J_n\)</span>, bootstrap a pivot when you can, and never without a theorem.</p>
+</div>
 </div>
 </section>
-<section id="section-4" class="slide level2 standout" data-background-color="var(--slate)">
+<section id="section-4" class="slide level2 standout" data-background-color="var(--slate)" data-visibility="uncounted">
 <h2>&nbsp;</h2>
 <div class="standout-body">
 <p>Questions?</p>
 </div>
 </section>
-<section id="references" class="slide level2">
+<section id="references" class="slide level2" data-visibility="uncounted">
 <h2>References</h2>
 <ul>
 <li>Chapter 18 of <em>Testing Statistical Hypotheses</em>, by <span class="fgv">Erich Lehmann and Joseph Romano</span> (Sections 18.1 to 18.3 and Example 18.7.2)</li>
@@ -1705,7 +1811,7 @@ P\left\{R^*_n = 0 \,\middle|\, X^n\right\} = 1 - \left(1 - \tfrac{1}{n}\right)^n
       });
     </script>
     <script type="ojs-module-contents">
-    eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6InZpZXdvZiBnYyA9IElucHV0cy5mb3JtKHtcbiAgbjogSW5wdXRzLnJhbmdlKFs1LCAxMDAwMF0sIHt2YWx1ZTogMTAsIHN0ZXA6IDEsIHRyYW5zZm9ybTogTWF0aC5sb2csIGxhYmVsOiBcIlNhbXBsZSBzaXplIG5cIn0pLFxuICBzZWVkOiBJbnB1dHMuYnV0dG9uKFwiRHJhdyBuZXcgc2FtcGxlc1wiLCB7dmFsdWU6IDEsIHJlZHVjZTogdiA9PiB2ICsgMX0pXG59LCB7dGVtcGxhdGU6ICh7biwgc2VlZH0pID0+IHtcbiAgbi5zdHlsZS5zZXRQcm9wZXJ0eShcIi0taW5wdXQtd2lkdGhcIiwgXCI0MjBweFwiKVxuICBuLnN0eWxlLm1heFdpZHRoID0gXCJub25lXCJcbiAgcmV0dXJuIGh0bWxgPGRpdiBzdHlsZT1cImRpc3BsYXk6IGZsZXg7IGp1c3RpZnktY29udGVudDogY2VudGVyOyBhbGlnbi1pdGVtczogY2VudGVyOyBjb2x1bW4tZ2FwOiAzMHB4XCI+JHtufSR7c2VlZH08L2Rpdj5gXG59fSlcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMiIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6Ii8vIDIgKyAxMDAgbmVzdGVkIHN0cmVhbXMgb2YgVVswLDFdIGRyYXdzOiB0aGUgZmlyc3QgbiBvZiBlYWNoIHN0cmVhbSBpcyB0aGUgc2FtcGxlIG9mIHNpemUgbixcbi8vIHNvIG1vdmluZyB0aGUgc2xpZGVyIGZvbGxvd3Mgb25lIHBhdGggcGVyIHNhbXBsZS4gQ2FjaGVkIGJ5IHNlZWQgc28gdGhlIHNsaWRlciBkb2VzIG5vdCByZWRyYXcgdGhlbS5cbmdjTWF4TiA9IDEwMDAwXG5nY0Nsb3VkID0gMTAwXG5nY0NhY2hlID0gbmV3IE1hcCgpXG5nY1N0cmVhbXMgPSB7XG4gIGlmICghZ2NDYWNoZS5oYXMoZ2Muc2VlZCkpIHtcbiAgICBjb25zdCB1bmlmID0gZDMucmFuZG9tTGNnKGdjLnNlZWQpXG4gICAgZ2NDYWNoZS5jbGVhcigpXG4gICAgZ2NDYWNoZS5zZXQoZ2Muc2VlZCwgZDMucmFuZ2UoZ2NDbG91ZCArIDIpLm1hcCgoKSA9PiBGbG9hdDY0QXJyYXkuZnJvbSh7bGVuZ3RoOiBnY01heE59LCB1bmlmKSkpXG4gIH1cbiAgcmV0dXJuIGdjQ2FjaGUuZ2V0KGdjLnNlZWQpXG59XG5cbi8vIHN1cF90IHxGX24odCkgLSB0fCBmcm9tIGEgc29ydGVkIHNhbXBsZSAodGhlIEtvbG1vZ29yb3YtU21pcm5vdiBkaXN0YW5jZSlcbmZ1bmN0aW9uIHN1cEdhcCh4cykge1xuICBjb25zdCBuID0geHMubGVuZ3RoXG4gIGxldCBkID0gMFxuICBmb3IgKGxldCBpID0gMDsgaSA8IG47IGkrKykgZCA9IE1hdGgubWF4KGQsIChpICsgMSkgLyBuIC0geHNbaV0sIHhzW2ldIC0gaSAvIG4pXG4gIHJldHVybiBkXG59XG5cbi8vIEVDREYgYXMgcG9pbnRzIGZvciBhIHN0ZXAtYWZ0ZXIgbGluZTogZXhhY3QganVtcHMgZm9yIHNtYWxsIG4sIGEgZmluZSBncmlkIGZvciBsYXJnZSBuXG5mdW5jdGlvbiBlY2RmUG9pbnRzKHhzKSB7XG4gIGNvbnN0IG4gPSB4cy5sZW5ndGhcbiAgaWYgKG4gPD0gNDAwKSByZXR1cm4gW1swLCAwXSwgLi4uQXJyYXkuZnJvbSh4cywgKHgsIGkpID0+IFt4LCAoaSArIDEpIC8gbl0pLCBbMSwgMV1dXG4gIGNvbnN0IHB0cyA9IFtdXG4gIGZvciAobGV0IGcgPSAwLCBqID0gMDsgZyA8PSA1MDA7IGcrKykge1xuICAgIHdoaWxlIChqIDwgbiAmJiB4c1tqXSA8PSBnIC8gNTAwKSBqKytcbiAgICBwdHMucHVzaChbZyAvIDUwMCwgaiAvIG5dKVxuICB9XG4gIHJldHVybiBwdHNcbn1cblxuZ2NTb3J0ZWQgPSBnY1N0cmVhbXMubWFwKHMgPT4gcy5zbGljZSgwLCBnYy5uKS5zb3J0KCkpXG5nY0dhcHMgPSBnY1NvcnRlZC5tYXAoc3VwR2FwKVxuZGt3ID0gTWF0aC5zcXJ0KE1hdGgubG9nKDIgLyAwLjA1KSAvICgyICogZ2MubikpXG5nY0luc2lkZSA9IGdjR2Fwcy5zbGljZSgyKS5maWx0ZXIoZCA9PiBkIDw9IGRrdykubGVuZ3RoXG5cbmdjU3R5bGUgPSAoe1xuICB3aWR0aDogNTYwLCBoZWlnaHQ6IDQ1MCwgbWFyZ2luTGVmdDogNDUsIG1hcmdpblJpZ2h0OiAxNSwgbWFyZ2luQm90dG9tOiA0NSxcbiAgc3R5bGU6IHtmb250U2l6ZTogXCIxOHB4XCIsIGZvbnRGYW1pbHk6IFwiQXJpYWwsIEFyaW1vLCBzYW5zLXNlcmlmXCJ9LFxuICB4OiB7bGFiZWw6IFwidFwiLCBkb21haW46IFswLCAxXSwgdGlja3M6IDUsIGxhYmVsQW5jaG9yOiBcImNlbnRlclwiLCBsYWJlbEFycm93OiBcIm5vbmVcIn0sXG4gIHk6IHtsYWJlbDogbnVsbCwgZG9tYWluOiBbMCwgMV0sIHRpY2tzOiA1fSxcbiAgZ3JpZDogdHJ1ZVxufSlcbmdjTGFiZWwgPSAodGV4dCwgZHksIGZpbGwpID0+IFBsb3QudGV4dChbdGV4dF0sIHtmcmFtZUFuY2hvcjogXCJ0b3AtbGVmdFwiLCBkeDogMTAsIGR5LCBmaWxsLCBmb250V2VpZ2h0OiBcImJvbGRcIiwgZm9udFNpemU6IDE5LCBzdHJva2U6IFwid2hpdGVcIiwgc3Ryb2tlV2lkdGg6IDZ9KVxuZ2NUaXRsZSA9IHRleHQgPT4gaHRtbGA8ZGl2IHN0eWxlPVwidGV4dC1hbGlnbjogY2VudGVyOyBmb250LXdlaWdodDogYm9sZDsgZm9udC1zaXplOiAyMnB4OyBjb2xvcjogIzJEM0U1MFwiPiR7dGV4dH08L2Rpdj5gXG5cbmdjTGVmdCA9IFBsb3QucGxvdCh7Li4uZ2NTdHlsZSwgbWFya3M6IFtcbiAgUGxvdC5saW5lKFtbMCwgMF0sIFsxLCAxXV0sIHtzdHJva2U6IFwiYmxhY2tcIiwgc3Ryb2tlV2lkdGg6IDEuNSwgc3Ryb2tlRGFzaGFycmF5OiBcIjYsNVwifSksXG4gIFBsb3QubGluZShlY2RmUG9pbnRzKGdjU29ydGVkWzBdKSwge2N1cnZlOiBcInN0ZXAtYWZ0ZXJcIiwgc3Ryb2tlOiBcIiMwMDcyQkNcIiwgc3Ryb2tlV2lkdGg6IDIuNX0pLFxuICBQbG90LmxpbmUoZWNkZlBvaW50cyhnY1NvcnRlZFsxXSksIHtjdXJ2ZTogXCJzdGVwLWFmdGVyXCIsIHN0cm9rZTogXCIjRUI4MTFCXCIsIHN0cm9rZVdpZHRoOiAyLjV9KSxcbiAgZ2NMYWJlbChgU2FtcGxlIDE6IHN1cCBnYXAgPSAke2djR2Fwc1swXS50b0ZpeGVkKDMpfWAsIDgsIFwiIzAwNzJCQ1wiKSxcbiAgZ2NMYWJlbChgU2FtcGxlIDI6IHN1cCBnYXAgPSAke2djR2Fwc1sxXS50b0ZpeGVkKDMpfWAsIDM2LCBcIiNFQjgxMUJcIilcbl19KVxuXG5nY1JpZ2h0ID0ge1xuICBjb25zdCBiYW5kID0gZDMucmFuZ2UoMCwgMS4wMDAxLCAwLjAwNSkubWFwKHQgPT4gKHt0LCBsbzogTWF0aC5tYXgoMCwgdCAtIGRrdyksIGhpOiBNYXRoLm1pbigxLCB0ICsgZGt3KX0pKVxuICBjb25zdCBjbG91ZCA9IGdjU29ydGVkLnNsaWNlKDIpLmZsYXRNYXAoKHhzLCBpZCkgPT4gZWNkZlBvaW50cyh4cykubWFwKChbdCwgeV0pID0+ICh7dCwgeSwgaWR9KSkpXG4gIHJldHVybiBQbG90LnBsb3Qoey4uLmdjU3R5bGUsIG1hcmtzOiBbXG4gICAgUGxvdC5hcmVhWShiYW5kLCB7eDogXCJ0XCIsIHkxOiBcImxvXCIsIHkyOiBcImhpXCIsIGZpbGw6IFwiIzJEM0U1MFwiLCBmaWxsT3BhY2l0eTogMC4xMn0pLFxuICAgIFBsb3QubGluZShjbG91ZCwge3g6IFwidFwiLCB5OiBcInlcIiwgejogXCJpZFwiLCBjdXJ2ZTogXCJzdGVwLWFmdGVyXCIsIHN0cm9rZTogXCIjMDA3MkJDXCIsIHN0cm9rZU9wYWNpdHk6IDAuMjUsIHN0cm9rZVdpZHRoOiAxLjJ9KSxcbiAgICBQbG90LmxpbmUoW1swLCAwXSwgWzEsIDFdXSwge3N0cm9rZTogXCJibGFja1wiLCBzdHJva2VXaWR0aDogMS41LCBzdHJva2VEYXNoYXJyYXk6IFwiNiw1XCJ9KSxcbiAgICBnY0xhYmVsKGBES1cgOTUlIGJhbmQ6IMKxICR7ZGt3LnRvRml4ZWQoMyl9YCwgOCwgXCIjMkQzRTUwXCIpLFxuICAgIGdjTGFiZWwoYCR7Z2NJbnNpZGV9IG9mICR7Z2NDbG91ZH0gc2FtcGxlcyBpbnNpZGUgaXRgLCAzNiwgXCIjMDA3MkJDXCIpXG4gIF19KVxufVxuXG5odG1sYDxkaXYgc3R5bGU9XCJkaXNwbGF5OiBmbGV4OyBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjsgY29sdW1uLWdhcDogMzBweFwiPlxuICA8ZGl2PiR7Z2NUaXRsZShcIlR3byBzYW1wbGVzLCBvbmUgcGF0aCBlYWNoXCIpfSR7Z2NMZWZ0fTwvZGl2PlxuICA8ZGl2PiR7Z2NUaXRsZShgJHtnY0Nsb3VkfSBzYW1wbGVzYCl9JHtnY1JpZ2h0fTwvZGl2PlxuPC9kaXY+YFxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0zIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoidmlld29mIGRlbW8gPSBJbnB1dHMuZm9ybSh7XG4gIG46IElucHV0cy5yYWRpbyhbMTAwMCwgMjAwMCwgNTAwMCwgMTAwMDAsIDIwMDAwXSwge3ZhbHVlOiAxMDAwLCBsYWJlbDogXCJQb2xsIHNpemUgblwiLCBmb3JtYXQ6IGQgPT4gZC50b0xvY2FsZVN0cmluZyhcImVuLVVTXCIpfSksXG4gIEI6IElucHV0cy5yYW5nZShbNTAsIDEwMDAwXSwge3ZhbHVlOiAyMDAsIHN0ZXA6IDEsIHRyYW5zZm9ybTogTWF0aC5sb2csIGxhYmVsOiBcIkJvb3RzdHJhcCBkcmF3cyBCXCJ9KSxcbiAgcG9sbDogSW5wdXRzLmJ1dHRvbihcIkRyYXcgYSBuZXcgcG9sbFwiLCB7dmFsdWU6IDEsIHJlZHVjZTogdiA9PiB2ICsgMX0pXG59LCB7dGVtcGxhdGU6ICh7biwgQiwgcG9sbH0pID0+IHtcbiAgbi5zdHlsZS5zZXRQcm9wZXJ0eShcIi0taW5wdXQtd2lkdGhcIiwgXCI1NjBweFwiKVxuICBuLnN0eWxlLm1heFdpZHRoID0gXCJub25lXCJcbiAgQi5zdHlsZS5zZXRQcm9wZXJ0eShcIi0taW5wdXQtd2lkdGhcIiwgXCIzMDBweFwiKVxuICByZXR1cm4gaHRtbGA8ZGl2IHN0eWxlPVwiZGlzcGxheTogZmxleDsgZmxleC1kaXJlY3Rpb246IGNvbHVtbjsgYWxpZ24taXRlbXM6IGNlbnRlclwiPlxuICAgICR7bn08ZGl2IHN0eWxlPVwiZGlzcGxheTogZmxleDsgYWxpZ24taXRlbXM6IGNlbnRlcjsgY29sdW1uLWdhcDogMzBweFwiPiR7Qn0ke3BvbGx9PC9kaXY+XG4gIDwvZGl2PmBcbn19KVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC00IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoiLy8gTXVsdGlub21pYWwgZHJhdyBhcyBhIGNoYWluIG9mIGJpbm9taWFscyAoZXhhY3QpLiBXaXRoIGNhdGVnb3JpY2FsIGRhdGEsXG4vLyByZXNhbXBsaW5nIG4gcm93cyB3aXRoIHJlcGxhY2VtZW50IGlzIGEgTXVsdGlub21pYWwobiwgY2VsbCBmcmVxdWVuY2llcykgZHJhdy5cbmZ1bmN0aW9uIHJtdWx0aW5vbShuLCBwciwgYmlub20pIHtcbiAgY29uc3Qgb3V0ID0gbmV3IEFycmF5KHByLmxlbmd0aCkuZmlsbCgwKVxuICBsZXQgbGVmdCA9IG4sIG1hc3MgPSAxXG4gIGZvciAobGV0IGogPSAwOyBqIDwgcHIubGVuZ3RoIC0gMSAmJiBsZWZ0ID4gMDsgaisrKSB7XG4gICAgY29uc3QgcSA9IE1hdGgubWluKDEsIE1hdGgubWF4KDAsIHByW2pdIC8gbWFzcykpXG4gICAgb3V0W2pdID0gcSA+IDAgPyBiaW5vbShsZWZ0LCBxKSgpIDogMFxuICAgIGxlZnQgLT0gb3V0W2pdXG4gICAgbWFzcyAtPSBwcltqXVxuICB9XG4gIG91dFtwci5sZW5ndGggLSAxXSArPSBsZWZ0XG4gIHJldHVybiBvdXRcbn1cblxuLy8gbWF4X3tzLGt9IHx0X3tzLGt9fCBmb3IgNiBzdGF0ZXMgeCA0IHZvdGVzICh0aGUgZmlyc3QgMyB2b3RlcyBhcmUgY2FuZGlkYXRlcylcbmZ1bmN0aW9uIG1heFQoY291bnRzLCBwUmVmKSB7XG4gIGxldCBtID0gMFxuICBmb3IgKGxldCBzID0gMDsgcyA8IDY7IHMrKykge1xuICAgIGNvbnN0IE4gPSBjb3VudHNbNCAqIHNdICsgY291bnRzWzQgKiBzICsgMV0gKyBjb3VudHNbNCAqIHMgKyAyXSArIGNvdW50c1s0ICogcyArIDNdXG4gICAgZm9yIChsZXQgayA9IDA7IGsgPCAzOyBrKyspIHtcbiAgICAgIGNvbnN0IHAgPSBjb3VudHNbNCAqIHMgKyBrXSAvIE5cbiAgICAgIGNvbnN0IHQgPSBNYXRoLmFicyhwIC0gcFJlZlszICogcyArIGtdKSAvIE1hdGguc3FydChwICogKDEgLSBwKSAvIE4pXG4gICAgICBtID0gTWF0aC5tYXgobSwgTnVtYmVyLmlzTmFOKHQpID8gSW5maW5pdHkgOiB0KVxuICAgIH1cbiAgfVxuICByZXR1cm4gbVxufVxuXG5wb2xsQ291bnRzID0gcm11bHRpbm9tKGRlbW8ubiwgcG9sbF9wcm9icywgZDMucmFuZG9tQmlub21pYWwuc291cmNlKGQzLnJhbmRvbUxjZygxMDAwICsgZGVtby5wb2xsKSkpXG5wb2xsU2hhcmVzID0gZDMucmFuZ2UoMTgpLm1hcChpID0+IHtcbiAgY29uc3QgcyA9IE1hdGguZmxvb3IoaSAvIDMpLCBrID0gaSAlIDNcbiAgY29uc3QgYyA9IHBvbGxDb3VudHMuc2xpY2UoNCAqIHMsIDQgKiBzICsgNClcbiAgcmV0dXJuIGNba10gLyBkMy5zdW0oYylcbn0pXG5cbmJvb3RSID0ge1xuICBjb25zdCBiaW5vbSA9IGQzLnJhbmRvbUJpbm9taWFsLnNvdXJjZShkMy5yYW5kb21MY2coNyArIDMxICogZGVtby5wb2xsKSlcbiAgY29uc3QgZnJlcSA9IHBvbGxDb3VudHMubWFwKGMgPT4gYyAvIGRlbW8ubilcbiAgcmV0dXJuIEZsb2F0NjRBcnJheS5mcm9tKHtsZW5ndGg6IGRlbW8uQn0sICgpID0+IG1heFQocm11bHRpbm9tKGRlbW8ubiwgZnJlcSwgYmlub20pLCBwb2xsU2hhcmVzKSlcbn1cblxuY1N0YXIgPSBkMy5xdWFudGlsZShib290UiwgMC45NSlcbnRydXRoTiA9IHBvbGxfdHJ1dGhbU3RyaW5nKGRlbW8ubildXG5idyA9IHBvbGxfZWRnZXNbMV0gLSBwb2xsX2VkZ2VzWzBdXG5oaXN0Qm9vdCA9IHBvbGxfZWRnZXMuc2xpY2UoMCwgLTEpLm1hcCgoeDAsIGkpID0+IHtcbiAgY29uc3QgeDEgPSBwb2xsX2VkZ2VzW2kgKyAxXVxuICBjb25zdCBpbkJpbiA9IGJvb3RSLmZpbHRlcihyID0+IChpID09PSAwID8gdHJ1ZSA6IHIgPj0geDApICYmIChpID09PSBwb2xsX2VkZ2VzLmxlbmd0aCAtIDIgPyB0cnVlIDogciA8IHgxKSkubGVuZ3RoXG4gIHJldHVybiB7eDAsIHgxLCBkZW5zOiBpbkJpbiAvIChkZW1vLkIgKiBidyl9XG59KVxudHJ1dGhMaW5lID0gdHJ1dGhOLmRlbnMubWFwKChkLCBpKSA9PiAoe3g6IChwb2xsX2VkZ2VzW2ldICsgcG9sbF9lZGdlc1tpICsgMV0pIC8gMiwgZGVuczogZH0pKVxuXG5QbG90LnBsb3Qoe1xuICB3aWR0aDogMTE1MCwgaGVpZ2h0OiAzOTAsIG1hcmdpbkxlZnQ6IDUwLCBtYXJnaW5Cb3R0b206IDQ1LFxuICBzdHlsZToge2ZvbnRTaXplOiBcIjIwcHhcIiwgZm9udEZhbWlseTogXCJBcmlhbCwgQXJpbW8sIHNhbnMtc2VyaWZcIn0sXG4gIHg6IHtsYWJlbDogXCJtYXggfHR8XCIsIGRvbWFpbjogWzEsIDUuNV0sIGxhYmVsQW5jaG9yOiBcImNlbnRlclwiLCBsYWJlbEFycm93OiBcIm5vbmVcIn0sXG4gIHk6IHtsYWJlbDogbnVsbCwgZG9tYWluOiBbMCwgMS42XSwgdGlja3M6IDR9LFxuICBncmlkOiB0cnVlLFxuICBtYXJrczogW1xuICAgIFBsb3QucmVjdFkoaGlzdEJvb3QsIHt4MTogXCJ4MFwiLCB4MjogXCJ4MVwiLCB5OiBcImRlbnNcIiwgZmlsbDogXCIjMDA3MkJDXCIsIGZpbGxPcGFjaXR5OiAwLjM1LCBpbnNldDogMC41fSksXG4gICAgUGxvdC5saW5lKHRydXRoTGluZSwge3g6IFwieFwiLCB5OiBcImRlbnNcIiwgc3Ryb2tlOiBcIiMyRDNFNTBcIiwgc3Ryb2tlV2lkdGg6IDMsIGN1cnZlOiBcImJhc2lzXCJ9KSxcbiAgICBQbG90LnJ1bGVYKFsxLjk2XSwge3N0cm9rZTogXCIjRUI4MTFCXCIsIHN0cm9rZVdpZHRoOiAzLCBzdHJva2VEYXNoYXJyYXk6IFwiNyw1XCJ9KSxcbiAgICBQbG90LnJ1bGVYKFtwb2xsX2NfbGltaXRdLCB7c3Ryb2tlOiBcIiM4ODg4ODhcIiwgc3Ryb2tlV2lkdGg6IDIsIHN0cm9rZURhc2hhcnJheTogXCIzLDRcIn0pLFxuICAgIFBsb3QucnVsZVgoW3RydXRoTi5jXSwge3N0cm9rZTogXCIjMkQzRTUwXCIsIHN0cm9rZVdpZHRoOiAzfSksXG4gICAgUGxvdC5ydWxlWChbY1N0YXJdLCB7c3Ryb2tlOiBcIiMwMDcyQkNcIiwgc3Ryb2tlV2lkdGg6IDN9KSxcbiAgICBQbG90LnRleHQoW2Bib290c3RyYXAgxIkqID0gJHtjU3Rhci50b0ZpeGVkKDIpfWBdLCB7ZnJhbWVBbmNob3I6IFwidG9wLXJpZ2h0XCIsIGR4OiAtMTAsIGR5OiA4LCBmaWxsOiBcIiMwMDcyQkNcIiwgZm9udFdlaWdodDogXCJib2xkXCIsIGZvbnRTaXplOiAyMSwgc3Ryb2tlOiBcIndoaXRlXCIsIHN0cm9rZVdpZHRoOiA2fSksXG4gICAgUGxvdC50ZXh0KFtgdHJ1ZSBjID0gJHt0cnV0aE4uYy50b0ZpeGVkKDIpfWBdLCB7ZnJhbWVBbmNob3I6IFwidG9wLXJpZ2h0XCIsIGR4OiAtMTAsIGR5OiAzNiwgZmlsbDogXCIjMkQzRTUwXCIsIGZvbnRXZWlnaHQ6IFwiYm9sZFwiLCBmb250U2l6ZTogMjEsIHN0cm9rZTogXCJ3aGl0ZVwiLCBzdHJva2VXaWR0aDogNn0pLFxuICAgIFBsb3QudGV4dChbYGxpbWl0ID0gJHtwb2xsX2NfbGltaXQudG9GaXhlZCgyKX1gXSwge2ZyYW1lQW5jaG9yOiBcInRvcC1yaWdodFwiLCBkeDogLTEwLCBkeTogNjQsIGZpbGw6IFwiIzg4ODg4OFwiLCBmb250V2VpZ2h0OiBcImJvbGRcIiwgZm9udFNpemU6IDIxLCBzdHJva2U6IFwid2hpdGVcIiwgc3Ryb2tlV2lkdGg6IDZ9KSxcbiAgICBQbG90LnRleHQoW2BUVjogMS45NiBjb3ZlcnMgYWxsIDE4IG9ubHkgJHtNYXRoLnJvdW5kKDEwMCAqIHRydXRoTi5jb3YxOTYpfSUgb2YgdGhlIHRpbWVgXSwge2ZyYW1lQW5jaG9yOiBcInRvcC1yaWdodFwiLCBkeDogLTEwLCBkeTogOTIsIGZpbGw6IFwiI0VCODExQlwiLCBmb250V2VpZ2h0OiBcImJvbGRcIiwgZm9udFNpemU6IDIxLCBzdHJva2U6IFwid2hpdGVcIiwgc3Ryb2tlV2lkdGg6IDZ9KVxuICBdXG59KVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0UXVpZXQiLCJzb3VyY2UiOiJzaGlueUlucHV0KCdnYycpIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0UXVpZXQiLCJzb3VyY2UiOiJzaGlueUlucHV0KCdkZW1vJykifV19
+    eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6InZpZXdvZiBnYyA9IElucHV0cy5mb3JtKHtcbiAgbjogSW5wdXRzLnJhbmdlKFs1LCAxMDAwMF0sIHt2YWx1ZTogMTAsIHN0ZXA6IDEsIHRyYW5zZm9ybTogTWF0aC5sb2csIGxhYmVsOiBcIlNhbXBsZSBzaXplIG5cIn0pLFxuICBzZWVkOiBJbnB1dHMuYnV0dG9uKFwiRHJhdyBuZXcgc2FtcGxlc1wiLCB7dmFsdWU6IDEsIHJlZHVjZTogdiA9PiB2ICsgMX0pXG59LCB7dGVtcGxhdGU6ICh7biwgc2VlZH0pID0+IHtcbiAgbi5zdHlsZS5zZXRQcm9wZXJ0eShcIi0taW5wdXQtd2lkdGhcIiwgXCI0MjBweFwiKVxuICBuLnN0eWxlLm1heFdpZHRoID0gXCJub25lXCJcbiAgcmV0dXJuIGh0bWxgPGRpdiBzdHlsZT1cImRpc3BsYXk6IGZsZXg7IGp1c3RpZnktY29udGVudDogY2VudGVyOyBhbGlnbi1pdGVtczogY2VudGVyOyBjb2x1bW4tZ2FwOiAzMHB4XCI+JHtufSR7c2VlZH08L2Rpdj5gXG59fSlcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMiIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6Ii8vIDIgKyAxMDAgbmVzdGVkIHN0cmVhbXMgb2YgVVswLDFdIGRyYXdzOiB0aGUgZmlyc3QgbiBvZiBlYWNoIHN0cmVhbSBpcyB0aGUgc2FtcGxlIG9mIHNpemUgbixcbi8vIHNvIG1vdmluZyB0aGUgc2xpZGVyIGZvbGxvd3Mgb25lIHBhdGggcGVyIHNhbXBsZS4gQ2FjaGVkIGJ5IHNlZWQgc28gdGhlIHNsaWRlciBkb2VzIG5vdCByZWRyYXcgdGhlbS5cbmdjTWF4TiA9IDEwMDAwXG5nY0Nsb3VkID0gMTAwXG5nY0NhY2hlID0gbmV3IE1hcCgpXG5nY1N0cmVhbXMgPSB7XG4gIGlmICghZ2NDYWNoZS5oYXMoZ2Muc2VlZCkpIHtcbiAgICBjb25zdCB1bmlmID0gZDMucmFuZG9tTGNnKGdjLnNlZWQpXG4gICAgZ2NDYWNoZS5jbGVhcigpXG4gICAgZ2NDYWNoZS5zZXQoZ2Muc2VlZCwgZDMucmFuZ2UoZ2NDbG91ZCArIDIpLm1hcCgoKSA9PiBGbG9hdDY0QXJyYXkuZnJvbSh7bGVuZ3RoOiBnY01heE59LCB1bmlmKSkpXG4gIH1cbiAgcmV0dXJuIGdjQ2FjaGUuZ2V0KGdjLnNlZWQpXG59XG5cbi8vIHN1cF90IHxGX24odCkgLSB0fCBmcm9tIGEgc29ydGVkIHNhbXBsZSAodGhlIEtvbG1vZ29yb3YtU21pcm5vdiBkaXN0YW5jZSlcbmZ1bmN0aW9uIHN1cEdhcCh4cykge1xuICBjb25zdCBuID0geHMubGVuZ3RoXG4gIGxldCBkID0gMFxuICBmb3IgKGxldCBpID0gMDsgaSA8IG47IGkrKykgZCA9IE1hdGgubWF4KGQsIChpICsgMSkgLyBuIC0geHNbaV0sIHhzW2ldIC0gaSAvIG4pXG4gIHJldHVybiBkXG59XG5cbi8vIEVDREYgYXMgcG9pbnRzIGZvciBhIHN0ZXAtYWZ0ZXIgbGluZTogZXhhY3QganVtcHMgZm9yIHNtYWxsIG4sIGEgZmluZSBncmlkIGZvciBsYXJnZSBuXG5mdW5jdGlvbiBlY2RmUG9pbnRzKHhzKSB7XG4gIGNvbnN0IG4gPSB4cy5sZW5ndGhcbiAgaWYgKG4gPD0gNDAwKSByZXR1cm4gW1swLCAwXSwgLi4uQXJyYXkuZnJvbSh4cywgKHgsIGkpID0+IFt4LCAoaSArIDEpIC8gbl0pLCBbMSwgMV1dXG4gIGNvbnN0IHB0cyA9IFtdXG4gIGZvciAobGV0IGcgPSAwLCBqID0gMDsgZyA8PSA1MDA7IGcrKykge1xuICAgIHdoaWxlIChqIDwgbiAmJiB4c1tqXSA8PSBnIC8gNTAwKSBqKytcbiAgICBwdHMucHVzaChbZyAvIDUwMCwgaiAvIG5dKVxuICB9XG4gIHJldHVybiBwdHNcbn1cblxuZ2NTb3J0ZWQgPSBnY1N0cmVhbXMubWFwKHMgPT4gcy5zbGljZSgwLCBnYy5uKS5zb3J0KCkpXG5nY0dhcHMgPSBnY1NvcnRlZC5tYXAoc3VwR2FwKVxuZGt3ID0gTWF0aC5zcXJ0KE1hdGgubG9nKDIgLyAwLjA1KSAvICgyICogZ2MubikpXG5nY0luc2lkZSA9IGdjR2Fwcy5zbGljZSgyKS5maWx0ZXIoZCA9PiBkIDw9IGRrdykubGVuZ3RoXG5cbmdjU3R5bGUgPSAoe1xuICB3aWR0aDogNTYwLCBoZWlnaHQ6IDQ1MCwgbWFyZ2luTGVmdDogNDUsIG1hcmdpblJpZ2h0OiAxNSwgbWFyZ2luQm90dG9tOiA0NSxcbiAgc3R5bGU6IHtmb250U2l6ZTogXCIxOHB4XCIsIGZvbnRGYW1pbHk6IFwiQXJpYWwsIEFyaW1vLCBzYW5zLXNlcmlmXCJ9LFxuICB4OiB7bGFiZWw6IFwidFwiLCBkb21haW46IFswLCAxXSwgdGlja3M6IDUsIGxhYmVsQW5jaG9yOiBcImNlbnRlclwiLCBsYWJlbEFycm93OiBcIm5vbmVcIn0sXG4gIHk6IHtsYWJlbDogbnVsbCwgZG9tYWluOiBbMCwgMV0sIHRpY2tzOiA1fSxcbiAgZ3JpZDogdHJ1ZVxufSlcbmdjTGFiZWwgPSAodGV4dCwgZHksIGZpbGwpID0+IFBsb3QudGV4dChbdGV4dF0sIHtmcmFtZUFuY2hvcjogXCJ0b3AtbGVmdFwiLCBkeDogMTAsIGR5LCBmaWxsLCBmb250V2VpZ2h0OiBcImJvbGRcIiwgZm9udFNpemU6IDE5LCBzdHJva2U6IFwid2hpdGVcIiwgc3Ryb2tlV2lkdGg6IDZ9KVxuZ2NUaXRsZSA9IHRleHQgPT4gaHRtbGA8ZGl2IHN0eWxlPVwidGV4dC1hbGlnbjogY2VudGVyOyBmb250LXdlaWdodDogYm9sZDsgZm9udC1zaXplOiAyMnB4OyBjb2xvcjogIzJEM0U1MFwiPiR7dGV4dH08L2Rpdj5gXG5cbmdjTGVmdCA9IFBsb3QucGxvdCh7Li4uZ2NTdHlsZSwgbWFya3M6IFtcbiAgUGxvdC5saW5lKFtbMCwgMF0sIFsxLCAxXV0sIHtzdHJva2U6IFwiYmxhY2tcIiwgc3Ryb2tlV2lkdGg6IDEuNSwgc3Ryb2tlRGFzaGFycmF5OiBcIjYsNVwifSksXG4gIFBsb3QubGluZShlY2RmUG9pbnRzKGdjU29ydGVkWzBdKSwge2N1cnZlOiBcInN0ZXAtYWZ0ZXJcIiwgc3Ryb2tlOiBcIiMwMDcyQkNcIiwgc3Ryb2tlV2lkdGg6IDIuNX0pLFxuICBQbG90LmxpbmUoZWNkZlBvaW50cyhnY1NvcnRlZFsxXSksIHtjdXJ2ZTogXCJzdGVwLWFmdGVyXCIsIHN0cm9rZTogXCIjRUI4MTFCXCIsIHN0cm9rZVdpZHRoOiAyLjV9KSxcbiAgZ2NMYWJlbChgU2FtcGxlIDE6IHN1cCBnYXAgPSAke2djR2Fwc1swXS50b0ZpeGVkKDMpfWAsIDgsIFwiIzAwNzJCQ1wiKSxcbiAgZ2NMYWJlbChgU2FtcGxlIDI6IHN1cCBnYXAgPSAke2djR2Fwc1sxXS50b0ZpeGVkKDMpfWAsIDM2LCBcIiNFQjgxMUJcIilcbl19KVxuXG5nY1JpZ2h0ID0ge1xuICBjb25zdCBiYW5kID0gZDMucmFuZ2UoMCwgMS4wMDAxLCAwLjAwNSkubWFwKHQgPT4gKHt0LCBsbzogTWF0aC5tYXgoMCwgdCAtIGRrdyksIGhpOiBNYXRoLm1pbigxLCB0ICsgZGt3KX0pKVxuICBjb25zdCBjbG91ZCA9IGdjU29ydGVkLnNsaWNlKDIpLmZsYXRNYXAoKHhzLCBpZCkgPT4gZWNkZlBvaW50cyh4cykubWFwKChbdCwgeV0pID0+ICh7dCwgeSwgaWR9KSkpXG4gIHJldHVybiBQbG90LnBsb3Qoey4uLmdjU3R5bGUsIG1hcmtzOiBbXG4gICAgUGxvdC5hcmVhWShiYW5kLCB7eDogXCJ0XCIsIHkxOiBcImxvXCIsIHkyOiBcImhpXCIsIGZpbGw6IFwiIzJEM0U1MFwiLCBmaWxsT3BhY2l0eTogMC4xMn0pLFxuICAgIFBsb3QubGluZShjbG91ZCwge3g6IFwidFwiLCB5OiBcInlcIiwgejogXCJpZFwiLCBjdXJ2ZTogXCJzdGVwLWFmdGVyXCIsIHN0cm9rZTogXCIjMDA3MkJDXCIsIHN0cm9rZU9wYWNpdHk6IDAuMjUsIHN0cm9rZVdpZHRoOiAxLjJ9KSxcbiAgICBQbG90LmxpbmUoW1swLCAwXSwgWzEsIDFdXSwge3N0cm9rZTogXCJibGFja1wiLCBzdHJva2VXaWR0aDogMS41LCBzdHJva2VEYXNoYXJyYXk6IFwiNiw1XCJ9KSxcbiAgICBnY0xhYmVsKGBES1cgOTUlIGJhbmQ6IMKxICR7ZGt3LnRvRml4ZWQoMyl9YCwgOCwgXCIjMkQzRTUwXCIpLFxuICAgIGdjTGFiZWwoYCR7Z2NJbnNpZGV9IG9mICR7Z2NDbG91ZH0gc2FtcGxlcyBpbnNpZGUgaXRgLCAzNiwgXCIjMDA3MkJDXCIpXG4gIF19KVxufVxuXG5odG1sYDxkaXYgc3R5bGU9XCJkaXNwbGF5OiBmbGV4OyBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjsgY29sdW1uLWdhcDogMzBweFwiPlxuICA8ZGl2PiR7Z2NUaXRsZShcIlR3byBzYW1wbGVzLCBvbmUgcGF0aCBlYWNoXCIpfSR7Z2NMZWZ0fTwvZGl2PlxuICA8ZGl2PiR7Z2NUaXRsZShgJHtnY0Nsb3VkfSBzYW1wbGVzYCl9JHtnY1JpZ2h0fTwvZGl2PlxuPC9kaXY+YFxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0zIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoidmlld29mIGRlbW8gPSBJbnB1dHMuZm9ybSh7XG4gIG46IElucHV0cy5yYWRpbyhbMTAwMCwgMjAwMCwgNTAwMCwgMTAwMDAsIDIwMDAwXSwge3ZhbHVlOiAxMDAwLCBsYWJlbDogXCJQb2xsIHNpemUgblwiLCBmb3JtYXQ6IGQgPT4gZC50b0xvY2FsZVN0cmluZyhcImVuLVVTXCIpfSksXG4gIEI6IElucHV0cy5yYW5nZShbNTAsIDEwMDAwXSwge3ZhbHVlOiAyMDAsIHN0ZXA6IDEsIHRyYW5zZm9ybTogTWF0aC5sb2csIGxhYmVsOiBcIkJvb3RzdHJhcCBkcmF3cyBCXCJ9KSxcbiAgcG9sbDogSW5wdXRzLmJ1dHRvbihcIkRyYXcgYSBuZXcgcG9sbFwiLCB7dmFsdWU6IDEsIHJlZHVjZTogdiA9PiB2ICsgMX0pXG59LCB7dGVtcGxhdGU6ICh7biwgQiwgcG9sbH0pID0+IHtcbiAgbi5zdHlsZS5zZXRQcm9wZXJ0eShcIi0taW5wdXQtd2lkdGhcIiwgXCI1NjBweFwiKVxuICBuLnN0eWxlLm1heFdpZHRoID0gXCJub25lXCJcbiAgQi5zdHlsZS5zZXRQcm9wZXJ0eShcIi0taW5wdXQtd2lkdGhcIiwgXCIzMDBweFwiKVxuICByZXR1cm4gaHRtbGA8ZGl2IHN0eWxlPVwiZGlzcGxheTogZmxleDsgZmxleC1kaXJlY3Rpb246IGNvbHVtbjsgYWxpZ24taXRlbXM6IGNlbnRlclwiPlxuICAgICR7bn08ZGl2IHN0eWxlPVwiZGlzcGxheTogZmxleDsgYWxpZ24taXRlbXM6IGNlbnRlcjsgY29sdW1uLWdhcDogMzBweFwiPiR7Qn0ke3BvbGx9PC9kaXY+XG4gIDwvZGl2PmBcbn19KVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC00IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoiLy8gTXVsdGlub21pYWwgZHJhdyBhcyBhIGNoYWluIG9mIGJpbm9taWFscyAoZXhhY3QpLiBXaXRoIGNhdGVnb3JpY2FsIGRhdGEsXG4vLyByZXNhbXBsaW5nIG4gcm93cyB3aXRoIHJlcGxhY2VtZW50IGlzIGEgTXVsdGlub21pYWwobiwgY2VsbCBmcmVxdWVuY2llcykgZHJhdy5cbmZ1bmN0aW9uIHJtdWx0aW5vbShuLCBwciwgYmlub20pIHtcbiAgY29uc3Qgb3V0ID0gbmV3IEFycmF5KHByLmxlbmd0aCkuZmlsbCgwKVxuICBsZXQgbGVmdCA9IG4sIG1hc3MgPSAxXG4gIGZvciAobGV0IGogPSAwOyBqIDwgcHIubGVuZ3RoIC0gMSAmJiBsZWZ0ID4gMDsgaisrKSB7XG4gICAgY29uc3QgcSA9IE1hdGgubWluKDEsIE1hdGgubWF4KDAsIHByW2pdIC8gbWFzcykpXG4gICAgb3V0W2pdID0gcSA+IDAgPyBiaW5vbShsZWZ0LCBxKSgpIDogMFxuICAgIGxlZnQgLT0gb3V0W2pdXG4gICAgbWFzcyAtPSBwcltqXVxuICB9XG4gIG91dFtwci5sZW5ndGggLSAxXSArPSBsZWZ0XG4gIHJldHVybiBvdXRcbn1cblxuLy8gbWF4X3tzLGt9IHx0X3tzLGt9fCBmb3IgNiBzdGF0ZXMgeCA0IHZvdGVzICh0aGUgZmlyc3QgMyB2b3RlcyBhcmUgY2FuZGlkYXRlcylcbmZ1bmN0aW9uIG1heFQoY291bnRzLCBwUmVmKSB7XG4gIGxldCBtID0gMFxuICBmb3IgKGxldCBzID0gMDsgcyA8IDY7IHMrKykge1xuICAgIGNvbnN0IE4gPSBjb3VudHNbNCAqIHNdICsgY291bnRzWzQgKiBzICsgMV0gKyBjb3VudHNbNCAqIHMgKyAyXSArIGNvdW50c1s0ICogcyArIDNdXG4gICAgZm9yIChsZXQgayA9IDA7IGsgPCAzOyBrKyspIHtcbiAgICAgIGNvbnN0IHAgPSBjb3VudHNbNCAqIHMgKyBrXSAvIE5cbiAgICAgIGNvbnN0IHQgPSBNYXRoLmFicyhwIC0gcFJlZlszICogcyArIGtdKSAvIE1hdGguc3FydChwICogKDEgLSBwKSAvIE4pXG4gICAgICBtID0gTWF0aC5tYXgobSwgTnVtYmVyLmlzTmFOKHQpID8gSW5maW5pdHkgOiB0KVxuICAgIH1cbiAgfVxuICByZXR1cm4gbVxufVxuXG5wb2xsQ291bnRzID0gcm11bHRpbm9tKGRlbW8ubiwgcG9sbF9wcm9icywgZDMucmFuZG9tQmlub21pYWwuc291cmNlKGQzLnJhbmRvbUxjZygxMDAwICsgZGVtby5wb2xsKSkpXG5wb2xsU2hhcmVzID0gZDMucmFuZ2UoMTgpLm1hcChpID0+IHtcbiAgY29uc3QgcyA9IE1hdGguZmxvb3IoaSAvIDMpLCBrID0gaSAlIDNcbiAgY29uc3QgYyA9IHBvbGxDb3VudHMuc2xpY2UoNCAqIHMsIDQgKiBzICsgNClcbiAgcmV0dXJuIGNba10gLyBkMy5zdW0oYylcbn0pXG5cbmJvb3RSID0ge1xuICBjb25zdCBiaW5vbSA9IGQzLnJhbmRvbUJpbm9taWFsLnNvdXJjZShkMy5yYW5kb21MY2coNyArIDMxICogZGVtby5wb2xsKSlcbiAgY29uc3QgZnJlcSA9IHBvbGxDb3VudHMubWFwKGMgPT4gYyAvIGRlbW8ubilcbiAgcmV0dXJuIEZsb2F0NjRBcnJheS5mcm9tKHtsZW5ndGg6IGRlbW8uQn0sICgpID0+IG1heFQocm11bHRpbm9tKGRlbW8ubiwgZnJlcSwgYmlub20pLCBwb2xsU2hhcmVzKSlcbn1cblxuY1N0YXIgPSBkMy5xdWFudGlsZShib290UiwgMC45NSlcbnRydXRoTiA9IHBvbGxfdHJ1dGhbU3RyaW5nKGRlbW8ubildXG5idyA9IHBvbGxfZWRnZXNbMV0gLSBwb2xsX2VkZ2VzWzBdXG5oaXN0Qm9vdCA9IHBvbGxfZWRnZXMuc2xpY2UoMCwgLTEpLm1hcCgoeDAsIGkpID0+IHtcbiAgY29uc3QgeDEgPSBwb2xsX2VkZ2VzW2kgKyAxXVxuICBjb25zdCBpbkJpbiA9IGJvb3RSLmZpbHRlcihyID0+IChpID09PSAwID8gdHJ1ZSA6IHIgPj0geDApICYmIChpID09PSBwb2xsX2VkZ2VzLmxlbmd0aCAtIDIgPyB0cnVlIDogciA8IHgxKSkubGVuZ3RoXG4gIHJldHVybiB7eDAsIHgxLCBkZW5zOiBpbkJpbiAvIChkZW1vLkIgKiBidyl9XG59KVxudHJ1dGhMaW5lID0gdHJ1dGhOLmRlbnMubWFwKChkLCBpKSA9PiAoe3g6IChwb2xsX2VkZ2VzW2ldICsgcG9sbF9lZGdlc1tpICsgMV0pIC8gMiwgZGVuczogZH0pKVxuXG5QbG90LnBsb3Qoe1xuICB3aWR0aDogMTE1MCwgaGVpZ2h0OiAzOTAsIG1hcmdpbkxlZnQ6IDUwLCBtYXJnaW5Cb3R0b206IDQ1LFxuICBzdHlsZToge2ZvbnRTaXplOiBcIjIwcHhcIiwgZm9udEZhbWlseTogXCJBcmlhbCwgQXJpbW8sIHNhbnMtc2VyaWZcIn0sXG4gIHg6IHtsYWJlbDogXCJtYXggfHR8XCIsIGRvbWFpbjogWzEsIDUuNV0sIGxhYmVsQW5jaG9yOiBcImNlbnRlclwiLCBsYWJlbEFycm93OiBcIm5vbmVcIn0sXG4gIHk6IHtsYWJlbDogbnVsbCwgZG9tYWluOiBbMCwgMS42XSwgdGlja3M6IDR9LFxuICBncmlkOiB0cnVlLFxuICBtYXJrczogW1xuICAgIFBsb3QucmVjdFkoaGlzdEJvb3QsIHt4MTogXCJ4MFwiLCB4MjogXCJ4MVwiLCB5OiBcImRlbnNcIiwgZmlsbDogXCIjMDA3MkJDXCIsIGZpbGxPcGFjaXR5OiAwLjM1LCBpbnNldDogMC41fSksXG4gICAgUGxvdC5saW5lKHRydXRoTGluZSwge3g6IFwieFwiLCB5OiBcImRlbnNcIiwgc3Ryb2tlOiBcIiMyRDNFNTBcIiwgc3Ryb2tlV2lkdGg6IDMsIGN1cnZlOiBcImJhc2lzXCJ9KSxcbiAgICBQbG90LnJ1bGVYKFsxLjk2XSwge3N0cm9rZTogXCIjRUI4MTFCXCIsIHN0cm9rZVdpZHRoOiAzLCBzdHJva2VEYXNoYXJyYXk6IFwiNyw1XCJ9KSxcbiAgICBQbG90LnJ1bGVYKFtwb2xsX2NfbGltaXRdLCB7c3Ryb2tlOiBcIiM4ODg4ODhcIiwgc3Ryb2tlV2lkdGg6IDIsIHN0cm9rZURhc2hhcnJheTogXCIzLDRcIn0pLFxuICAgIFBsb3QucnVsZVgoW3RydXRoTi5jXSwge3N0cm9rZTogXCIjMkQzRTUwXCIsIHN0cm9rZVdpZHRoOiAzfSksXG4gICAgUGxvdC5ydWxlWChbY1N0YXJdLCB7c3Ryb2tlOiBcIiMwMDcyQkNcIiwgc3Ryb2tlV2lkdGg6IDN9KSxcbiAgICBQbG90LnRleHQoW2Bib290c3RyYXAgxIkqID0gJHtjU3Rhci50b0ZpeGVkKDIpfWBdLCB7ZnJhbWVBbmNob3I6IFwidG9wLXJpZ2h0XCIsIGR4OiAtMTAsIGR5OiA4LCBmaWxsOiBcIiMwMDcyQkNcIiwgZm9udFdlaWdodDogXCJib2xkXCIsIGZvbnRTaXplOiAyMSwgc3Ryb2tlOiBcIndoaXRlXCIsIHN0cm9rZVdpZHRoOiA2fSksXG4gICAgUGxvdC50ZXh0KFtgdHJ1ZSBjID0gJHt0cnV0aE4uYy50b0ZpeGVkKDIpfWBdLCB7ZnJhbWVBbmNob3I6IFwidG9wLXJpZ2h0XCIsIGR4OiAtMTAsIGR5OiAzNiwgZmlsbDogXCIjMkQzRTUwXCIsIGZvbnRXZWlnaHQ6IFwiYm9sZFwiLCBmb250U2l6ZTogMjEsIHN0cm9rZTogXCJ3aGl0ZVwiLCBzdHJva2VXaWR0aDogNn0pLFxuICAgIFBsb3QudGV4dChbYGxpbWl0ID0gJHtwb2xsX2NfbGltaXQudG9GaXhlZCgyKX1gXSwge2ZyYW1lQW5jaG9yOiBcInRvcC1yaWdodFwiLCBkeDogLTEwLCBkeTogNjQsIGZpbGw6IFwiIzg4ODg4OFwiLCBmb250V2VpZ2h0OiBcImJvbGRcIiwgZm9udFNpemU6IDIxLCBzdHJva2U6IFwid2hpdGVcIiwgc3Ryb2tlV2lkdGg6IDZ9KSxcbiAgICBQbG90LnRleHQoW2BUVjogMS45NiBjb3ZlcnMgYWxsIDE4IG9ubHkgJHtNYXRoLnJvdW5kKDEwMCAqIHRydXRoTi5jb3YxOTYpfSUgb2YgdGhlIHRpbWVgXSwge2ZyYW1lQW5jaG9yOiBcInRvcC1yaWdodFwiLCBkeDogLTEwLCBkeTogOTIsIGZpbGw6IFwiI0VCODExQlwiLCBmb250V2VpZ2h0OiBcImJvbGRcIiwgZm9udFNpemU6IDIxLCBzdHJva2U6IFwid2hpdGVcIiwgc3Ryb2tlV2lkdGg6IDZ9KVxuICBdXG59KVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC01IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoidmlld29mIHVmID0gSW5wdXRzLmZvcm0oe1xuICBuOiBJbnB1dHMucmFuZ2UoWzEwLCAxMDAwMDBdLCB7dmFsdWU6IDEwMCwgc3RlcDogMSwgdHJhbnNmb3JtOiBNYXRoLmxvZywgbGFiZWw6IFwiU2FtcGxlIHNpemUgblwifSksXG4gIHNlZWQ6IElucHV0cy5idXR0b24oXCJEcmF3IGEgbmV3IHNhbXBsZVwiLCB7dmFsdWU6IDEsIHJlZHVjZTogdiA9PiB2ICsgMX0pXG59LCB7dGVtcGxhdGU6ICh7biwgc2VlZH0pID0+IHtcbiAgbi5zdHlsZS5zZXRQcm9wZXJ0eShcIi0taW5wdXQtd2lkdGhcIiwgXCI0MjBweFwiKVxuICBuLnN0eWxlLm1heFdpZHRoID0gXCJub25lXCJcbiAgcmV0dXJuIGh0bWxgPGRpdiBzdHlsZT1cImRpc3BsYXk6IGZsZXg7IGp1c3RpZnktY29udGVudDogY2VudGVyOyBhbGlnbi1pdGVtczogY2VudGVyOyBjb2x1bW4tZ2FwOiAzMHB4XCI+JHtufSR7c2VlZH08L2Rpdj5gXG59fSlcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtNiIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6Ii8vIHRoZXRhID0gMS4gT25lIHNhbXBsZSBvZiBzaXplIG4sIHRoZW4gQiA9IDEwLDAwMCBib290c3RyYXAgbWF4aW1hLiBUaGUgaW5kZXggb2YgdGhlIG1heCBvZiBuXG4vLyBkcmF3cyB3aXRoIHJlcGxhY2VtZW50IGZyb20gdGhlIHNvcnRlZCBkYXRhIHNhdGlzZmllcyBQKGoqIDw9IGopID0gKGovbilebiwgc28gaiogPSBjZWlsKG4gVV4oMS9uKSkuXG51ZkIgPSAxMDAwMFxudWZHcmlkID0gZDMucmFuZ2UoNDUxKS5tYXAoayA9PiAoayAtIDQwMCkgLyAxMDApICAgICAgICAgICAgLy8geCBmcm9tIC00IHRvIDAuNSwgd2l0aCAwIG9uIHRoZSBncmlkXG51ZlNhbXBsZSA9IHtcbiAgY29uc3QgdW5pZiA9IGQzLnJhbmRvbUxjZyg5NyAqIHVmLnNlZWQgKyB1Zi5uKVxuICByZXR1cm4gRmxvYXQ2NEFycmF5LmZyb20oe2xlbmd0aDogdWYubn0sIHVuaWYpLnNvcnQoKVxufVxudWZSb290cyA9IHtcbiAgY29uc3QgbiA9IHVmLm4sIHhtYXggPSB1ZlNhbXBsZVtuIC0gMV0sIHVuaWYgPSBkMy5yYW5kb21MY2coMTMgKiB1Zi5zZWVkICsgNyAqIHVmLm4pXG4gIHJldHVybiBGbG9hdDY0QXJyYXkuZnJvbSh7bGVuZ3RoOiB1ZkJ9LCAoKSA9PiB7XG4gICAgY29uc3QgaiA9IE1hdGgubWF4KDEsIE1hdGguY2VpbChuICogTWF0aC5wb3codW5pZigpLCAxIC8gbikpKVxuICAgIHJldHVybiBuICogKHVmU2FtcGxlW2ogLSAxXSAtIHhtYXgpXG4gIH0pLnNvcnQoKVxufVxudWZKdW1wID0gdWZSb290cy5maWx0ZXIociA9PiByID09PSAwKS5sZW5ndGggLyB1ZkJcbnVmQ3VydmVzID0gdWZHcmlkLmZsYXRNYXAoeCA9PiBbXG4gIHt4LCB5OiBkMy5iaXNlY3RSaWdodCh1ZlJvb3RzLCB4KSAvIHVmQiwgd2hpY2g6IFwiYm9vdFwifSxcbiAge3gsIHk6IHggPD0gMCA/IE1hdGgucG93KE1hdGgubWF4KDAsIDEgKyB4IC8gdWYubiksIHVmLm4pIDogMSwgd2hpY2g6IFwidHJ1ZVwifVxuXSlcblxuUGxvdC5wbG90KHtcbiAgd2lkdGg6IDExNTAsIGhlaWdodDogNDUwLCBtYXJnaW5MZWZ0OiA1MCwgbWFyZ2luQm90dG9tOiA0NSxcbiAgc3R5bGU6IHtmb250U2l6ZTogXCIyMHB4XCIsIGZvbnRGYW1pbHk6IFwiQXJpYWwsIEFyaW1vLCBzYW5zLXNlcmlmXCJ9LFxuICB4OiB7bGFiZWw6IFwieFwiLCBkb21haW46IFstNCwgMC41XSwgbGFiZWxBbmNob3I6IFwiY2VudGVyXCIsIGxhYmVsQXJyb3c6IFwibm9uZVwifSxcbiAgeToge2xhYmVsOiBudWxsLCBkb21haW46IFswLCAxLjA0XSwgdGlja3M6IDV9LFxuICBncmlkOiB0cnVlLFxuICBtYXJrczogW1xuICAgIFBsb3QubGluZSh1ZkN1cnZlcy5maWx0ZXIoZCA9PiBkLndoaWNoID09PSBcInRydWVcIiksIHt4OiBcInhcIiwgeTogXCJ5XCIsIHN0cm9rZTogXCJibGFja1wiLCBzdHJva2VXaWR0aDogMi41LCBzdHJva2VEYXNoYXJyYXk6IFwiOCw2XCJ9KSxcbiAgICBQbG90LmxpbmUodWZDdXJ2ZXMuZmlsdGVyKGQgPT4gZC53aGljaCA9PT0gXCJib290XCIpLCB7eDogXCJ4XCIsIHk6IFwieVwiLCBjdXJ2ZTogXCJzdGVwLWFmdGVyXCIsIHN0cm9rZTogXCIjMDA3MkJDXCIsIHN0cm9rZVdpZHRoOiAzfSksXG4gICAgUGxvdC5ydWxlWChbMF0sIHt5MTogMSAtIHVmSnVtcCwgeTI6IDEsIHN0cm9rZTogXCIjQzYyODI4XCIsIHN0cm9rZVdpZHRoOiA2fSksXG4gICAgUGxvdC50ZXh0KFtgVHJ1ZSBK4oKZKHgsIFApOiBubyBqdW1wIGFueXdoZXJlYF0sIHtmcmFtZUFuY2hvcjogXCJ0b3AtbGVmdFwiLCBkeDogMTIsIGR5OiAxMCwgZmlsbDogXCJibGFja1wiLCBmb250V2VpZ2h0OiBcImJvbGRcIiwgZm9udFNpemU6IDIxLCBzdHJva2U6IFwid2hpdGVcIiwgc3Ryb2tlV2lkdGg6IDZ9KSxcbiAgICBQbG90LnRleHQoW2BCb290c3RyYXAgTOKCmSh4KSwgQiA9IDEwLDAwMGBdLCB7ZnJhbWVBbmNob3I6IFwidG9wLWxlZnRcIiwgZHg6IDEyLCBkeTogMzgsIGZpbGw6IFwiIzAwNzJCQ1wiLCBmb250V2VpZ2h0OiBcImJvbGRcIiwgZm9udFNpemU6IDIxLCBzdHJva2U6IFwid2hpdGVcIiwgc3Ryb2tlV2lkdGg6IDZ9KSxcbiAgICBQbG90LnRleHQoW2BqdW1wIGF0IDA6ICR7dWZKdW1wLnRvRml4ZWQoMyl9YF0sIHtmcmFtZUFuY2hvcjogXCJ0b3AtbGVmdFwiLCBkeDogMTIsIGR5OiA2NiwgZmlsbDogXCIjQzYyODI4XCIsIGZvbnRXZWlnaHQ6IFwiYm9sZFwiLCBmb250U2l6ZTogMjEsIHN0cm9rZTogXCJ3aGl0ZVwiLCBzdHJva2VXaWR0aDogNn0pXG4gIF1cbn0pXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXRRdWlldCIsInNvdXJjZSI6InNoaW55SW5wdXQoJ2djJykifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXRRdWlldCIsInNvdXJjZSI6InNoaW55SW5wdXQoJ2RlbW8nKSJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldFF1aWV0Iiwic291cmNlIjoic2hpbnlJbnB1dCgndWYnKSJ9XX0=
     </script>
     <script type="module">
     if (window.location.protocol === "file:") { alert("The OJS runtime does not work with file:// URLs. Please use a web server to view this document."); }

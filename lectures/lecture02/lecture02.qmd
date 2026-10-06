@@ -376,7 +376,7 @@ $$
 The bootstrap does **not** avoid asymptotics. What it avoids is having to **know** $J$.
 :::
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?
@@ -740,7 +740,7 @@ Plot.plot({
 })
 ```
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?
@@ -906,7 +906,7 @@ $$
 
 - Reading [Hansen]{.fgv}? He writes these results as $\sqrt n\,(\bar Y^* - \bar Y) \xrightarrow{d^*} N(0, \Sigma)$, same idea
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?
@@ -914,11 +914,27 @@ Questions?
 
 # Bootstrapping Regressions {visibility="uncounted"}
 
+## Why Bootstrap a Regression?
+
+- Example: for EPGE students who go on to the PhD, regress PhD grade on master's grade
+- One row per student, so iid is easy to believe
+- But only about 5 students per year: ten cohorts give $n = 50$
+- The spread of PhD grades likely varies with the master's grade: heteroskedasticity
+- The usual fix, robust standard errors and $\pm 1.96$, is asymptotic. Is $n = 50$ enough?
+
+. . .
+
+- Spoiler: not really. The bootstrap does much better
+
 ## What Is an Observation?
 
 - Data: $Z_i = (Y_i, X_i)$ iid $P$, with $X_i \in \R^k$
-- Parameter: the linear projection $\beta(P) \equiv \E[X_iX_i']^{-1}\E[X_iY_i]$, no model needed
-- OLS is a plug-in estimator: $\hat\beta_n = \beta(\hat P_n)$
+- Parameter: the linear projection $\beta(P) \equiv \E_P[X_iX_i']^{-1}\E_P[X_iY_i]$, no model needed
+- Under $\hat P_n$, expectations are sample averages: $\E_{\hat P_n}[g(Z)] = \frac{1}{n}\sum_{i=1}^n g(Z_i)$
+- So OLS is a plug-in estimator:
+$$
+\beta(\hat P_n) = \Big(\frac{1}{n}\sum_{i=1}^n X_iX_i'\Big)^{-1}\frac{1}{n}\sum_{i=1}^n X_iY_i = (\mathbf X'\mathbf X)^{-1}\mathbf X'\mathbf Y = \hat\beta_n
+$$
 
 . . .
 
@@ -952,7 +968,7 @@ Same recipe as the poll: the pairs bootstrap-t for $\beta_j$
 - Residual bootstrap: keep each $X_i$, resample the $\hat U_i$. That imposes homoskedasticity
 
 ```{python}
-# Coverage of 95% intervals for the slope: Y = 1 + X + |X| e, X and e iid N(0,1), n = 30
+# Coverage of 95% intervals for the slope: Y = 1 + X + |X| e, X ~ t_10 and e ~ N(0,1) independent, n = 50
 def ols(X, Y):                        # batched OLS: X is (..., n, k), Y is (..., n)
     XtX_inv = np.linalg.inv(X.swapaxes(-1, -2) @ X)
     b = (XtX_inv @ (X.swapaxes(-1, -2) @ Y[..., None]))[..., 0]
@@ -963,10 +979,10 @@ def ols(X, Y):                        # batched OLS: X is (..., n, k), Y is (...
     return b, U, se_ols, np.sqrt(np.diagonal(V_rob, axis1=-2, axis2=-1))
 
 np.random.seed(2026)
-n_reg, M_reg, B_reg = 30, 2000, 499
+n_reg, M_reg, B_reg = 50, 2000, 499
 hits = np.zeros(4)
 for m in range(M_reg):
-    x = np.random.standard_normal(n_reg)
+    x = np.random.standard_t(10, n_reg)
     X = np.c_[np.ones(n_reg), x]
     Y = 1 + x + np.abs(x) * np.random.standard_normal(n_reg)
     b, U, se_ols, se_rob = ols(X, Y)
@@ -983,16 +999,16 @@ cov_reg = [f'{100 * h / M_reg:.0f}%' for h in hits]
 
 . . .
 
-$Y_i = 1 + X_i + |X_i|\,\varepsilon_i$, $X_i, \varepsilon_i \iid N(0,1)$, $n = 30$. Coverage of 95% CIs for the slope:
+Our $n = 50$ students, stylized: $Y_i = 1 + X_i + |X_i|\,\varepsilon_i$, with $X_i \sim t_{10}$, $\varepsilon_i \sim N(0,1)$
 
-| Interval | Coverage |
+| 95% CI for the slope | Coverage |
 |:--|:--:|
 | $\pm 1.96 \times$ usual OLS standard error | `{python} cov_reg[0]` |
 | $\pm 1.96 \times$ robust standard error | `{python} cov_reg[1]` |
 | Residual bootstrap-t, usual standard error | `{python} cov_reg[2]` |
 | Pairs bootstrap-t, robust standard error | `{python} cov_reg[3]` |
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?
@@ -1002,51 +1018,73 @@ Questions?
 
 ## The Maximum of a Uniform
 
-- $X_i \iid U(0, \theta)$, estimator $\hat\theta_n = X_{(n)} = \max_i X_i$, root $R_n = n\,(X_{(n)} - \theta) \le 0$
-- For $x \le 0$, the true distribution is
-$$
-J_n(x, P) = P\left\{X_{(n)} \le \theta + \tfrac{x}{n}\right\} = \left(1 + \frac{x}{n\theta}\right)^n \to e^{x/\theta}
-$$
-- So $R_n \xrightarrow{d} -\theta \cdot \text{Exp}(1)$: a **continuous** limit, with no mass at any point
+- $X_i \iid U(0, \theta)$, estimator $\hat\theta_n = X_{(n)} = \max_i X_i$, root $R_n = n\,(X_{(n)} - \theta)$
+- Its limit is $-\theta \cdot \text{Exp}(1)$: a **continuous** distribution, with no mass at any point
 
 . . .
 
-- Bootstrap root: $R^*_n = n\,(X^*_{(n)} - X_{(n)}) \le 0$, which is zero if $X_{(n)}$ is ever drawn
-- Each draw misses $X_{(n)}$ with probability $1 - 1/n$, so, given the data,
-$$
-P\left\{R^*_n = 0 \,\middle|\, X^n\right\} = 1 - \left(1 - \tfrac{1}{n}\right)^n \to 1 - e^{-1} \approx 0.632
-$$
-- The bootstrap puts 63% of its mass on a single point, where the truth puts none!
+- Bootstrap root: $R^*_n = n\,(X^*_{(n)} - X_{(n)})$, exactly zero whenever $X_{(n)}$ is resampled
+- That happens often, for every $n$: the bootstrap puts a lump of mass at zero, the truth none!
+
+. . .
+
+- [Exercise: you will work through this example, step by step, in the problem set]{.alert}
 
 ## In Pictures
 
-```{python}
-#| fig-align: center
-np.random.seed(11)
-B_fail = 10000
-fig, axes = plt.subplots(1, 2, figsize=(11, 4.4))
-xg = np.linspace(-4, 0.5, 600)
-for ax, n_f in zip(axes, [100, 10000]):
-    x = np.sort(np.random.uniform(0, 1, n_f))                    # theta = 1
-    # The index of the max of n draws with replacement: P(j* <= j) = (j/n)^n
-    j_star = np.maximum(np.ceil(n_f * np.random.uniform(size=B_fail) ** (1 / n_f)), 1).astype(int)
-    R_star = np.sort(n_f * (x[j_star - 1] - x[-1]))
-    L_n = np.searchsorted(R_star, xg, side='right') / B_fail
-    J_n = np.where(xg <= 0, np.clip(1 + xg / n_f, 0, None) ** n_f, 1.0)
-    ax.plot(xg, J_n, color='black', ls='--', lw=2, label='True $J_n(x, P)$')
-    ax.step(xg, L_n, where='post', color=blue, lw=2.5, label='Bootstrap $L_n(x)$')
-    jump = np.mean(R_star == 0)
-    ax.annotate(f'jump at 0: {jump:.2f}', xy=(0, 1 - jump / 2), xytext=(-3.6, 0.85),
-                fontsize=14, color=red, arrowprops=dict(arrowstyle='->', color=red, lw=1.5))
-    ax.set_title(f'$n$ = {n_f:,}, $B$ = {B_fail:,}', fontsize=15)
-    ax.set_xlabel('$x$', fontsize=13)
-    ax.set_ylim(-0.02, 1.05)
-    ax.grid(alpha=0.3)
-    ax.legend(loc='upper left', fontsize=12, bbox_to_anchor=(0, 0.75))
-plt.tight_layout()
+```{ojs}
+//| echo: false
+viewof uf = Inputs.form({
+  n: Inputs.range([10, 100000], {value: 100, step: 1, transform: Math.log, label: "Sample size n"}),
+  seed: Inputs.button("Draw a new sample", {value: 1, reduce: v => v + 1})
+}, {template: ({n, seed}) => {
+  n.style.setProperty("--input-width", "420px")
+  n.style.maxWidth = "none"
+  return html`<div style="display: flex; justify-content: center; align-items: center; column-gap: 30px">${n}${seed}</div>`
+}})
 ```
 
-- More data does **not** help: the jump at zero is still there with $n = 10{,}000$
+```{ojs}
+//| echo: false
+// theta = 1. One sample of size n, then B = 10,000 bootstrap maxima. The index of the max of n
+// draws with replacement from the sorted data satisfies P(j* <= j) = (j/n)^n, so j* = ceil(n U^(1/n)).
+ufB = 10000
+ufGrid = d3.range(451).map(k => (k - 400) / 100)            // x from -4 to 0.5, with 0 on the grid
+ufSample = {
+  const unif = d3.randomLcg(97 * uf.seed + uf.n)
+  return Float64Array.from({length: uf.n}, unif).sort()
+}
+ufRoots = {
+  const n = uf.n, xmax = ufSample[n - 1], unif = d3.randomLcg(13 * uf.seed + 7 * uf.n)
+  return Float64Array.from({length: ufB}, () => {
+    const j = Math.max(1, Math.ceil(n * Math.pow(unif(), 1 / n)))
+    return n * (ufSample[j - 1] - xmax)
+  }).sort()
+}
+ufJump = ufRoots.filter(r => r === 0).length / ufB
+ufCurves = ufGrid.flatMap(x => [
+  {x, y: d3.bisectRight(ufRoots, x) / ufB, which: "boot"},
+  {x, y: x <= 0 ? Math.pow(Math.max(0, 1 + x / uf.n), uf.n) : 1, which: "true"}
+])
+
+Plot.plot({
+  width: 1150, height: 450, marginLeft: 50, marginBottom: 45,
+  style: {fontSize: "20px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {label: "x", domain: [-4, 0.5], labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: [0, 1.04], ticks: 5},
+  grid: true,
+  marks: [
+    Plot.line(ufCurves.filter(d => d.which === "true"), {x: "x", y: "y", stroke: "black", strokeWidth: 2.5, strokeDasharray: "8,6"}),
+    Plot.line(ufCurves.filter(d => d.which === "boot"), {x: "x", y: "y", curve: "step-after", stroke: "#0072BC", strokeWidth: 3}),
+    Plot.ruleX([0], {y1: 1 - ufJump, y2: 1, stroke: "#C62828", strokeWidth: 6}),
+    Plot.text([`True Jₙ(x, P): no jump anywhere`], {frameAnchor: "top-left", dx: 12, dy: 10, fill: "black", fontWeight: "bold", fontSize: 21, stroke: "white", strokeWidth: 6}),
+    Plot.text([`Bootstrap Lₙ(x), B = 10,000`], {frameAnchor: "top-left", dx: 12, dy: 38, fill: "#0072BC", fontWeight: "bold", fontSize: 21, stroke: "white", strokeWidth: 6}),
+    Plot.text([`jump at 0: ${ufJump.toFixed(3)}`], {frameAnchor: "top-left", dx: 12, dy: 66, fill: "#C62828", fontWeight: "bold", fontSize: 21, stroke: "white", strokeWidth: 6})
+  ]
+})
+```
+
+- More data does **not** help: push $n$ to 100,000 and the jump at zero is still there
 
 ## What Went Wrong?
 
@@ -1061,45 +1099,32 @@ Other failures, all with iid data:
 - Infinite variance: for the mean, it works a.s. **iff** $\sigma^2 < \infty$ [(Giné and Zinn, 1989)]{.fgv}
 - Parameter on the boundary: $\hat\mu_n = \max(\bar X_n, 0)$ when $\mu = 0$ [(L&R Problem 18.10)]{.fgv}
 - Degenerate smooth functions: $\sqrt n\,(\bar X_n^2 - \mu^2)$ when $\mu = 0$ [(L&R Problem 18.17)]{.fgv}
-- Superefficient estimators (Hodges): not even the parametric bootstrap works [(Beran, 1984)]{.fgv}
 
-## Handle With Care
+## Wrap-Up
 
-:::: {.columns}
-::: {.column width="50%"}
-**If it fails**
+- Goal: a confidence set for $\theta(P)$. All we need is $J_n(\cdot, P)$, the law of the root
+- Pivots: $J_n$ is free of $P$. Asymptotics: swap $J_n$ for its limit $J$, if you know it
+- Bootstrap: plug $\hat P_n$ into $J_n$ itself, then simulate. No limit to derive
+- Why it works: $\hat P_n$ is close to $P$ (Glivenko–Cantelli), and $J_n$ is continuous in $P$
+- In action: joint coverage for the poll, and the pairs bootstrap-t for regressions
+- It can fail, as with the maximum of a uniform: make sure a theorem covers your root
 
-- $m$-out-of-$n$: resample only $m \ll n$
-- Subsampling [(L&R Section 18.7)]{.fgv}
-- Find a theorem for **your** root
-- Bootstrap a pivot when you can
-:::
-
-::: {.column width="50%" .polecol}
-**Other bootstraps**
-
-- Parametric: draw from $P_{\hat\psi}$
-- Residual: resample OLS residuals
-- Wild: robust to heteroskedasticity
-- Block: dependent data (soon!)
-- Cluster: resample whole clusters
-:::
-::::
+. . .
 
 ::: {.thm .takeaway}
 ::: {.thmhead}
 The bottom line
 :::
-The bootstrap is not magic. Like any asymptotic approximation, it needs a theorem.
+Plug $\hat P_n$ into $J_n$, bootstrap a pivot when you can, and never without a theorem.
 :::
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?
 :::
 
-## References
+## References {visibility="uncounted"}
 
 - Chapter 18 of _Testing Statistical Hypotheses_, by [Erich Lehmann and Joseph Romano]{.fgv} (Sections 18.1 to 18.3 and Example 18.7.2)
 - Chapter 10 of _Econometrics_, by [Bruce Hansen]{.fgv}
