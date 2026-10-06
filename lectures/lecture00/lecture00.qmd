@@ -121,7 +121,7 @@ After the first half of the course, you should be able to:
 - However, if you come, you have to be on time
 - 15-minute grace period -- after that, you will not be allowed to enter the classroom
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?

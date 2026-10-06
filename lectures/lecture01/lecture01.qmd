@@ -205,7 +205,7 @@ $$
 
 - [Exercise: which kernel gives back the binned estimator?]{.alert}
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?
@@ -417,7 +417,7 @@ where $B(x) = m'(x)\frac{f'(x)}{f(x)} + \frac{1}{2}m''(x)$.
 - Why is the convergence rate $\sqrt{nh}$ and not just $\sqrt{n}$?
 - True or false: is there always a finite-sample bias here?
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?
@@ -616,7 +616,7 @@ $$
 - What does this imply if $m(\cdot)$ is, in fact, linear?
 - The local-linear estimator is much better close to the boundary! Why?
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?
@@ -706,13 +706,13 @@ where $\hat{\sigma}^2(x)$ comes from the residuals of your fit, smoothed with th
 
 - Why is this cheating?
 
-## &nbsp; {.standout background-color="var(--slate)"}
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
 Questions?
 :::
 
-## References
+## References {visibility="uncounted"}
 
 - Chapter 19 of _Econometrics_, by Bruce Hansen
 - Chapter 17 of _Probability and Statistics for Economists_, by Bruce Hansen
