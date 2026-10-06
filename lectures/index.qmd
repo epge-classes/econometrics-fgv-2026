@@ -29,7 +29,7 @@ format:
 ::: {.lectures}
 - [00]{.num} [Class Setup]{.ttl} [[Slides](lecture00/lecture00.html){.pill} [PDF](lecture00/lecture00.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 - [01]{.num} [Non-Parametric Estimation]{.ttl} [[Slides](lecture01/lecture01.html){.pill} [PDF](lecture01/lecture01.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
-- [02]{.num} [Bootstrap 101]{.ttl} [coming soon]{.soon}
+- [02]{.num} [Bootstrap 101]{.ttl} [[Slides](lecture02/lecture02.html){.pill} [PDF](lecture02/lecture02.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 - [03]{.num} [Building Blocks for Time Series]{.ttl} [coming soon]{.soon}
 - [04]{.num} [Lag Operator, MA Models, and AR Models]{.ttl} [coming soon]{.soon}
 - [05]{.num} [ARMA Models and the Wold Decomposition]{.ttl} [coming soon]{.soon}
