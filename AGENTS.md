@@ -7,7 +7,7 @@ Entry point for coding agents working in this repo.
 Materials for **Econometrics I (Part I), FGV EPGE, 2026**, taught by Raul Riva: public repo `epge-classes/econometrics-fgv-2026`.
 
 - Lecture slides are **Quarto → revealjs** decks, published with GitHub Pages at <https://epge-classes.github.io/econometrics-fgv-2026/>.
-- Problem sets go through GitHub Classroom. The syllabus is `README.md`.
+- Problem sets go through **Classroom 50** (GitHub Classroom shut down in 2026): one group assignment, `ps`, gives each group one private repo for all of Part I, created from the template `epge-classes/assignment-delivery` (folders `Assignment-00`..`Assignment-10`; Problem Set N goes in `Assignment-0N`). The syllabus is `README.md`.
 - Last year's course is in the sibling folder `../econometrics-fgv-2025` (Quarto → Beamer and LaTeX). **Read it, never write to it:** no edits, no renders, no git commands that change it. Copy anything you need first.
 - To port a 2025 lecture, follow **[MIGRATION_GUIDELINES.md](MIGRATION_GUIDELINES.md)**.
 
@@ -29,7 +29,7 @@ lectures/                 Quarto project; its contents become the site root
   index.qmd               landing page (plain HTML): links + one row per lecture
   lectureNN/lectureNN.qmd one deck per folder, zero-padded 00..10
 problem_sets/             LaTeX problem sets, browsed on GitHub (not on Pages)
-  README.md               student-facing index: PDF, source, data, Classroom link, due date
+  README.md               student-facing index: how to submit, then per set: PDF, source, data, folder, due date
   _template/problem_set_template.tex   the fixed preamble and title block
   PSN/problem_set_N.tex   one folder per set, with its .pdf and data files
 extra-stuff/              gitignored, not part of the class
@@ -70,7 +70,7 @@ Written in LaTeX. Each `PSN/` folder commits the `.tex`, the compiled `.pdf` and
 - **Start from the template.** Copy `_template/problem_set_template.tex` to `PSN/problem_set_N.tex` and change only the title (`Problem Set I`, `II`, ... in Roman numerals) and the problems. Don't edit the preamble per set; if it must change, change the template and every set.
 - **Problems** use `\problem{points}` (it numbers itself) and items use `\begin{enumerate}[a)]`.
 - **Build** from `problem_sets/`: `latexmk -pdf -cd PS1/problem_set_1.tex && latexmk -c -cd PS1/problem_set_1.tex`.
-- **Release:** add the set's entry to `problem_sets/README.md` with the GitHub Classroom link and due date. Pushing `problem_sets/**` doesn't trigger Pages, and nothing else is needed.
+- **Release:** add the set's entry to `problem_sets/README.md` with its `Assignment-0N` folder and due date (the accept link is shared once, under "How to submit"). Pushing `problem_sets/**` doesn't trigger Pages, and nothing else is needed.
 - **Ask before committing solutions** (the repo is public). 2025 solutions live in `../econometrics-fgv-2025/solutions/`.
 - Link papers by DOI instead of committing their PDFs.
 
