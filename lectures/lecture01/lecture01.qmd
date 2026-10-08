@@ -706,6 +706,68 @@ where $\hat{\sigma}^2(x)$ comes from the residuals of your fit, smoothed with th
 
 - Why is this cheating?
 
+## Confidence Bands in Action
+
+```{ojs}
+//| echo: false
+viewof n_ci = Inputs.range([20, 5000], {value: 100, step: 1, transform: Math.log, label: "Sample size n"})
+viewof h_ci = Inputs.range([0.05, 1.5], {value: 0.3, step: 0.01, transform: Math.log, label: "Bandwidth h"})
+```
+
+```{ojs}
+//| echo: false
+// Running example, Gaussian kernel: NW fit and the pointwise 95% band from the slides
+band = {
+  const n = n_ci, h = h_ci, dx = 2 * Math.PI / (n - 1)
+  const RK = 1 / (2 * Math.sqrt(Math.PI))  // R(K) for the Gaussian kernel
+  const X = d3.range(n).map(i => i * dx)
+  const Y = X.map((x, i) => 0.5 * Math.cos(x) + eps_pool[i])
+
+  // Kernel-weighted average of v at x0 (skipping observation `skip`), and
+  // sum_i K((X_i - x0)/h) = n h f_n(x0). X is an even grid, so only visit |u| < 6.
+  const smooth = (v, x0, skip = -1) => {
+    const lo = Math.max(0, Math.ceil((x0 - 6 * h) / dx))
+    const hi = Math.min(n - 1, Math.floor((x0 + 6 * h) / dx))
+    let num = 0, den = 0
+    for (let i = lo; i <= hi; i++) {
+      if (i === skip) continue
+      const u = (X[i] - x0) / h, w = Math.exp(-0.5 * u * u)
+      num += w * v[i]; den += w
+    }
+    return {avg: num / den, sumK: den / Math.sqrt(2 * Math.PI)}
+  }
+
+  // Squared leave-one-out residuals, smoothed with the same kernel give sigma^2(x)
+  const e2 = X.map((x, i) => (Y[i] - smooth(Y, x, i).avg) ** 2)
+  const fit = d3.range(301).map(j => {
+    const x = 2 * Math.PI * j / 300
+    const {avg: mhat, sumK} = smooth(Y, x)
+    const se = Math.sqrt(smooth(e2, x).avg * RK / sumK)
+    return {x, m: 0.5 * Math.cos(x), mhat, lo: mhat - 1.96 * se, hi: mhat + 1.96 * se}
+  })
+  const ok = fit.filter(d => d.lo <= d.m && d.m <= d.hi).length
+  return {data: X.map((x, i) => ({x, y: Y[i]})), fit, cover: ok / fit.length}
+}
+
+Plot.plot({
+  width: 1200, height: 450, marginLeft: 60, marginBottom: 50,
+  style: {fontSize: "21px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {label: "X", labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: [-1, 1], ticks: 5},
+  grid: true,
+  marks: [
+    Plot.dot(band.data, {x: "x", y: "y", symbol: "times", stroke: "black", clip: true,
+             r: n_ci <= 200 ? 4 : n_ci <= 1000 ? 3 : 2, strokeOpacity: n_ci <= 200 ? 1 : n_ci <= 1000 ? 0.6 : 0.35}),
+    Plot.areaY(band.fit, {x: "x", y1: "lo", y2: "hi", fill: "#0072BC", fillOpacity: 0.25, clip: true}),
+    Plot.line(band.fit, {x: "x", y: "m", stroke: "#C62828", strokeWidth: 2, strokeDasharray: "7,5"}),
+    Plot.line(band.fit, {x: "x", y: "mhat", stroke: "#0072BC", strokeWidth: 3, clip: true}),
+    Plot.text([`NW fit + 95% band, h = ${h_ci.toFixed(2)}, n = ${n_ci}`], {frameAnchor: "bottom-right", dx: -10, dy: -66, fill: "#0072BC", fontWeight: "bold", fontSize: 22, stroke: "white", strokeWidth: 6}),
+    Plot.text(["true m(x)"], {frameAnchor: "bottom-right", dx: -10, dy: -38, fill: "#C62828", fontSize: 22, stroke: "white", strokeWidth: 6}),
+    Plot.text([`band covers m(x) at ${Math.round(100 * band.cover)}% of points`], {frameAnchor: "bottom-right", dx: -10, dy: -10, fill: "#EB811B", fontWeight: "bold", fontSize: 22, stroke: "white", strokeWidth: 6})
+  ]
+})
+```
+
 ## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
