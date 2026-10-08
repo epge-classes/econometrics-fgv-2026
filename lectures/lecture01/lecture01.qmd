@@ -205,6 +205,61 @@ $$
 
 - [Exercise: which kernel gives back the binned estimator?]{.alert}
 
+## Pick Your Own $h$ and $n$
+
+```{python}
+# Hand a pool of noise draws to the interactive (Observable JS) cells below.
+# Same seed as before: the first 100 draws are exactly the noise used above.
+np.random.seed(42)
+ojs_define(eps_pool=np.random.normal(0, sigma, 5000).tolist())
+```
+
+```{ojs}
+//| echo: false
+viewof h = Inputs.range([0.02, 3], {value: 0.3, step: 0.01, transform: Math.log, label: "Bandwidth h"})
+viewof n = Inputs.range([20, 5000], {value: 100, step: 1, transform: Math.log, label: "Sample size n"})
+viewof kernel = Inputs.radio(["Gaussian", "Epanechnikov"], {value: "Gaussian", label: "Kernel"})
+```
+
+```{ojs}
+//| echo: false
+// Same design as the simulation: X on an even grid over [0, 2pi], m(x) = cos(x)/2
+data = d3.range(n).map(i => {
+  const x = 2 * Math.PI * i / (n - 1)
+  const m = 0.5 * Math.cos(x)
+  return {x, m, y: m + eps_pool[i]}
+})
+
+// Unit-variance kernels, as in the table (normalizing constants cancel in NW)
+K = kernel === "Gaussian"
+  ? (u => Math.exp(-0.5 * u * u))
+  : (u => Math.abs(u) < Math.sqrt(5) ? 1 - u * u / 5 : 0)
+
+// Nadaraya-Watson on a grid; 0/0 (no data in the window) leaves a gap
+fit = d3.range(301).map(j => {
+  const x0 = 2 * Math.PI * j / 300
+  let num = 0, den = 0
+  for (const d of data) { const w = K((d.x - x0) / h); num += w * d.y; den += w }
+  return {x: x0, mhat: den > 0 ? num / den : NaN}
+})
+
+Plot.plot({
+  width: 1200, height: 430, marginLeft: 60, marginBottom: 50,
+  style: {fontSize: "21px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {label: "X", labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: [-1, 1], ticks: 5},
+  grid: true,
+  marks: [
+    Plot.dot(data, {x: "x", y: "y", symbol: "times", stroke: "black",
+             r: n <= 200 ? 4 : n <= 1000 ? 3 : 2, strokeOpacity: n <= 200 ? 1 : n <= 1000 ? 0.6 : 0.35}),
+    Plot.line(data, {x: "x", y: "m", stroke: "#C62828", strokeWidth: 2, strokeDasharray: "7,5"}),
+    Plot.line(fit, {x: "x", y: "mhat", stroke: "#0072BC", strokeWidth: 3}),
+    Plot.text([`NW fit, h = ${h.toFixed(2)}, n = ${n}`], {frameAnchor: "bottom-right", dx: -10, dy: -38, fill: "#0072BC", fontWeight: "bold", fontSize: 22, stroke: "white", strokeWidth: 6}),
+    Plot.text(["true m(x)"], {frameAnchor: "bottom-right", dx: -10, dy: -10, fill: "#C62828", fontSize: 22, stroke: "white", strokeWidth: 6})
+  ]
+})
+```
+
 ## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
 ::: {.standout-body}
@@ -492,61 +547,6 @@ plt.ylabel('Y')
 plt.title('Nadaraya-Watson Estimator with Different Bandwidths')
 plt.grid(alpha=0.3)
 plt.tight_layout()
-```
-
-## Pick Your Own $h$ and $n$
-
-```{python}
-# Hand a pool of noise draws to the interactive (Observable JS) cells below.
-# Same seed as before: the first 100 draws are exactly the noise used above.
-np.random.seed(42)
-ojs_define(eps_pool=np.random.normal(0, sigma, 5000).tolist())
-```
-
-```{ojs}
-//| echo: false
-viewof h = Inputs.range([0.02, 3], {value: 0.3, step: 0.01, transform: Math.log, label: "Bandwidth h"})
-viewof n = Inputs.range([20, 5000], {value: 100, step: 1, transform: Math.log, label: "Sample size n"})
-viewof kernel = Inputs.radio(["Gaussian", "Epanechnikov"], {value: "Gaussian", label: "Kernel"})
-```
-
-```{ojs}
-//| echo: false
-// Same design as the simulation: X on an even grid over [0, 2pi], m(x) = cos(x)/2
-data = d3.range(n).map(i => {
-  const x = 2 * Math.PI * i / (n - 1)
-  const m = 0.5 * Math.cos(x)
-  return {x, m, y: m + eps_pool[i]}
-})
-
-// Unit-variance kernels, as in the table (normalizing constants cancel in NW)
-K = kernel === "Gaussian"
-  ? (u => Math.exp(-0.5 * u * u))
-  : (u => Math.abs(u) < Math.sqrt(5) ? 1 - u * u / 5 : 0)
-
-// Nadaraya-Watson on a grid; 0/0 (no data in the window) leaves a gap
-fit = d3.range(301).map(j => {
-  const x0 = 2 * Math.PI * j / 300
-  let num = 0, den = 0
-  for (const d of data) { const w = K((d.x - x0) / h); num += w * d.y; den += w }
-  return {x: x0, mhat: den > 0 ? num / den : NaN}
-})
-
-Plot.plot({
-  width: 1200, height: 430, marginLeft: 60, marginBottom: 50,
-  style: {fontSize: "21px", fontFamily: "Arial, Arimo, sans-serif"},
-  x: {label: "X", labelAnchor: "center", labelArrow: "none"},
-  y: {label: null, domain: [-1, 1], ticks: 5},
-  grid: true,
-  marks: [
-    Plot.dot(data, {x: "x", y: "y", symbol: "times", stroke: "black",
-             r: n <= 200 ? 4 : n <= 1000 ? 3 : 2, strokeOpacity: n <= 200 ? 1 : n <= 1000 ? 0.6 : 0.35}),
-    Plot.line(data, {x: "x", y: "m", stroke: "#C62828", strokeWidth: 2, strokeDasharray: "7,5"}),
-    Plot.line(fit, {x: "x", y: "mhat", stroke: "#0072BC", strokeWidth: 3}),
-    Plot.text([`NW fit, h = ${h.toFixed(2)}, n = ${n}`], {frameAnchor: "bottom-right", dx: -10, dy: -38, fill: "#0072BC", fontWeight: "bold", fontSize: 22, stroke: "white", strokeWidth: 6}),
-    Plot.text(["true m(x)"], {frameAnchor: "bottom-right", dx: -10, dy: -10, fill: "#C62828", fontSize: 22, stroke: "white", strokeWidth: 6})
-  ]
-})
 ```
 
 ## What About the Boundary?
