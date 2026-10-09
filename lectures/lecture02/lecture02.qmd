@@ -790,21 +790,45 @@ $$
 - This needs $F$ continuous and strictly increasing at $F^{-1}(1-\alpha)$
 - Apply it path by path, with $F_n = J_n(\cdot, \hat P_n(\omega))$ and $F = J(\cdot, P)$ $\implies$ (ii)
 
-## Proof of (iii)
+## Proof of (iii): Two Ingredients {.tightmath}
 
-- Under $P$, $R_n(X^n, \theta(P)) \xrightarrow{d} J(\cdot, P)$: take $\{P, P, \dots\}$ in the assumption
-- By (ii), $\hat c_n \equiv J_n^{-1}(1-\alpha, \hat P_n) \to c \equiv J^{-1}(1-\alpha, P)$ almost surely
-- By Slutsky, $R_n(X^n, \theta(P)) - \hat c_n \xrightarrow{d} J(\cdot + c, P)$, which is continuous at zero, so
+- Shorthand: $R_n \equiv R_n(X^n, \theta(P))$, $\ \hat c_n \equiv J_n^{-1}(1-\alpha, \hat P_n)$, $\ c \equiv J^{-1}(1-\alpha, P)$
+- Goal: show $P\{R_n \le \hat c_n\} \to 1-\alpha$
+
+. . .
+
+- **The root converges.** Under $P$, the CDF of $R_n$ is $J_n(\cdot, P)$, by definition
+- $\{P, P, \dots\} \in \mathcal{C}_P$, so the assumption gives $J_n(\cdot, P) \Rightarrow J(\cdot, P)$, i.e.,
 $$
-P\left\{R_n(X^n, \theta(P)) \le \hat c_n\right\}
-= P\left\{R_n(X^n, \theta(P)) - \hat c_n \le 0\right\}
-\to J(c, P) = 1 - \alpha
+R_n \xrightarrow{d} R, \qquad R \sim J(\cdot, P)
 $$
 
 . . .
 
-- Bonus: (iii) still holds if (i) and (ii) hold only in probability [(L&R Problem 18.3)]{.fgv}
-- Almost sure: **strongly** consistent bootstrap. In probability: **weakly** consistent
+- **The critical value converges.** By (ii), $\hat c_n \to c$ almost surely, so also in probability
+- The limit $c$ is a constant, which is what Slutsky needs
+
+## Proof of (iii): Putting Them Together {.tightmath}
+
+- By Slutsky, combining $R_n \xrightarrow{d} R$ and $\hat c_n \xrightarrow{p} c$:
+$$
+R_n - \hat c_n \xrightarrow{d} R - c,
+\qquad
+P\{R - c \le x\} = P\{R \le x + c\} = J(x + c, P)
+$$
+- $J(\cdot, P)$ is continuous, so $x = 0$ is a continuity point of the limit CDF $J(\cdot + c, P)$:
+$$
+P\{R_n \le \hat c_n\} = P\{R_n - \hat c_n \le 0\} \to J(c, P)
+$$
+
+. . .
+
+- Last step: $J(c, P) = 1-\alpha$. Recall $c = \inf\{x : J(x, P) \ge 1-\alpha\}$
+- $J(c, P) \ge 1-\alpha$: $J(\cdot, P)$ is right-continuous
+- $J(c, P) \le 1-\alpha$: $J(x, P) < 1-\alpha$ for every $x < c$, and $J(\cdot, P)$ is continuous
+$$
+P\{R_n \le \hat c_n\} \to J(c, P) = 1-\alpha \qquad \blacksquare
+$$
 
 ## Reading the Theorem
 
@@ -829,26 +853,50 @@ Let $F$ have finite, nonzero variance $\sigma^2(F)$ and mean $\theta(F)$. Let $J
 
 (i) Let $\mathcal{C}_F$ be the set of sequences $\{F_n\}$ such that $F_n \Rightarrow F$, $\theta(F_n) \to \theta(F)$ and $\sigma^2(F_n) \to \sigma^2(F)$. For every $\{F_n\} \in \mathcal{C}_F$, $J_n(\cdot, F_n)$ converges weakly to $N(0, \sigma^2(F))$.
 
-(ii) If $X_1, \dots, X_n$ are iid $F$, then the bootstrap $J_n(\cdot, \hat F_n)$ is strongly consistent: (i)–(iii) of the previous theorem hold.
+(ii) If $X_1, \dots, X_n$ are iid $F$, then the bootstrap $J_n(\cdot, \hat F_n)$ is consistent: (i)–(iii) of the previous theorem hold.
 :::
 
 - Part (i) is a CLT for a **triangular array**: row $n$ is iid from $F_n$, which changes with $n$
 - That's exactly what resampling from $\hat F_n$ looks like: a new distribution for each $n$
 
-## Proof of (i): Setup
+## Proof of (i): A Triangular Array {.tightmath}
 
-- For each $n$, let $X_{n,1}, \dots, X_{n,n}$ be iid $F_n$, and let $Y_{n,i} \equiv X_{n,i} - \theta(F_n)$
-- Since $\sigma^2(F_n) \to \sigma^2(F) > 0$, Lindeberg–Feller gives $\sqrt n\, \bar Y_n \xrightarrow{d} N(0, \sigma^2(F))$ as long as
+- $F_n$ changes with $n$, so each $n$ needs its own sample. Row $n$ is $X_{n,1}, \dots, X_{n,n}$ iid $F_n$:
 $$
-\E\left[Y_{n,1}^2\, I\{Y_{n,1}^2 > \epsilon^2 n\}\right] \to 0 \qquad \text{for every } \epsilon > 0
+\begin{array}{llll}
+X_{1,1} & & & \sim F_1 \\
+X_{2,1} & X_{2,2} & & \sim F_2 \\
+X_{3,1} & X_{3,2} & X_{3,3} & \sim F_3 \\
+\vdots & & & \ \ \vdots
+\end{array}
 $$
-- The rows are iid, so the Lindeberg condition only involves $Y_{n,1}$
+- Center at the row's own mean: $Y_{n,i} \equiv X_{n,i} - \theta(F_n)$ has mean $0$ and variance $\sigma^2(F_n)$
+
+. . .
+
+- Under $F_n$, the root is a normalized row sum, and its CDF is $J_n(\cdot, F_n)$:
+$$
+\sqrt n\,\big(\bar X_n - \theta(F_n)\big) = \frac{1}{\sqrt n} \sum_{i=1}^n Y_{n,i}
+$$
+- Goal: show that this row sum converges in distribution to $N(0, \sigma^2(F))$
+
+## Proof of (i): Reduce to Lindeberg {.tightmath}
+
+- $Z_{n,i} \equiv Y_{n,i}/\sqrt n$ has mean zero and $\sum_i \Var(Z_{n,i}) = \sigma^2(F_n) \to \sigma^2(F)$
+- Lindeberg–Feller: $\sum_i Z_{n,i} \xrightarrow{d} N(0, \sigma^2(F))$ if, for every $\epsilon > 0$,
+$$
+\sum_{i=1}^n \E\left[Z_{n,i}^2\, I\{|Z_{n,i}| > \epsilon\}\right] \to 0
+$$
+- Rows are iid, so all $n$ terms equal the one for $Y_{n,1}$, a generic draw from row $n$:
+$$
+\sum_{i=1}^n \E\left[\frac{Y_{n,i}^2}{n}\, I\{|Y_{n,i}| > \epsilon \sqrt n\}\right] = \E\left[Y_{n,1}^2\, I\{Y_{n,1}^2 > \epsilon^2 n\}\right]
+$$
 
 . . .
 
 What we know about $Y_{n,1}$:
 
-- $Y_{n,1} \xrightarrow{d} Y \equiv X - \theta(F)$, with $X \sim F$: because $F_n \Rightarrow F$ and $\theta(F_n) \to \theta(F)$
+- $Y_{n,1} \xrightarrow{d} Y \equiv X - \theta(F)$, with $X \sim F$: because $F_n \Rightarrow F$ and $\theta(F_n) \to \theta(F)$ (Slutsky)
 - $\E[Y_{n,1}^2] = \sigma^2(F_n) \to \sigma^2(F) = \E[Y^2]$
 - By the continuous mapping theorem, $Y_{n,1}^2 \xrightarrow{d} Y^2$
 
@@ -873,7 +921,8 @@ $$
 
 - So $\limsup_n \E\left[Y_{n,1}^2 I\{Y_{n,1}^2 > \epsilon^2 n\}\right] \le \E\left[Y^2 I\{Y^2 > \beta\}\right]$ for every such $\beta$
 - Continuity points are dense, so we can let $\beta \to \infty$ along them
-- Since $\E[Y^2] < \infty$, dominated convergence gives $\E[Y^2 I\{Y^2 > \beta\}] \downarrow 0$ $\blacksquare$
+- Since $\E[Y^2] < \infty$, dominated convergence gives $\E[Y^2 I\{Y^2 > \beta\}] \downarrow 0$
+- So the $\limsup$ is zero: the Lindeberg condition holds, and (i) follows $\blacksquare$
 
 ## Proof of (ii)
 
