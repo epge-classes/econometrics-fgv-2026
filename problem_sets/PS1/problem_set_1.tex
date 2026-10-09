@@ -63,10 +63,10 @@ This exercise will show you how to ensure that $\hat{f}_n(x) \xrightarrow{p} f(x
 
 \begin{enumerate}[a)]
 	\item Show that $\hat{f}_n(x) \geq 0$ for all $x$, and that $\int_{-\infty}^{\infty} \hat{f}_n(x) dx = 1$ for all $n$.
-	\item Assume from now on that $f$ is continuous at $x$. Show that $\mathbb{E}[\hat{f}_n(x)] = f(x) + o(1)$.
+	\item Assume from now on that the density $f$ is bounded on $\mathbb{R}$, continuous at $x$, and $f(x) > 0$. Show that $\mathbb{E}[\hat{f}_n(x)] = f(x) + o(1)$.
 	\item Show that $\Var(\hat{f}_n(x)) = \frac{1}{nh}\cdot f(x)R(K) + o\left(\frac{1}{nh}\right)$, where \(R(K) = \int_{-\infty}^{\infty} K^2(u) du\).
 	\item Argue that these results imply that $\hat{f}_n(x)$ is consistent for $f(x)$.
-	\item Now, assume that $f$ is twice continuously differentiable at $x$. Show that 
+	\item Now, assume that $f$ is twice differentiable in a neighborhood of $x$, with $f''$ continuous at $x$, and that $K$ has unit variance, $\int_{-\infty}^{\infty} u^2 K(u)\, du = 1$. Show that
 	\begin{equation*}
 		\mathbb{E}[\hat{f}_n(x)] = f(x) + \frac{h^2}{2}f''(x) + o(h^2)
 	\end{equation*}
