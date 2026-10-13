@@ -6,8 +6,8 @@
 <script src="lecture03_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="lecture03_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="lecture03_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="lecture03_files/libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.10.18">
+<link href="lecture03_files/libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.19">
 
   <title>Lecture 3: Building Blocks for Time Series</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -285,25 +285,25 @@ $$
 <ul>
 <li>So far: mostly cross-sectional methods (everything about <span class="math inline">\(Y_i\)</span>)</li>
 <li>Next step: time series methods (everything about <span class="math inline">\(Y_t\)</span>)</li>
-<li>Next next step: panel data methods (everything about <span class="math inline">\(Y_{i,t}\)</span>), probably the most prevalent type nowadays</li>
+<li>Then: panel data methods (everything about <span class="math inline">\(Y_{i,t}\)</span>), the most common type today</li>
 </ul>
 <div class="fragment">
 <ul>
-<li>Next weeks: focus on understanding the challenges of time series data</li>
-<li>This lecture: how is a time series different from cross-sectional data? <span class="math inline">\(+\)</span> important definitions</li>
+<li>Next weeks: the challenges of time series data</li>
+<li>This lecture: how time series differ from cross-sections, plus key definitions</li>
 <li>Main reference: <a href="https://www.amazon.com/Time-Analysis-James-Douglas-Hamilton/dp/0691042896"><em>Time Series Analysis</em>, by James Hamilton</a></li>
-<li>Hansen’s book provides a nice introduction, but it is too short on the topic</li>
+<li>Hansen’s book is a nice but short introduction</li>
 </ul>
 </div>
 </section>
 <section id="what-is-a-time-series" class="slide level2">
 <h2>What Is a Time Series?</h2>
 <ul>
-<li>A <em>time series</em> is a sequence of observations on a variable (or several variables) over time, at equally spaced intervals</li>
+<li>A <em>time series</em>: observations on one or more variables at equally spaced times</li>
 <li>Example: annual population of a country</li>
 <li>Unlike cross-sectional data, time series data is <strong>ordered</strong></li>
-<li>In this course, time is discrete: we observe data at specific intervals (days, months, years…)</li>
-<li>Continuous-time series (e.g., high-frequency financial data) are a more advanced topic, with a vast literature as well</li>
+<li>Here, time is discrete: days, months, years…</li>
+<li>Continuous time (e.g., high-frequency finance) is a more advanced topic</li>
 </ul>
 </section>
 <section id="why-should-you-care" class="slide level2">
@@ -317,7 +317,7 @@ $$
 <li>Forecasting: what could the future look like?
 <ul>
 <li>What will inflation be next month? How many students will enroll next semester?</li>
-<li>How much inventory should a firm hold? What’s the likely path of deforestation in a given area?</li>
+<li>How much inventory should a firm hold? Where is deforestation heading?</li>
 </ul></li>
 <li>Nowcasting: high(er)-frequency monitoring of low-frequency variables
 <ul>
@@ -348,7 +348,7 @@ $$
 <ul>
 <li>If inflation is high this month, it will likely be high next month</li>
 <li>If a student is doing well on every exam, they will likely do well on the next one</li>
-<li>The major difference w.r.t. cross-sectional data: the future might depend on the past</li>
+<li>Key difference from cross-sections: the future may depend on the past</li>
 </ul>
 </div>
 </section></section>
@@ -359,7 +359,7 @@ $$
 </section>
 <section id="random-variables" class="slide level2">
 <h2>Random Variables</h2>
-<p>Formally, the right way to think about a time series is as a <strong>stochastic process</strong>. First, what is a <em>random variable</em>?</p>
+<p>Formally, a time series is a <strong>stochastic process</strong>. First, what is a <em>random variable</em>?</p>
 <div class="thm">
 <div class="thmhead">
 <p>Definition (Random Variable)</p>
@@ -401,19 +401,19 @@ $$
 <section id="the-challenge-ahead" class="slide level2">
 <h2>The Challenge Ahead</h2>
 <ul>
-<li>You only observe the red path, but the blue ones were equally likely to have happened</li>
-<li>The main challenge: you see <em>one</em> path and want to make inference about the <em>whole process</em></li>
+<li>You observe only the red path, but the blue ones were equally likely</li>
+<li>The challenge: you see <em>one</em> path but want to learn about the <em>whole process</em></li>
 </ul>
 <div class="fragment">
 <p>Example: inflation in Brazil in 1989</p>
 <ul>
 <li>We know it was super high</li>
 <li>But we have only one reading of inflation for 1989</li>
-<li>When can we say something about the “inflation process” in Brazil given <strong>only one</strong> observation?</li>
+<li>When can <strong>one</strong> observation tell us about Brazil’s “inflation process”?</li>
 </ul>
 </div>
 <div class="fragment">
-<p>We will need to impose a lot of structure! Without structure, we are lost!</p>
+<p>We need a lot of structure! Without it, we are lost!</p>
 </div>
 </section>
 <section id="section" class="slide level2 standout" data-background-color="var(--slate)" data-visibility="uncounted">
@@ -541,7 +541,7 @@ F_{t_1,\ldots,t_n}(y_1,\ldots,y_n)=F_{t_1+\tau,\ldots,t_n+\tau}(y_1,\ldots,y_n) 
 </ul>
 <div class="fragment">
 <ul>
-<li>Let’s say I want to estimate two (potentially different) quantities: <span class="math inline">\(\E[m_{20}]\)</span> and <span class="math inline">\(\E[m_{80}]\)</span></li>
+<li>Goal: estimate two (possibly different) quantities, <span class="math inline">\(\E[m_{20}]\)</span> and <span class="math inline">\(\E[m_{80}]\)</span></li>
 <li>How can I do that?</li>
 </ul>
 </div>
@@ -575,53 +575,20 @@ F_{t_1,\ldots,t_n}(y_1,\ldots,y_n)=F_{t_1+\tau,\ldots,t_n+\tau}(y_1,\ldots,y_n) 
 </ul>
 </div>
 </section>
-<section id="ergodicity-definition" class="slide level2">
-<h2>Ergodicity: Definition</h2>
+<section id="example-one-path-wrong-answer" class="slide level2">
+<h2>Example: One Path, Wrong Answer</h2>
 <ul>
-<li>Ergodicity is a property that some stochastic processes have</li>
-<li>Intuitive definition (don’t quote me on this):</li>
-</ul>
-<div class="thm">
-<div class="thmhead">
-<p>Definition (Ergodicity, Intuitive)</p>
-</div>
-<p>A stochastic process <span class="math inline">\(\{Y_t\}\)</span> is <em>ergodic</em> if its realized paths are “rich enough” with probability 1. By “rich enough”, we mean that, with probability 1, it will neither get stuck in a subset of the state space nor fall into cyclic trajectories.</p>
-</div>
-<div class="fragment">
-<p>Said another way: if you observe a process for a long enough <span class="math inline">\(T\)</span>, you will be able to learn everything about the process</p>
-</div>
-</section>
-<section id="ergodicity-vs-stationarity" class="slide level2">
-<h2>Ergodicity vs Stationarity</h2>
-<ul>
-<li>There are ways to test whether a process is stationary. We will get there</li>
-<li>There is no way to test for ergodicity! You have to assume it!</li>
-</ul>
-<div class="fragment">
-<p>Important:</p>
-<ul>
-<li>When a process is stationary, there are simple conditions that imply ergodicity</li>
-<li>Under ergodicity and strict stationarity, <span class="math inline">\(\widetilde{m}_{20}\)</span> is consistent!</li>
-<li>This result is called the <strong>Ergodic Theorem</strong> (Theorem 14.9 in Hansen’s book)</li>
-</ul>
-</div>
-<div class="fragment">
-<p>Also important:</p>
-<ul>
-<li>Stationarity does not imply ergodicity (next slide)</li>
-<li><span class="alert">Exercise (problem set): show that a stationary process is not ergodic</span></li>
-</ul>
-</div>
-</section>
-<section id="time-averages-vs.-ensemble-averages" class="slide level2">
-<h2>Time Averages vs.&nbsp;Ensemble Averages</h2>
-<p>Two stationary processes, 50 paths each:</p>
-<ul>
-<li><strong>Ergodic:</strong> <span class="math inline">\(Y_t = \varepsilon_t\)</span>, <span class="math inline">\(\varepsilon_t \iid N(0,1)\)</span></li>
-<li><strong>Not ergodic:</strong> <span class="math inline">\(Y_t = X_t^2\)</span>, <span class="math inline">\(X_t = S\,\varepsilon_t\)</span>, <span class="math inline">\(S^2 \in \{0.5, 1.5\}\)</span> drawn once per path (50/50)</li>
+<li>A coin is flipped <strong>once</strong>: <span class="math inline">\(Z = +2\)</span> (“up”) or <span class="math inline">\(Z = -2\)</span> (“down”), each with probability <span class="math inline">\(1/2\)</span></li>
+<li>Then <span class="math inline">\(Y_t = Z + \varepsilon_t\)</span>, <span class="math inline">\(\varepsilon_t \iid N(0,1)\)</span> independent of <span class="math inline">\(Z\)</span>: stationary, with <span class="math inline">\(\E[Y_t] = 0\)</span></li>
 </ul>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb3" data-startfrom="392" data-source-offset="0"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 391;"><span id="cb3-392"><a href="" aria-label="392"></a>viewof Tmax <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="dv">10</span><span class="op">,</span> <span class="dv">5000</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">1000</span><span class="op">,</span> <span class="dt">step</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">transform</span><span class="op">:</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">log</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Sample size T"</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb3" data-startfrom="354" data-source-offset="0"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 353;"><span id="cb3-354"><a href="" aria-label="354"></a>viewof coin <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">form</span>({</span>
+<span id="cb3-355"><a href="" aria-label="355"></a>  <span class="dt">play</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">button</span>(<span class="st">"Play"</span><span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span> <span class="dt">reduce</span><span class="op">:</span> v <span class="kw">=&gt;</span> v <span class="op">+</span> <span class="dv">1</span>})<span class="op">,</span></span>
+<span id="cb3-356"><a href="" aria-label="356"></a>  <span class="dt">flip</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">button</span>(<span class="st">"Flip a new coin"</span><span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span> <span class="dt">reduce</span><span class="op">:</span> v <span class="kw">=&gt;</span> v <span class="op">+</span> <span class="dv">1</span>})</span>
+<span id="cb3-357"><a href="" aria-label="357"></a>}<span class="op">,</span> {<span class="dt">template</span><span class="op">:</span> ({play<span class="op">,</span> flip}) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-358"><a href="" aria-label="358"></a>  <span class="cf">for</span> (<span class="kw">const</span> b <span class="kw">of</span> [play<span class="op">,</span> flip]) { b<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">width</span> <span class="op">=</span> <span class="st">"auto"</span><span class="op">;</span> b<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">margin</span> <span class="op">=</span> <span class="st">"0"</span><span class="op">;</span> b<span class="op">.</span><span class="fu">querySelector</span>(<span class="st">"label"</span>)<span class="op">?.</span><span class="fu">remove</span>() }</span>
+<span id="cb3-359"><a href="" aria-label="359"></a>  <span class="cf">return</span> <span class="fu">html</span><span class="vs">`&lt;div style="display: flex; justify-content: center; align-items: center; column-gap: 30px; width: 100%; max-width: none"&gt;</span><span class="sc">${</span>play<span class="sc">}${</span>flip<span class="sc">}</span><span class="vs">&lt;/div&gt;`</span></span>
+<span id="cb3-360"><a href="" aria-label="360"></a>}})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div id="ojs-cell-3" data-nodetype="declaration">
 
@@ -629,51 +596,50 @@ F_{t_1,\ldots,t_n}(y_1,\ldots,y_n)=F_{t_1+\tau,\ldots,t_n+\tau}(y_1,\ldots,y_n) 
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb4" data-startfrom="399" data-source-offset="-99"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 398;"><span id="cb4-399"><a href="" aria-label="399"></a>ergo <span class="op">=</span> {</span>
-<span id="cb4-400"><a href="" aria-label="400"></a>  <span class="kw">const</span> rng <span class="op">=</span> d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="dv">126</span>)</span>
-<span id="cb4-401"><a href="" aria-label="401"></a>  <span class="kw">const</span> draw <span class="op">=</span> d3<span class="op">.</span><span class="at">randomNormal</span><span class="op">.</span><span class="fu">source</span>(rng)(<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>)</span>
-<span id="cb4-402"><a href="" aria-label="402"></a>  <span class="kw">const</span> T <span class="op">=</span> <span class="dv">5000</span></span>
-<span id="cb4-403"><a href="" aria-label="403"></a>  <span class="kw">const</span> grid <span class="op">=</span> <span class="bu">Array</span><span class="op">.</span><span class="fu">from</span>(<span class="kw">new</span> <span class="bu">Set</span>(d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">301</span>)<span class="op">.</span><span class="fu">map</span>(j <span class="kw">=&gt;</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">exp</span>(j <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">log</span>(T) <span class="op">/</span> <span class="dv">300</span>)))))</span>
-<span id="cb4-404"><a href="" aria-label="404"></a>  <span class="cf">return</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">50</span>)<span class="op">.</span><span class="fu">map</span>(i <span class="kw">=&gt;</span> {</span>
-<span id="cb4-405"><a href="" aria-label="405"></a>    <span class="kw">const</span> S2 <span class="op">=</span> <span class="fu">rng</span>() <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">?</span> <span class="fl">0.5</span> <span class="op">:</span> <span class="fl">1.5</span></span>
-<span id="cb4-406"><a href="" aria-label="406"></a>    <span class="kw">let</span> sum1 <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> sum2 <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> k <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb4-407"><a href="" aria-label="407"></a>    <span class="kw">const</span> avgs <span class="op">=</span> []</span>
-<span id="cb4-408"><a href="" aria-label="408"></a>    <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> t <span class="op">&lt;=</span> T<span class="op">;</span> t<span class="op">++</span>) {</span>
-<span id="cb4-409"><a href="" aria-label="409"></a>      <span class="kw">const</span> e <span class="op">=</span> <span class="fu">draw</span>()</span>
-<span id="cb4-410"><a href="" aria-label="410"></a>      sum1 <span class="op">+=</span> e</span>
-<span id="cb4-411"><a href="" aria-label="411"></a>      sum2 <span class="op">+=</span> e <span class="op">*</span> e</span>
-<span id="cb4-412"><a href="" aria-label="412"></a>      <span class="cf">if</span> (t <span class="op">===</span> grid[k]) { avgs<span class="op">.</span><span class="fu">push</span>({t<span class="op">,</span> <span class="dt">m1</span><span class="op">:</span> sum1 <span class="op">/</span> t<span class="op">,</span> <span class="dt">m2</span><span class="op">:</span> sum2 <span class="op">/</span> t})<span class="op">;</span> k<span class="op">++</span> }</span>
-<span id="cb4-413"><a href="" aria-label="413"></a>    }</span>
-<span id="cb4-414"><a href="" aria-label="414"></a>    <span class="cf">return</span> {<span class="dt">path</span><span class="op">:</span> i<span class="op">,</span> S2<span class="op">,</span> avgs}</span>
-<span id="cb4-415"><a href="" aria-label="415"></a>  })</span>
-<span id="cb4-416"><a href="" aria-label="416"></a>}</span>
-<span id="cb4-417"><a href="" aria-label="417"></a></span>
-<span id="cb4-418"><a href="" aria-label="418"></a><span class="co">// Left: Y = e, so its time average is that of e. Right: Y = X^2 = S^2 e^2, so its time average is S^2 times that of e^2</span></span>
-<span id="cb4-419"><a href="" aria-label="419"></a>ergoRows <span class="op">=</span> ergo<span class="op">.</span><span class="fu">flatMap</span>(p <span class="kw">=&gt;</span> p<span class="op">.</span><span class="at">avgs</span></span>
-<span id="cb4-420"><a href="" aria-label="420"></a>  <span class="op">.</span><span class="fu">filter</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">t</span> <span class="op">&lt;=</span> Tmax)</span>
-<span id="cb4-421"><a href="" aria-label="421"></a>  <span class="op">.</span><span class="fu">map</span>(d <span class="kw">=&gt;</span> ({<span class="dt">path</span><span class="op">:</span> p<span class="op">.</span><span class="at">path</span><span class="op">,</span> <span class="dt">t</span><span class="op">:</span> d<span class="op">.</span><span class="at">t</span><span class="op">,</span> <span class="dt">m1</span><span class="op">:</span> d<span class="op">.</span><span class="at">m1</span><span class="op">,</span> <span class="dt">m2</span><span class="op">:</span> p<span class="op">.</span><span class="at">S2</span> <span class="op">*</span> d<span class="op">.</span><span class="at">m2</span>})))</span>
-<span id="cb4-422"><a href="" aria-label="422"></a></span>
-<span id="cb4-423"><a href="" aria-label="423"></a>avgPanel <span class="op">=</span> (key<span class="op">,</span> target<span class="op">,</span> domain<span class="op">,</span> title) <span class="kw">=&gt;</span> <span class="fu">html</span><span class="vs">`&lt;div&gt;</span></span>
-<span id="cb4-424"><a href="" aria-label="424"></a><span class="vs">  &lt;div style="text-align: center"&gt;</span><span class="sc">${</span>title<span class="sc">}</span><span class="vs">&lt;/div&gt;</span></span>
-<span id="cb4-425"><a href="" aria-label="425"></a><span class="vs">  </span><span class="sc">${</span>Plot<span class="op">.</span><span class="fu">plot</span>({</span>
-<span id="cb4-426"><a href="" aria-label="426"></a>    <span class="dt">width</span><span class="op">:</span> <span class="dv">590</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">350</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">50</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
-<span id="cb4-427"><a href="" aria-label="427"></a>    <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"18px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
-<span id="cb4-428"><a href="" aria-label="428"></a>    <span class="dt">x</span><span class="op">:</span> {<span class="dt">type</span><span class="op">:</span> <span class="st">"log"</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="dv">1</span><span class="op">,</span> Tmax]<span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"t (log scale)"</span><span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
-<span id="cb4-429"><a href="" aria-label="429"></a>    <span class="dt">y</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> domain<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> <span class="dv">5</span>}<span class="op">,</span></span>
-<span id="cb4-430"><a href="" aria-label="430"></a>    <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
-<span id="cb4-431"><a href="" aria-label="431"></a>    <span class="dt">marks</span><span class="op">:</span> [</span>
-<span id="cb4-432"><a href="" aria-label="432"></a>      Plot<span class="op">.</span><span class="fu">ruleY</span>([target]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"black"</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"7,5"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">1.5</span>})<span class="op">,</span></span>
-<span id="cb4-433"><a href="" aria-label="433"></a>      Plot<span class="op">.</span><span class="fu">line</span>(ergoRows<span class="op">.</span><span class="fu">filter</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">&gt;</span> <span class="dv">0</span>)<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"t"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> key<span class="op">,</span> <span class="dt">z</span><span class="op">:</span> <span class="st">"path"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeOpacity</span><span class="op">:</span> <span class="fl">0.3</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">1.3</span><span class="op">,</span> <span class="dt">clip</span><span class="op">:</span> <span class="kw">true</span>})<span class="op">,</span></span>
-<span id="cb4-434"><a href="" aria-label="434"></a>      Plot<span class="op">.</span><span class="fu">line</span>(ergoRows<span class="op">.</span><span class="fu">filter</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> <span class="dv">0</span>)<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"t"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> key<span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#C62828"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span><span class="op">,</span> <span class="dt">clip</span><span class="op">:</span> <span class="kw">true</span>})<span class="op">,</span></span>
-<span id="cb4-435"><a href="" aria-label="435"></a>      Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`the path you saw: </span><span class="sc">${</span>ergoRows<span class="op">.</span><span class="fu">filter</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> <span class="dv">0</span>)<span class="op">.</span><span class="fu">at</span>(<span class="op">-</span><span class="dv">1</span>)[key]<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#C62828"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">20</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})</span>
-<span id="cb4-436"><a href="" aria-label="436"></a>    ]</span>
-<span id="cb4-437"><a href="" aria-label="437"></a>  })<span class="sc">}</span></span>
-<span id="cb4-438"><a href="" aria-label="438"></a><span class="vs">&lt;/div&gt;`</span></span>
-<span id="cb4-439"><a href="" aria-label="439"></a></span>
-<span id="cb4-440"><a href="" aria-label="440"></a><span class="fu">html</span><span class="vs">`&lt;div style="display: flex; gap: 20px; justify-content: center; font-size: 19px"&gt;</span></span>
-<span id="cb4-441"><a href="" aria-label="441"></a><span class="sc">${</span><span class="fu">avgPanel</span>(<span class="st">"m1"</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> [<span class="op">-</span><span class="fl">1.5</span><span class="op">,</span> <span class="fl">1.5</span>]<span class="op">,</span> <span class="fu">html</span><span class="vs">`Time average of ergodic &lt;i&gt;Y&lt;sub&gt;t&lt;/sub&gt;&lt;/i&gt; (dashed: E[&lt;i&gt;Y&lt;sub&gt;t&lt;/sub&gt;&lt;/i&gt;] = 0)`</span>)<span class="sc">}</span></span>
-<span id="cb4-442"><a href="" aria-label="442"></a><span class="sc">${</span><span class="fu">avgPanel</span>(<span class="st">"m2"</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">3</span>]<span class="op">,</span> <span class="fu">html</span><span class="vs">`Time average of non-ergodic &lt;i&gt;Y&lt;sub&gt;t&lt;/sub&gt;&lt;/i&gt; (dashed: E[&lt;i&gt;Y&lt;sub&gt;t&lt;/sub&gt;&lt;/i&gt;] = 1)`</span>)<span class="sc">}</span></span>
-<span id="cb4-443"><a href="" aria-label="443"></a><span class="vs">&lt;/div&gt;`</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb4" data-startfrom="366" data-source-offset="-0"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 365;"><span id="cb4-366"><a href="" aria-label="366"></a>coinT <span class="op">=</span> <span class="dv">500</span></span>
+<span id="cb4-367"><a href="" aria-label="367"></a></span>
+<span id="cb4-368"><a href="" aria-label="368"></a><span class="co">// One coin flip per click of "Flip a new coin", then T shocks around Z.</span></span>
+<span id="cb4-369"><a href="" aria-label="369"></a><span class="co">// The click count is hashed into the seed: nearby LCG seeds give near-identical first draws</span></span>
+<span id="cb4-370"><a href="" aria-label="370"></a>coinSeed <span class="op">=</span> k <span class="kw">=&gt;</span> {</span>
+<span id="cb4-371"><a href="" aria-label="371"></a>  <span class="kw">let</span> x <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">imul</span>(k <span class="op">^</span> (k <span class="op">&gt;&gt;&gt;</span> <span class="dv">16</span>)<span class="op">,</span> <span class="bn">0x85ebca6b</span>)</span>
+<span id="cb4-372"><a href="" aria-label="372"></a>  x <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">imul</span>(x <span class="op">^</span> (x <span class="op">&gt;&gt;&gt;</span> <span class="dv">13</span>)<span class="op">,</span> <span class="bn">0xc2b2ae35</span>)</span>
+<span id="cb4-373"><a href="" aria-label="373"></a>  <span class="cf">return</span> ((x <span class="op">^</span> (x <span class="op">&gt;&gt;&gt;</span> <span class="dv">16</span>)) <span class="op">&gt;&gt;&gt;</span> <span class="dv">0</span>) <span class="op">/</span> <span class="dv">4294967296</span></span>
+<span id="cb4-374"><a href="" aria-label="374"></a>}</span>
+<span id="cb4-375"><a href="" aria-label="375"></a></span>
+<span id="cb4-376"><a href="" aria-label="376"></a>coinPath <span class="op">=</span> {</span>
+<span id="cb4-377"><a href="" aria-label="377"></a>  <span class="kw">const</span> rng <span class="op">=</span> d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="fu">coinSeed</span>(<span class="dv">2227</span> <span class="op">+</span> coin<span class="op">.</span><span class="at">flip</span>))</span>
+<span id="cb4-378"><a href="" aria-label="378"></a>  <span class="kw">const</span> draw <span class="op">=</span> d3<span class="op">.</span><span class="at">randomNormal</span><span class="op">.</span><span class="fu">source</span>(rng)(<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>)</span>
+<span id="cb4-379"><a href="" aria-label="379"></a>  <span class="kw">const</span> Z <span class="op">=</span> <span class="fu">rng</span>() <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">?</span> <span class="dv">2</span> <span class="op">:</span> <span class="op">-</span><span class="dv">2</span></span>
+<span id="cb4-380"><a href="" aria-label="380"></a>  <span class="kw">let</span> sum <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-381"><a href="" aria-label="381"></a>  <span class="kw">const</span> rows <span class="op">=</span> <span class="bu">Array</span><span class="op">.</span><span class="fu">from</span>({<span class="dt">length</span><span class="op">:</span> coinT}<span class="op">,</span> (_<span class="op">,</span> i) <span class="kw">=&gt;</span> {</span>
+<span id="cb4-382"><a href="" aria-label="382"></a>    <span class="kw">const</span> y <span class="op">=</span> Z <span class="op">+</span> <span class="fu">draw</span>()</span>
+<span id="cb4-383"><a href="" aria-label="383"></a>    sum <span class="op">+=</span> y</span>
+<span id="cb4-384"><a href="" aria-label="384"></a>    <span class="cf">return</span> {<span class="dt">t</span><span class="op">:</span> i <span class="op">+</span> <span class="dv">1</span><span class="op">,</span> y<span class="op">,</span> <span class="dt">avg</span><span class="op">:</span> sum <span class="op">/</span> (i <span class="op">+</span> <span class="dv">1</span>)}</span>
+<span id="cb4-385"><a href="" aria-label="385"></a>  })</span>
+<span id="cb4-386"><a href="" aria-label="386"></a>  <span class="cf">return</span> {Z<span class="op">,</span> rows}</span>
+<span id="cb4-387"><a href="" aria-label="387"></a>}</span>
+<span id="cb4-388"><a href="" aria-label="388"></a></span>
+<span id="cb4-389"><a href="" aria-label="389"></a><span class="co">// Before any click, show the whole path (also what the print view shows); a click animates it.</span></span>
+<span id="cb4-390"><a href="" aria-label="390"></a><span class="co">// Progress follows the clock (6 s in total), so slow frames skip ahead instead of dragging</span></span>
+<span id="cb4-391"><a href="" aria-label="391"></a>coinNow <span class="op">=</span> {</span>
+<span id="cb4-392"><a href="" aria-label="392"></a>  <span class="cf">if</span> (coin<span class="op">.</span><span class="at">play</span> <span class="op">+</span> coin<span class="op">.</span><span class="at">flip</span> <span class="op">===</span> <span class="dv">0</span>) { <span class="kw">yield</span> coinT<span class="op">;</span> <span class="cf">return</span> }</span>
+<span id="cb4-393"><a href="" aria-label="393"></a>  <span class="kw">const</span> start <span class="op">=</span> <span class="bu">performance</span><span class="op">.</span><span class="fu">now</span>()</span>
+<span id="cb4-394"><a href="" aria-label="394"></a>  <span class="cf">while</span> (<span class="kw">true</span>) {</span>
+<span id="cb4-395"><a href="" aria-label="395"></a>    <span class="kw">const</span> t <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(coinT<span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(<span class="dv">1</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>((<span class="bu">performance</span><span class="op">.</span><span class="fu">now</span>() <span class="op">-</span> start) <span class="op">/</span> <span class="dv">6000</span> <span class="op">*</span> coinT)))</span>
+<span id="cb4-396"><a href="" aria-label="396"></a>    <span class="kw">yield</span> t</span>
+<span id="cb4-397"><a href="" aria-label="397"></a>    <span class="cf">if</span> (t <span class="op">===</span> coinT) <span class="cf">return</span></span>
+<span id="cb4-398"><a href="" aria-label="398"></a>    <span class="cf">await</span> Promises<span class="op">.</span><span class="fu">delay</span>(<span class="dv">16</span>)</span>
+<span id="cb4-399"><a href="" aria-label="399"></a>  }</span>
+<span id="cb4-400"><a href="" aria-label="400"></a>}</span>
+<span id="cb4-401"><a href="" aria-label="401"></a></span>
+<span id="cb4-402"><a href="" aria-label="402"></a>coinShown <span class="op">=</span> coinPath<span class="op">.</span><span class="at">rows</span><span class="op">.</span><span class="fu">slice</span>(<span class="dv">0</span><span class="op">,</span> coinNow)</span>
+<span id="cb4-403"><a href="" aria-label="403"></a></span>
+<span id="cb4-404"><a href="" aria-label="404"></a><span class="fu">html</span><span class="vs">`&lt;div style="text-align: center; font-size: 24px; margin-top: 10px"&gt;</span></span>
+<span id="cb4-405"><a href="" aria-label="405"></a><span class="vs">  &lt;span style="color: #0072BC; font-weight: bold"&gt;the path you see&lt;/span&gt; &amp;nbsp;·&amp;nbsp;</span></span>
+<span id="cb4-406"><a href="" aria-label="406"></a><span class="vs">  &lt;span style="color: #C62828; font-weight: bold"&gt;its time average&lt;/span&gt; &amp;nbsp;·&amp;nbsp;</span></span>
+<span id="cb4-407"><a href="" aria-label="407"></a><span class="vs">  &lt;span style="color: #EB811B; font-weight: bold"&gt;Z = ±2&lt;/span&gt; &amp;nbsp;·&amp;nbsp;</span></span>
+<span id="cb4-408"><a href="" aria-label="408"></a><span class="vs">  dashed: E[&lt;i&gt;Y&lt;sub&gt;t&lt;/sub&gt;&lt;/i&gt;] = 0</span></span>
+<span id="cb4-409"><a href="" aria-label="409"></a><span class="vs">&lt;/div&gt;`</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <div id="ojs-cell-4-1" data-nodetype="declaration">
@@ -697,7 +663,172 @@ F_{t_1,\ldots,t_n}(y_1,\ldots,y_n)=F_{t_1+\tau,\ldots,t_n+\tau}(y_1,\ldots,y_n) 
 </div>
 <div class="cell-output cell-output-display">
 <div>
-<div id="ojs-cell-4-4" data-nodetype="expression">
+<div id="ojs-cell-4-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-4-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-4-6" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb5" data-startfrom="411" data-source-offset="-1572"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 410;"><span id="cb5-411"><a href="" aria-label="411"></a>Plot<span class="op">.</span><span class="fu">plot</span>({</span>
+<span id="cb5-412"><a href="" aria-label="412"></a>  <span class="dt">width</span><span class="op">:</span> <span class="dv">1200</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">420</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">50</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
+<span id="cb5-413"><a href="" aria-label="413"></a>  <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"19px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
+<span id="cb5-414"><a href="" aria-label="414"></a>  <span class="dt">x</span><span class="op">:</span> {<span class="dt">domain</span><span class="op">:</span> [<span class="dv">1</span><span class="op">,</span> coinT]<span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Periods"</span><span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
+<span id="cb5-415"><a href="" aria-label="415"></a>  <span class="dt">y</span><span class="op">:</span> {<span class="dt">domain</span><span class="op">:</span> [<span class="op">-</span><span class="fl">5.5</span><span class="op">,</span> <span class="fl">5.5</span>]<span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> [<span class="op">-</span><span class="dv">4</span><span class="op">,</span> <span class="op">-</span><span class="dv">2</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">4</span>]}<span class="op">,</span></span>
+<span id="cb5-416"><a href="" aria-label="416"></a>  <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb5-417"><a href="" aria-label="417"></a>  <span class="dt">marks</span><span class="op">:</span> [</span>
+<span id="cb5-418"><a href="" aria-label="418"></a>    Plot<span class="op">.</span><span class="fu">ruleY</span>([<span class="op">-</span><span class="dv">2</span><span class="op">,</span> <span class="dv">2</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"3,5"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">2</span>})<span class="op">,</span></span>
+<span id="cb5-419"><a href="" aria-label="419"></a>    Plot<span class="op">.</span><span class="fu">ruleY</span>([<span class="dv">0</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"black"</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"7,5"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">1.5</span>})<span class="op">,</span></span>
+<span id="cb5-420"><a href="" aria-label="420"></a>    Plot<span class="op">.</span><span class="fu">line</span>(coinShown<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"t"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"y"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeOpacity</span><span class="op">:</span> <span class="fl">0.45</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">1.2</span>})<span class="op">,</span></span>
+<span id="cb5-421"><a href="" aria-label="421"></a>    Plot<span class="op">.</span><span class="fu">line</span>(coinShown<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"t"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"avg"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#C62828"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span>})<span class="op">,</span></span>
+<span id="cb5-422"><a href="" aria-label="422"></a>    Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`coin: </span><span class="sc">${</span>coinPath<span class="op">.</span><span class="at">Z</span> <span class="op">&gt;</span> <span class="dv">0</span> <span class="op">?</span> <span class="st">"up"</span> <span class="op">:</span> <span class="st">"down"</span><span class="sc">}</span><span class="vs"> · time average after </span><span class="sc">${</span>coinShown<span class="op">.</span><span class="at">length</span><span class="sc">}</span><span class="vs"> periods: </span><span class="sc">${</span>coinShown<span class="op">.</span><span class="fu">at</span>(<span class="op">-</span><span class="dv">1</span>)<span class="op">.</span><span class="at">avg</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span></span>
+<span id="cb5-423"><a href="" aria-label="423"></a>      {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#C62828"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">20</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})</span>
+<span id="cb5-424"><a href="" aria-label="424"></a>  ]</span>
+<span id="cb5-425"><a href="" aria-label="425"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-4-7" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="ergodicity-definition" class="slide level2">
+<h2>Ergodicity: Definition</h2>
+<ul>
+<li>Ergodicity is a property that some stochastic processes have</li>
+<li>Intuitive definition (don’t quote me on this):</li>
+</ul>
+<div class="thm">
+<div class="thmhead">
+<p>Definition (Ergodicity, Intuitive)</p>
+</div>
+<p>A stochastic process <span class="math inline">\(\{Y_t\}\)</span> is <em>ergodic</em> if its realized paths are “rich enough” with probability 1. By “rich enough”, we mean that, with probability 1, it will neither get stuck in a subset of the state space nor fall into cyclic trajectories.</p>
+</div>
+<div class="fragment">
+<p>In other words: observe a process for long enough and you learn everything about it</p>
+</div>
+</section>
+<section id="ergodicity-vs-stationarity" class="slide level2">
+<h2>Ergodicity vs Stationarity</h2>
+<ul>
+<li>There are ways to test whether a process is stationary. We will get there</li>
+<li>There is no way to test for ergodicity! You have to assume it!</li>
+</ul>
+<div class="fragment">
+<p>Important:</p>
+<ul>
+<li>When a process is stationary, there are simple conditions that imply ergodicity</li>
+<li>Under ergodicity and strict stationarity, <span class="math inline">\(\widetilde{m}_{20}\)</span> is consistent!</li>
+<li>This result is called the <strong>Ergodic Theorem</strong> (Theorem 14.9 in Hansen’s book)</li>
+</ul>
+</div>
+<div class="fragment">
+<p>Also important:</p>
+<ul>
+<li>Stationarity does not imply ergodicity (next slide)</li>
+<li><span class="alert">Exercise (problem set): analyze a process that is stationary but not ergodic</span></li>
+</ul>
+</div>
+</section>
+<section id="time-averages-vs.-ensemble-averages" class="slide level2">
+<h2>Time Averages vs.&nbsp;Ensemble Averages</h2>
+<p>Two stationary processes, 50 paths each:</p>
+<ul>
+<li><strong>Ergodic:</strong> <span class="math inline">\(Y_t = \varepsilon_t\)</span>, <span class="math inline">\(\varepsilon_t \iid N(0,1)\)</span></li>
+<li><strong>Not ergodic:</strong> <span class="math inline">\(Y_t = X_t^2\)</span>, <span class="math inline">\(X_t = S\,\varepsilon_t\)</span>, <span class="math inline">\(S^2 \in \{0.5, 1.5\}\)</span> drawn once per path (50/50)</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb6" data-startfrom="472" data-source-offset="0"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 471;"><span id="cb6-472"><a href="" aria-label="472"></a>viewof Tmax <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="dv">10</span><span class="op">,</span> <span class="dv">5000</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">1000</span><span class="op">,</span> <span class="dt">step</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">transform</span><span class="op">:</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">log</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Sample size T"</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb7" data-startfrom="479" data-source-offset="-99"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 478;"><span id="cb7-479"><a href="" aria-label="479"></a>ergo <span class="op">=</span> {</span>
+<span id="cb7-480"><a href="" aria-label="480"></a>  <span class="kw">const</span> rng <span class="op">=</span> d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="dv">126</span>)</span>
+<span id="cb7-481"><a href="" aria-label="481"></a>  <span class="kw">const</span> draw <span class="op">=</span> d3<span class="op">.</span><span class="at">randomNormal</span><span class="op">.</span><span class="fu">source</span>(rng)(<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>)</span>
+<span id="cb7-482"><a href="" aria-label="482"></a>  <span class="kw">const</span> T <span class="op">=</span> <span class="dv">5000</span></span>
+<span id="cb7-483"><a href="" aria-label="483"></a>  <span class="kw">const</span> grid <span class="op">=</span> <span class="bu">Array</span><span class="op">.</span><span class="fu">from</span>(<span class="kw">new</span> <span class="bu">Set</span>(d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">301</span>)<span class="op">.</span><span class="fu">map</span>(j <span class="kw">=&gt;</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">exp</span>(j <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">log</span>(T) <span class="op">/</span> <span class="dv">300</span>)))))</span>
+<span id="cb7-484"><a href="" aria-label="484"></a>  <span class="cf">return</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">50</span>)<span class="op">.</span><span class="fu">map</span>(i <span class="kw">=&gt;</span> {</span>
+<span id="cb7-485"><a href="" aria-label="485"></a>    <span class="kw">const</span> S2 <span class="op">=</span> <span class="fu">rng</span>() <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">?</span> <span class="fl">0.5</span> <span class="op">:</span> <span class="fl">1.5</span></span>
+<span id="cb7-486"><a href="" aria-label="486"></a>    <span class="kw">let</span> sum1 <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> sum2 <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> k <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb7-487"><a href="" aria-label="487"></a>    <span class="kw">const</span> avgs <span class="op">=</span> []</span>
+<span id="cb7-488"><a href="" aria-label="488"></a>    <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> t <span class="op">&lt;=</span> T<span class="op">;</span> t<span class="op">++</span>) {</span>
+<span id="cb7-489"><a href="" aria-label="489"></a>      <span class="kw">const</span> e <span class="op">=</span> <span class="fu">draw</span>()</span>
+<span id="cb7-490"><a href="" aria-label="490"></a>      sum1 <span class="op">+=</span> e</span>
+<span id="cb7-491"><a href="" aria-label="491"></a>      sum2 <span class="op">+=</span> e <span class="op">*</span> e</span>
+<span id="cb7-492"><a href="" aria-label="492"></a>      <span class="cf">if</span> (t <span class="op">===</span> grid[k]) { avgs<span class="op">.</span><span class="fu">push</span>({t<span class="op">,</span> <span class="dt">m1</span><span class="op">:</span> sum1 <span class="op">/</span> t<span class="op">,</span> <span class="dt">m2</span><span class="op">:</span> sum2 <span class="op">/</span> t})<span class="op">;</span> k<span class="op">++</span> }</span>
+<span id="cb7-493"><a href="" aria-label="493"></a>    }</span>
+<span id="cb7-494"><a href="" aria-label="494"></a>    <span class="cf">return</span> {<span class="dt">path</span><span class="op">:</span> i<span class="op">,</span> S2<span class="op">,</span> avgs}</span>
+<span id="cb7-495"><a href="" aria-label="495"></a>  })</span>
+<span id="cb7-496"><a href="" aria-label="496"></a>}</span>
+<span id="cb7-497"><a href="" aria-label="497"></a></span>
+<span id="cb7-498"><a href="" aria-label="498"></a><span class="co">// Left: Y = e, so its time average is that of e. Right: Y = X^2 = S^2 e^2, so its time average is S^2 times that of e^2</span></span>
+<span id="cb7-499"><a href="" aria-label="499"></a>ergoRows <span class="op">=</span> ergo<span class="op">.</span><span class="fu">flatMap</span>(p <span class="kw">=&gt;</span> p<span class="op">.</span><span class="at">avgs</span></span>
+<span id="cb7-500"><a href="" aria-label="500"></a>  <span class="op">.</span><span class="fu">filter</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">t</span> <span class="op">&lt;=</span> Tmax)</span>
+<span id="cb7-501"><a href="" aria-label="501"></a>  <span class="op">.</span><span class="fu">map</span>(d <span class="kw">=&gt;</span> ({<span class="dt">path</span><span class="op">:</span> p<span class="op">.</span><span class="at">path</span><span class="op">,</span> <span class="dt">t</span><span class="op">:</span> d<span class="op">.</span><span class="at">t</span><span class="op">,</span> <span class="dt">m1</span><span class="op">:</span> d<span class="op">.</span><span class="at">m1</span><span class="op">,</span> <span class="dt">m2</span><span class="op">:</span> p<span class="op">.</span><span class="at">S2</span> <span class="op">*</span> d<span class="op">.</span><span class="at">m2</span>})))</span>
+<span id="cb7-502"><a href="" aria-label="502"></a></span>
+<span id="cb7-503"><a href="" aria-label="503"></a>avgPanel <span class="op">=</span> (key<span class="op">,</span> target<span class="op">,</span> domain<span class="op">,</span> title) <span class="kw">=&gt;</span> <span class="fu">html</span><span class="vs">`&lt;div&gt;</span></span>
+<span id="cb7-504"><a href="" aria-label="504"></a><span class="vs">  &lt;div style="text-align: center"&gt;</span><span class="sc">${</span>title<span class="sc">}</span><span class="vs">&lt;/div&gt;</span></span>
+<span id="cb7-505"><a href="" aria-label="505"></a><span class="vs">  </span><span class="sc">${</span>Plot<span class="op">.</span><span class="fu">plot</span>({</span>
+<span id="cb7-506"><a href="" aria-label="506"></a>    <span class="dt">width</span><span class="op">:</span> <span class="dv">590</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">350</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">50</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
+<span id="cb7-507"><a href="" aria-label="507"></a>    <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"18px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
+<span id="cb7-508"><a href="" aria-label="508"></a>    <span class="dt">x</span><span class="op">:</span> {<span class="dt">type</span><span class="op">:</span> <span class="st">"log"</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="dv">1</span><span class="op">,</span> Tmax]<span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"t (log scale)"</span><span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
+<span id="cb7-509"><a href="" aria-label="509"></a>    <span class="dt">y</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> domain<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> <span class="dv">5</span>}<span class="op">,</span></span>
+<span id="cb7-510"><a href="" aria-label="510"></a>    <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb7-511"><a href="" aria-label="511"></a>    <span class="dt">marks</span><span class="op">:</span> [</span>
+<span id="cb7-512"><a href="" aria-label="512"></a>      Plot<span class="op">.</span><span class="fu">ruleY</span>([target]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"black"</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"7,5"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">1.5</span>})<span class="op">,</span></span>
+<span id="cb7-513"><a href="" aria-label="513"></a>      Plot<span class="op">.</span><span class="fu">line</span>(ergoRows<span class="op">.</span><span class="fu">filter</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">&gt;</span> <span class="dv">0</span>)<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"t"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> key<span class="op">,</span> <span class="dt">z</span><span class="op">:</span> <span class="st">"path"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeOpacity</span><span class="op">:</span> <span class="fl">0.3</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">1.3</span><span class="op">,</span> <span class="dt">clip</span><span class="op">:</span> <span class="kw">true</span>})<span class="op">,</span></span>
+<span id="cb7-514"><a href="" aria-label="514"></a>      Plot<span class="op">.</span><span class="fu">line</span>(ergoRows<span class="op">.</span><span class="fu">filter</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> <span class="dv">0</span>)<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"t"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> key<span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#C62828"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span><span class="op">,</span> <span class="dt">clip</span><span class="op">:</span> <span class="kw">true</span>})<span class="op">,</span></span>
+<span id="cb7-515"><a href="" aria-label="515"></a>      Plot<span class="op">.</span><span class="fu">text</span>([<span class="vs">`the path you saw: </span><span class="sc">${</span>ergoRows<span class="op">.</span><span class="fu">filter</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> <span class="dv">0</span>)<span class="op">.</span><span class="fu">at</span>(<span class="op">-</span><span class="dv">1</span>)[key]<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#C62828"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">20</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})</span>
+<span id="cb7-516"><a href="" aria-label="516"></a>    ]</span>
+<span id="cb7-517"><a href="" aria-label="517"></a>  })<span class="sc">}</span></span>
+<span id="cb7-518"><a href="" aria-label="518"></a><span class="vs">&lt;/div&gt;`</span></span>
+<span id="cb7-519"><a href="" aria-label="519"></a></span>
+<span id="cb7-520"><a href="" aria-label="520"></a><span class="fu">html</span><span class="vs">`&lt;div style="display: flex; gap: 20px; justify-content: center; font-size: 19px"&gt;</span></span>
+<span id="cb7-521"><a href="" aria-label="521"></a><span class="sc">${</span><span class="fu">avgPanel</span>(<span class="st">"m1"</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> [<span class="op">-</span><span class="fl">1.5</span><span class="op">,</span> <span class="fl">1.5</span>]<span class="op">,</span> <span class="fu">html</span><span class="vs">`Time average of ergodic &lt;i&gt;Y&lt;sub&gt;t&lt;/sub&gt;&lt;/i&gt; (dashed: E[&lt;i&gt;Y&lt;sub&gt;t&lt;/sub&gt;&lt;/i&gt;] = 0)`</span>)<span class="sc">}</span></span>
+<span id="cb7-522"><a href="" aria-label="522"></a><span class="sc">${</span><span class="fu">avgPanel</span>(<span class="st">"m2"</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">3</span>]<span class="op">,</span> <span class="fu">html</span><span class="vs">`Time average of non-ergodic &lt;i&gt;Y&lt;sub&gt;t&lt;/sub&gt;&lt;/i&gt; (dashed: E[&lt;i&gt;Y&lt;sub&gt;t&lt;/sub&gt;&lt;/i&gt;] = 1)`</span>)<span class="sc">}</span></span>
+<span id="cb7-523"><a href="" aria-label="523"></a><span class="vs">&lt;/div&gt;`</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-6-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-6-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-6-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-6-4" data-nodetype="expression">
 
 </div>
 </div>
@@ -778,12 +909,12 @@ F_{t_1,\ldots,t_n}(y_1,\ldots,y_n)=F_{t_1+\tau,\ldots,t_n+\tau}(y_1,\ldots,y_n) 
 <section id="stationarity-ergodicity-lln" class="slide level2">
 <h2>Stationarity + Ergodicity = LLN</h2>
 <ul>
-<li>You will be interested in approximating means and second moments of a process</li>
+<li>Goal: estimate the means and second moments of a process</li>
 <li>Stationarity + ergodicity is the “right set of assumptions” to do that</li>
 </ul>
 <div class="thm">
 <div class="thmhead">
-<p>Theorem (Hannan, 1970, Theorem 2, p.&nbsp;203)</p>
+<p>Ergodic Theorem (Hayashi, 2000, pp.&nbsp;101–102)</p>
 </div>
 <p>If <span class="math inline">\(Y_t\)</span> is strictly stationary and ergodic with <span class="math inline">\(\E|Y_t| &lt; \infty\)</span>, then <span class="math display">\[
 \bar{Y}_T = \frac{1}{T} \sum_{t=1}^{T} Y_t \xrightarrow{a.s.} \E[Y_t] \quad \text{as} \quad T \rightarrow \infty
@@ -795,19 +926,19 @@ F_{t_1,\ldots,t_n}(y_1,\ldots,y_n)=F_{t_1+\tau,\ldots,t_n+\tau}(y_1,\ldots,y_n) 
 <section id="what-to-do-in-practice" class="slide level2">
 <h2>What to Do in Practice?</h2>
 <ul>
-<li>The last theorem assumes something we cannot test. If we only care about estimation, there is an easier way out:</li>
+<li>Ergodicity cannot be tested. For estimation alone, there is an easier way out:</li>
 </ul>
 <div class="thm">
 <div class="thmhead">
-<p>Theorem (Hannan, 1970, Theorem 6, p.&nbsp;210)</p>
+<p>Theorem (Brockwell and Davis, 1991, Theorem 7.1.1)</p>
 </div>
-<p>If <span class="math inline">\(Y_t\)</span> is weakly stationary and <span class="math inline">\(\sum_{h=1}^{\infty} |\gamma_h| &lt; \infty\)</span>, then <span class="math display">\[
+<p>If <span class="math inline">\(Y_t\)</span> is weakly stationary and <span class="math inline">\(\sum_{h=0}^{\infty} |\gamma_h| &lt; \infty\)</span>, then <span class="math display">\[
 \bar{Y}_T = \frac{1}{T} \sum_{t=1}^{T} Y_t \xrightarrow{L_2} \E[Y_t] \quad \text{as} \quad T \rightarrow \infty
-\]</span> If, in addition, <span class="math inline">\(\E[Y_t^4] &lt; \infty\)</span> and the fourth-order cumulants of <span class="math inline">\(Y_t\)</span> are absolutely summable, then <span class="math inline">\(\hat{\gamma}_h \xrightarrow{L_2} \gamma_h\)</span> as <span class="math inline">\(T \rightarrow \infty\)</span>.</p>
+\]</span></p>
 </div>
-<p><span class="todo">Check the fourth-moment condition for <span class="math inline">\(\hat{\gamma}_h\)</span> against Hannan (1970), p.&nbsp;210</span></p>
 <ul>
-<li>Recall: <span class="math inline">\(L_2\)</span> convergence implies convergence in probability, but it neither implies nor is implied by a.s. convergence</li>
+<li>For <span class="math inline">\(\hat{\gamma}_h \xrightarrow{p} \gamma_h\)</span> we also need fourth moments (Brockwell and Davis, 1991, Prop. 7.3.4)</li>
+<li>Recall: <span class="math inline">\(L_2\)</span> implies <span class="math inline">\(\xrightarrow{p}\)</span>, but neither <span class="math inline">\(L_2\)</span> nor a.s. convergence implies the other</li>
 </ul>
 </section>
 <section id="section-1" class="slide level2 standout" data-background-color="var(--slate)" data-visibility="uncounted">
@@ -825,7 +956,7 @@ F_{t_1,\ldots,t_n}(y_1,\ldots,y_n)=F_{t_1+\tau,\ldots,t_n+\tau}(y_1,\ldots,y_n) 
 <h2>White Noise</h2>
 <ul>
 <li>In the cross-section, it’s common to write <span class="math inline">\(y_i = \alpha + \beta x_i + u_i\)</span> with <span class="math inline">\(u_i\)</span> i.i.d.</li>
-<li>Now we need weaker notions of “error term”: <strong>white noise</strong> processes and <strong>martingale difference sequences</strong></li>
+<li>We need weaker “error terms”: <strong>white noise</strong> and <strong>martingale difference sequences</strong></li>
 </ul>
 <div class="fragment">
 <div class="thm">
@@ -842,18 +973,18 @@ F_{t_1,\ldots,t_n}(y_1,\ldots,y_n)=F_{t_1+\tau,\ldots,t_n+\tau}(y_1,\ldots,y_n) 
 </div>
 </div>
 <div class="fragment">
-<p>Any i.i.d. sequence of variables with mean zero and finite variance is a white noise process.</p>
+<p>Any i.i.d. sequence with mean zero and finite variance is white noise.</p>
 </div>
 </section>
 <section id="information-sets" class="slide level2">
 <h2>Information Sets</h2>
 <ul>
 <li>Conditioning on past information is common in economic models and in Econometrics</li>
-<li>The correct mathematical objects here are <span class="math inline">\(\sigma\)</span>-<strong>fields</strong> and <strong>filtrations</strong>. We will avoid the measure-theoretic formalism for now</li>
-<li>Intuitively: the <span class="math inline">\(\sigma\)</span>-field (or <span class="math inline">\(\sigma\)</span>-algebra) generated by <span class="math inline">\((Y_t, Y_{t-1}, Y_{t-2}, \dots)\)</span> is the collection of possible histories of this process up to <span class="math inline">\(t\)</span></li>
+<li>The right objects are <span class="math inline">\(\sigma\)</span>-<strong>fields</strong> and <strong>filtrations</strong>, but we skip the measure theory</li>
+<li>Intuitively: the <span class="math inline">\(\sigma\)</span>-field generated by <span class="math inline">\((Y_t, Y_{t-1}, \dots)\)</span> collects the possible histories up to <span class="math inline">\(t\)</span></li>
 <li>We write <span class="math inline">\(\mathcal{F}_t = \sigma(Y_t, Y_{t-1}, Y_{t-2}, \dots)\)</span>: all information available up to time <span class="math inline">\(t\)</span></li>
-<li>In other areas of Economics, we typically call <span class="math inline">\(\sigma\)</span>-fields <em>information sets</em></li>
-<li>Example: <span class="math inline">\(\E[Y_t | \mathcal{F}_{t-1}]\)</span> is our best guess for <span class="math inline">\(Y_t\)</span> given information from this process, and only that, up to <span class="math inline">\(t-1\)</span></li>
+<li>Elsewhere in Economics, <span class="math inline">\(\sigma\)</span>-fields are called <em>information sets</em></li>
+<li>Example: <span class="math inline">\(\E[Y_t | \mathcal{F}_{t-1}]\)</span> is the best guess for <span class="math inline">\(Y_t\)</span> using only this process up to <span class="math inline">\(t-1\)</span></li>
 </ul>
 </section>
 <section id="martingale-difference-sequences" class="slide level2">
@@ -906,7 +1037,8 @@ F_{t_1,\ldots,t_n}(y_1,\ldots,y_n)=F_{t_1+\tau,\ldots,t_n+\tau}(y_1,\ldots,y_n) 
 <section id="references" class="slide level2" data-visibility="uncounted">
 <h2>References</h2>
 <ul>
-<li>Hannan, E. J. (1970). <em>Multiple Time Series</em>. Wiley</li>
+<li>Section 2.2 of <em>Econometrics</em>, by Fumio Hayashi (2000)</li>
+<li>Chapter 7 of <em>Time Series: Theory and Methods</em>, by Peter Brockwell and Richard Davis (1991, 2nd ed.)</li>
 <li>Chapters 3 and 4 of <em>Time Series Analysis</em>, by James Hamilton. MDS are covered in Chapter 7</li>
 <li>Chapter 14 of <em>Econometrics</em>, by Bruce Hansen</li>
 </ul>
@@ -1133,7 +1265,7 @@ F_{t_1,\ldots,t_n}(y_1,\ldots,y_n)=F_{t_1+\tau,\ldots,t_n+\tau}(y_1,\ldots,y_n) 
       });
     </script>
     <script type="ojs-module-contents">
-    eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6InZpZXdvZiByaG8gPSBJbnB1dHMucmFuZ2UoWy0wLjk1LCAwLjk5XSwge3ZhbHVlOiAwLjUsIHN0ZXA6IDAuMDEsIGxhYmVsOiBcIlBlcnNpc3RlbmNlIM+BXCJ9KVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0yIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoiLy8gRml4ZWQgc2hvY2tzOiB0aGUgc2xpZGVyIGNoYW5nZXMgcmhvIG9ubHksIG5ldmVyIHRoZSBkcmF3c1xuc2hvY2tzID0ge1xuICBjb25zdCBkcmF3ID0gZDMucmFuZG9tTm9ybWFsLnNvdXJjZShkMy5yYW5kb21MY2coMjE0MSkpKDAsIDEpXG4gIHJldHVybiBGbG9hdDY0QXJyYXkuZnJvbSh7bGVuZ3RoOiAxMDAwfSwgZHJhdylcbn1cblxuLy8gWV8wIGNvbWVzIGZyb20gdGhlIHN0YXRpb25hcnkgbGF3IE4oMCwgMSksIHNvIHRoZSB2YXJpYW5jZSBpcyAxIGZvciBldmVyeSByaG9cbnBlcnNpc3RQYXRoID0ge1xuICBjb25zdCB5ID0gbmV3IEZsb2F0NjRBcnJheShzaG9ja3MubGVuZ3RoKVxuICBjb25zdCBzID0gTWF0aC5zcXJ0KDEgLSByaG8gKiByaG8pXG4gIHlbMF0gPSBzaG9ja3NbMF1cbiAgZm9yIChsZXQgdCA9IDE7IHQgPCB5Lmxlbmd0aDsgdCsrKSB5W3RdID0gcmhvICogeVt0IC0gMV0gKyBzICogc2hvY2tzW3RdXG4gIHJldHVybiBBcnJheS5mcm9tKHksICh2LCB0KSA9PiAoe3QsIHk6IHZ9KSlcbn1cblxuUGxvdC5wbG90KHtcbiAgd2lkdGg6IDEyMDAsIGhlaWdodDogNDUwLCBtYXJnaW5MZWZ0OiA1MCwgbWFyZ2luQm90dG9tOiA0NSxcbiAgc3R5bGU6IHtmb250U2l6ZTogXCIxOXB4XCIsIGZvbnRGYW1pbHk6IFwiQXJpYWwsIEFyaW1vLCBzYW5zLXNlcmlmXCJ9LFxuICB4OiB7bGFiZWw6IFwiUGVyaW9kc1wiLCBsYWJlbEFuY2hvcjogXCJjZW50ZXJcIiwgbGFiZWxBcnJvdzogXCJub25lXCJ9LFxuICB5OiB7bGFiZWw6IG51bGwsIGRvbWFpbjogWy00LCA0XSwgdGlja3M6IDV9LFxuICBncmlkOiB0cnVlLFxuICBtYXJrczogW1xuICAgIFBsb3QucnVsZVkoWzBdLCB7c3Ryb2tlOiBcImJsYWNrXCIsIHN0cm9rZURhc2hhcnJheTogXCI1LDRcIn0pLFxuICAgIFBsb3QubGluZShwZXJzaXN0UGF0aCwge3g6IFwidFwiLCB5OiBcInlcIiwgc3Ryb2tlOiBcIiMwMDcyQkNcIiwgc3Ryb2tlV2lkdGg6IDEuMywgY2xpcDogdHJ1ZX0pXG4gIF1cbn0pXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTMiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJ2aWV3b2YgVG1heCA9IElucHV0cy5yYW5nZShbMTAsIDUwMDBdLCB7dmFsdWU6IDEwMDAsIHN0ZXA6IDEsIHRyYW5zZm9ybTogTWF0aC5sb2csIGxhYmVsOiBcIlNhbXBsZSBzaXplIFRcIn0pXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTQiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiIvLyA1MCBwYXRocyBvZiBpLmkuZC4gTigwLCAxKSBzaG9ja3M7IHJ1bm5pbmcgYXZlcmFnZXMgb2YgZSBhbmQgZV4yIGtlcHQgb24gfjMwMCBsb2ctc3BhY2VkIGRhdGVzLlxuZXJnbyA9IHtcbiAgY29uc3Qgcm5nID0gZDMucmFuZG9tTGNnKDEyNilcbiAgY29uc3QgZHJhdyA9IGQzLnJhbmRvbU5vcm1hbC5zb3VyY2Uocm5nKSgwLCAxKVxuICBjb25zdCBUID0gNTAwMFxuICBjb25zdCBncmlkID0gQXJyYXkuZnJvbShuZXcgU2V0KGQzLnJhbmdlKDMwMSkubWFwKGogPT4gTWF0aC5yb3VuZChNYXRoLmV4cChqICogTWF0aC5sb2coVCkgLyAzMDApKSkpKVxuICByZXR1cm4gZDMucmFuZ2UoNTApLm1hcChpID0+IHtcbiAgICBjb25zdCBTMiA9IHJuZygpIDwgMC41ID8gMC41IDogMS41XG4gICAgbGV0IHN1bTEgPSAwLCBzdW0yID0gMCwgayA9IDBcbiAgICBjb25zdCBhdmdzID0gW11cbiAgICBmb3IgKGxldCB0ID0gMTsgdCA8PSBUOyB0KyspIHtcbiAgICAgIGNvbnN0IGUgPSBkcmF3KClcbiAgICAgIHN1bTEgKz0gZVxuICAgICAgc3VtMiArPSBlICogZVxuICAgICAgaWYgKHQgPT09IGdyaWRba10pIHsgYXZncy5wdXNoKHt0LCBtMTogc3VtMSAvIHQsIG0yOiBzdW0yIC8gdH0pOyBrKysgfVxuICAgIH1cbiAgICByZXR1cm4ge3BhdGg6IGksIFMyLCBhdmdzfVxuICB9KVxufVxuXG4vLyBMZWZ0OiBZID0gZSwgc28gaXRzIHRpbWUgYXZlcmFnZSBpcyB0aGF0IG9mIGUuIFJpZ2h0OiBZID0gWF4yID0gU14yIGVeMiwgc28gaXRzIHRpbWUgYXZlcmFnZSBpcyBTXjIgdGltZXMgdGhhdCBvZiBlXjJcbmVyZ29Sb3dzID0gZXJnby5mbGF0TWFwKHAgPT4gcC5hdmdzXG4gIC5maWx0ZXIoZCA9PiBkLnQgPD0gVG1heClcbiAgLm1hcChkID0+ICh7cGF0aDogcC5wYXRoLCB0OiBkLnQsIG0xOiBkLm0xLCBtMjogcC5TMiAqIGQubTJ9KSkpXG5cbmF2Z1BhbmVsID0gKGtleSwgdGFyZ2V0LCBkb21haW4sIHRpdGxlKSA9PiBodG1sYDxkaXY+XG4gIDxkaXYgc3R5bGU9XCJ0ZXh0LWFsaWduOiBjZW50ZXJcIj4ke3RpdGxlfTwvZGl2PlxuICAke1Bsb3QucGxvdCh7XG4gICAgd2lkdGg6IDU5MCwgaGVpZ2h0OiAzNTAsIG1hcmdpbkxlZnQ6IDUwLCBtYXJnaW5Cb3R0b206IDQ1LFxuICAgIHN0eWxlOiB7Zm9udFNpemU6IFwiMThweFwiLCBmb250RmFtaWx5OiBcIkFyaWFsLCBBcmltbywgc2Fucy1zZXJpZlwifSxcbiAgICB4OiB7dHlwZTogXCJsb2dcIiwgZG9tYWluOiBbMSwgVG1heF0sIGxhYmVsOiBcInQgKGxvZyBzY2FsZSlcIiwgbGFiZWxBbmNob3I6IFwiY2VudGVyXCIsIGxhYmVsQXJyb3c6IFwibm9uZVwifSxcbiAgICB5OiB7bGFiZWw6IG51bGwsIGRvbWFpbiwgdGlja3M6IDV9LFxuICAgIGdyaWQ6IHRydWUsXG4gICAgbWFya3M6IFtcbiAgICAgIFBsb3QucnVsZVkoW3RhcmdldF0sIHtzdHJva2U6IFwiYmxhY2tcIiwgc3Ryb2tlRGFzaGFycmF5OiBcIjcsNVwiLCBzdHJva2VXaWR0aDogMS41fSksXG4gICAgICBQbG90LmxpbmUoZXJnb1Jvd3MuZmlsdGVyKGQgPT4gZC5wYXRoID4gMCksIHt4OiBcInRcIiwgeToga2V5LCB6OiBcInBhdGhcIiwgc3Ryb2tlOiBcIiMwMDcyQkNcIiwgc3Ryb2tlT3BhY2l0eTogMC4zLCBzdHJva2VXaWR0aDogMS4zLCBjbGlwOiB0cnVlfSksXG4gICAgICBQbG90LmxpbmUoZXJnb1Jvd3MuZmlsdGVyKGQgPT4gZC5wYXRoID09PSAwKSwge3g6IFwidFwiLCB5OiBrZXksIHN0cm9rZTogXCIjQzYyODI4XCIsIHN0cm9rZVdpZHRoOiAzLCBjbGlwOiB0cnVlfSksXG4gICAgICBQbG90LnRleHQoW2B0aGUgcGF0aCB5b3Ugc2F3OiAke2VyZ29Sb3dzLmZpbHRlcihkID0+IGQucGF0aCA9PT0gMCkuYXQoLTEpW2tleV0udG9GaXhlZCgyKX1gXSwge2ZyYW1lQW5jaG9yOiBcInRvcC1yaWdodFwiLCBkeDogLTEwLCBkeTogMTAsIGZpbGw6IFwiI0M2MjgyOFwiLCBmb250V2VpZ2h0OiBcImJvbGRcIiwgZm9udFNpemU6IDIwLCBzdHJva2U6IFwid2hpdGVcIiwgc3Ryb2tlV2lkdGg6IDZ9KVxuICAgIF1cbiAgfSl9XG48L2Rpdj5gXG5cbmh0bWxgPGRpdiBzdHlsZT1cImRpc3BsYXk6IGZsZXg7IGdhcDogMjBweDsganVzdGlmeS1jb250ZW50OiBjZW50ZXI7IGZvbnQtc2l6ZTogMTlweFwiPlxuJHthdmdQYW5lbChcIm0xXCIsIDAsIFstMS41LCAxLjVdLCBodG1sYFRpbWUgYXZlcmFnZSBvZiBlcmdvZGljIDxpPlk8c3ViPnQ8L3N1Yj48L2k+IChkYXNoZWQ6IEVbPGk+WTxzdWI+dDwvc3ViPjwvaT5dID0gMClgKX1cbiR7YXZnUGFuZWwoXCJtMlwiLCAxLCBbMCwgM10sIGh0bWxgVGltZSBhdmVyYWdlIG9mIG5vbi1lcmdvZGljIDxpPlk8c3ViPnQ8L3N1Yj48L2k+IChkYXNoZWQ6IEVbPGk+WTxzdWI+dDwvc3ViPjwvaT5dID0gMSlgKX1cbjwvZGl2PmBcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldFF1aWV0Iiwic291cmNlIjoic2hpbnlJbnB1dCgncmhvJykifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXRRdWlldCIsInNvdXJjZSI6InNoaW55SW5wdXQoJ1RtYXgnKSJ9XX0=
+    eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6InZpZXdvZiByaG8gPSBJbnB1dHMucmFuZ2UoWy0wLjk1LCAwLjk5XSwge3ZhbHVlOiAwLjUsIHN0ZXA6IDAuMDEsIGxhYmVsOiBcIlBlcnNpc3RlbmNlIM+BXCJ9KVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0yIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoiLy8gRml4ZWQgc2hvY2tzOiB0aGUgc2xpZGVyIGNoYW5nZXMgcmhvIG9ubHksIG5ldmVyIHRoZSBkcmF3c1xuc2hvY2tzID0ge1xuICBjb25zdCBkcmF3ID0gZDMucmFuZG9tTm9ybWFsLnNvdXJjZShkMy5yYW5kb21MY2coMjE0MSkpKDAsIDEpXG4gIHJldHVybiBGbG9hdDY0QXJyYXkuZnJvbSh7bGVuZ3RoOiAxMDAwfSwgZHJhdylcbn1cblxuLy8gWV8wIGNvbWVzIGZyb20gdGhlIHN0YXRpb25hcnkgbGF3IE4oMCwgMSksIHNvIHRoZSB2YXJpYW5jZSBpcyAxIGZvciBldmVyeSByaG9cbnBlcnNpc3RQYXRoID0ge1xuICBjb25zdCB5ID0gbmV3IEZsb2F0NjRBcnJheShzaG9ja3MubGVuZ3RoKVxuICBjb25zdCBzID0gTWF0aC5zcXJ0KDEgLSByaG8gKiByaG8pXG4gIHlbMF0gPSBzaG9ja3NbMF1cbiAgZm9yIChsZXQgdCA9IDE7IHQgPCB5Lmxlbmd0aDsgdCsrKSB5W3RdID0gcmhvICogeVt0IC0gMV0gKyBzICogc2hvY2tzW3RdXG4gIHJldHVybiBBcnJheS5mcm9tKHksICh2LCB0KSA9PiAoe3QsIHk6IHZ9KSlcbn1cblxuUGxvdC5wbG90KHtcbiAgd2lkdGg6IDEyMDAsIGhlaWdodDogNDUwLCBtYXJnaW5MZWZ0OiA1MCwgbWFyZ2luQm90dG9tOiA0NSxcbiAgc3R5bGU6IHtmb250U2l6ZTogXCIxOXB4XCIsIGZvbnRGYW1pbHk6IFwiQXJpYWwsIEFyaW1vLCBzYW5zLXNlcmlmXCJ9LFxuICB4OiB7bGFiZWw6IFwiUGVyaW9kc1wiLCBsYWJlbEFuY2hvcjogXCJjZW50ZXJcIiwgbGFiZWxBcnJvdzogXCJub25lXCJ9LFxuICB5OiB7bGFiZWw6IG51bGwsIGRvbWFpbjogWy00LCA0XSwgdGlja3M6IDV9LFxuICBncmlkOiB0cnVlLFxuICBtYXJrczogW1xuICAgIFBsb3QucnVsZVkoWzBdLCB7c3Ryb2tlOiBcImJsYWNrXCIsIHN0cm9rZURhc2hhcnJheTogXCI1LDRcIn0pLFxuICAgIFBsb3QubGluZShwZXJzaXN0UGF0aCwge3g6IFwidFwiLCB5OiBcInlcIiwgc3Ryb2tlOiBcIiMwMDcyQkNcIiwgc3Ryb2tlV2lkdGg6IDEuMywgY2xpcDogdHJ1ZX0pXG4gIF1cbn0pXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTMiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJ2aWV3b2YgY29pbiA9IElucHV0cy5mb3JtKHtcbiAgcGxheTogSW5wdXRzLmJ1dHRvbihcIlBsYXlcIiwge3ZhbHVlOiAwLCByZWR1Y2U6IHYgPT4gdiArIDF9KSxcbiAgZmxpcDogSW5wdXRzLmJ1dHRvbihcIkZsaXAgYSBuZXcgY29pblwiLCB7dmFsdWU6IDAsIHJlZHVjZTogdiA9PiB2ICsgMX0pXG59LCB7dGVtcGxhdGU6ICh7cGxheSwgZmxpcH0pID0+IHtcbiAgZm9yIChjb25zdCBiIG9mIFtwbGF5LCBmbGlwXSkgeyBiLnN0eWxlLndpZHRoID0gXCJhdXRvXCI7IGIuc3R5bGUubWFyZ2luID0gXCIwXCI7IGIucXVlcnlTZWxlY3RvcihcImxhYmVsXCIpPy5yZW1vdmUoKSB9XG4gIHJldHVybiBodG1sYDxkaXYgc3R5bGU9XCJkaXNwbGF5OiBmbGV4OyBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjsgYWxpZ24taXRlbXM6IGNlbnRlcjsgY29sdW1uLWdhcDogMzBweDsgd2lkdGg6IDEwMCU7IG1heC13aWR0aDogbm9uZVwiPiR7cGxheX0ke2ZsaXB9PC9kaXY+YFxufX0pXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTQiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJjb2luVCA9IDUwMFxuXG4vLyBPbmUgY29pbiBmbGlwIHBlciBjbGljayBvZiBcIkZsaXAgYSBuZXcgY29pblwiLCB0aGVuIFQgc2hvY2tzIGFyb3VuZCBaLlxuLy8gVGhlIGNsaWNrIGNvdW50IGlzIGhhc2hlZCBpbnRvIHRoZSBzZWVkOiBuZWFyYnkgTENHIHNlZWRzIGdpdmUgbmVhci1pZGVudGljYWwgZmlyc3QgZHJhd3NcbmNvaW5TZWVkID0gayA9PiB7XG4gIGxldCB4ID0gTWF0aC5pbXVsKGsgXiAoayA+Pj4gMTYpLCAweDg1ZWJjYTZiKVxuICB4ID0gTWF0aC5pbXVsKHggXiAoeCA+Pj4gMTMpLCAweGMyYjJhZTM1KVxuICByZXR1cm4gKCh4IF4gKHggPj4+IDE2KSkgPj4+IDApIC8gNDI5NDk2NzI5NlxufVxuXG5jb2luUGF0aCA9IHtcbiAgY29uc3Qgcm5nID0gZDMucmFuZG9tTGNnKGNvaW5TZWVkKDIyMjcgKyBjb2luLmZsaXApKVxuICBjb25zdCBkcmF3ID0gZDMucmFuZG9tTm9ybWFsLnNvdXJjZShybmcpKDAsIDEpXG4gIGNvbnN0IFogPSBybmcoKSA8IDAuNSA/IDIgOiAtMlxuICBsZXQgc3VtID0gMFxuICBjb25zdCByb3dzID0gQXJyYXkuZnJvbSh7bGVuZ3RoOiBjb2luVH0sIChfLCBpKSA9PiB7XG4gICAgY29uc3QgeSA9IFogKyBkcmF3KClcbiAgICBzdW0gKz0geVxuICAgIHJldHVybiB7dDogaSArIDEsIHksIGF2Zzogc3VtIC8gKGkgKyAxKX1cbiAgfSlcbiAgcmV0dXJuIHtaLCByb3dzfVxufVxuXG4vLyBCZWZvcmUgYW55IGNsaWNrLCBzaG93IHRoZSB3aG9sZSBwYXRoIChhbHNvIHdoYXQgdGhlIHByaW50IHZpZXcgc2hvd3MpOyBhIGNsaWNrIGFuaW1hdGVzIGl0LlxuLy8gUHJvZ3Jlc3MgZm9sbG93cyB0aGUgY2xvY2sgKDYgcyBpbiB0b3RhbCksIHNvIHNsb3cgZnJhbWVzIHNraXAgYWhlYWQgaW5zdGVhZCBvZiBkcmFnZ2luZ1xuY29pbk5vdyA9IHtcbiAgaWYgKGNvaW4ucGxheSArIGNvaW4uZmxpcCA9PT0gMCkgeyB5aWVsZCBjb2luVDsgcmV0dXJuIH1cbiAgY29uc3Qgc3RhcnQgPSBwZXJmb3JtYW5jZS5ub3coKVxuICB3aGlsZSAodHJ1ZSkge1xuICAgIGNvbnN0IHQgPSBNYXRoLm1pbihjb2luVCwgTWF0aC5tYXgoMSwgTWF0aC5yb3VuZCgocGVyZm9ybWFuY2Uubm93KCkgLSBzdGFydCkgLyA2MDAwICogY29pblQpKSlcbiAgICB5aWVsZCB0XG4gICAgaWYgKHQgPT09IGNvaW5UKSByZXR1cm5cbiAgICBhd2FpdCBQcm9taXNlcy5kZWxheSgxNilcbiAgfVxufVxuXG5jb2luU2hvd24gPSBjb2luUGF0aC5yb3dzLnNsaWNlKDAsIGNvaW5Ob3cpXG5cbmh0bWxgPGRpdiBzdHlsZT1cInRleHQtYWxpZ246IGNlbnRlcjsgZm9udC1zaXplOiAyNHB4OyBtYXJnaW4tdG9wOiAxMHB4XCI+XG4gIDxzcGFuIHN0eWxlPVwiY29sb3I6ICMwMDcyQkM7IGZvbnQtd2VpZ2h0OiBib2xkXCI+dGhlIHBhdGggeW91IHNlZTwvc3Bhbj4gJm5ic3A7wrcmbmJzcDtcbiAgPHNwYW4gc3R5bGU9XCJjb2xvcjogI0M2MjgyODsgZm9udC13ZWlnaHQ6IGJvbGRcIj5pdHMgdGltZSBhdmVyYWdlPC9zcGFuPiAmbmJzcDvCtyZuYnNwO1xuICA8c3BhbiBzdHlsZT1cImNvbG9yOiAjRUI4MTFCOyBmb250LXdlaWdodDogYm9sZFwiPlogPSDCsTI8L3NwYW4+ICZuYnNwO8K3Jm5ic3A7XG4gIGRhc2hlZDogRVs8aT5ZPHN1Yj50PC9zdWI+PC9pPl0gPSAwXG48L2Rpdj5gXG5cblBsb3QucGxvdCh7XG4gIHdpZHRoOiAxMjAwLCBoZWlnaHQ6IDQyMCwgbWFyZ2luTGVmdDogNTAsIG1hcmdpbkJvdHRvbTogNDUsXG4gIHN0eWxlOiB7Zm9udFNpemU6IFwiMTlweFwiLCBmb250RmFtaWx5OiBcIkFyaWFsLCBBcmltbywgc2Fucy1zZXJpZlwifSxcbiAgeDoge2RvbWFpbjogWzEsIGNvaW5UXSwgbGFiZWw6IFwiUGVyaW9kc1wiLCBsYWJlbEFuY2hvcjogXCJjZW50ZXJcIiwgbGFiZWxBcnJvdzogXCJub25lXCJ9LFxuICB5OiB7ZG9tYWluOiBbLTUuNSwgNS41XSwgbGFiZWw6IG51bGwsIHRpY2tzOiBbLTQsIC0yLCAwLCAyLCA0XX0sXG4gIGdyaWQ6IHRydWUsXG4gIG1hcmtzOiBbXG4gICAgUGxvdC5ydWxlWShbLTIsIDJdLCB7c3Ryb2tlOiBcIiNFQjgxMUJcIiwgc3Ryb2tlRGFzaGFycmF5OiBcIjMsNVwiLCBzdHJva2VXaWR0aDogMn0pLFxuICAgIFBsb3QucnVsZVkoWzBdLCB7c3Ryb2tlOiBcImJsYWNrXCIsIHN0cm9rZURhc2hhcnJheTogXCI3LDVcIiwgc3Ryb2tlV2lkdGg6IDEuNX0pLFxuICAgIFBsb3QubGluZShjb2luU2hvd24sIHt4OiBcInRcIiwgeTogXCJ5XCIsIHN0cm9rZTogXCIjMDA3MkJDXCIsIHN0cm9rZU9wYWNpdHk6IDAuNDUsIHN0cm9rZVdpZHRoOiAxLjJ9KSxcbiAgICBQbG90LmxpbmUoY29pblNob3duLCB7eDogXCJ0XCIsIHk6IFwiYXZnXCIsIHN0cm9rZTogXCIjQzYyODI4XCIsIHN0cm9rZVdpZHRoOiAzfSksXG4gICAgUGxvdC50ZXh0KFtgY29pbjogJHtjb2luUGF0aC5aID4gMCA/IFwidXBcIiA6IFwiZG93blwifSDCtyB0aW1lIGF2ZXJhZ2UgYWZ0ZXIgJHtjb2luU2hvd24ubGVuZ3RofSBwZXJpb2RzOiAke2NvaW5TaG93bi5hdCgtMSkuYXZnLnRvRml4ZWQoMil9YF0sXG4gICAgICB7ZnJhbWVBbmNob3I6IFwidG9wLXJpZ2h0XCIsIGR4OiAtMTAsIGR5OiAxMCwgZmlsbDogXCIjQzYyODI4XCIsIGZvbnRXZWlnaHQ6IFwiYm9sZFwiLCBmb250U2l6ZTogMjAsIHN0cm9rZTogXCJ3aGl0ZVwiLCBzdHJva2VXaWR0aDogNn0pXG4gIF1cbn0pXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTUiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJ2aWV3b2YgVG1heCA9IElucHV0cy5yYW5nZShbMTAsIDUwMDBdLCB7dmFsdWU6IDEwMDAsIHN0ZXA6IDEsIHRyYW5zZm9ybTogTWF0aC5sb2csIGxhYmVsOiBcIlNhbXBsZSBzaXplIFRcIn0pXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTYiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiIvLyA1MCBwYXRocyBvZiBpLmkuZC4gTigwLCAxKSBzaG9ja3M7IHJ1bm5pbmcgYXZlcmFnZXMgb2YgZSBhbmQgZV4yIGtlcHQgb24gfjMwMCBsb2ctc3BhY2VkIGRhdGVzLlxuZXJnbyA9IHtcbiAgY29uc3Qgcm5nID0gZDMucmFuZG9tTGNnKDEyNilcbiAgY29uc3QgZHJhdyA9IGQzLnJhbmRvbU5vcm1hbC5zb3VyY2Uocm5nKSgwLCAxKVxuICBjb25zdCBUID0gNTAwMFxuICBjb25zdCBncmlkID0gQXJyYXkuZnJvbShuZXcgU2V0KGQzLnJhbmdlKDMwMSkubWFwKGogPT4gTWF0aC5yb3VuZChNYXRoLmV4cChqICogTWF0aC5sb2coVCkgLyAzMDApKSkpKVxuICByZXR1cm4gZDMucmFuZ2UoNTApLm1hcChpID0+IHtcbiAgICBjb25zdCBTMiA9IHJuZygpIDwgMC41ID8gMC41IDogMS41XG4gICAgbGV0IHN1bTEgPSAwLCBzdW0yID0gMCwgayA9IDBcbiAgICBjb25zdCBhdmdzID0gW11cbiAgICBmb3IgKGxldCB0ID0gMTsgdCA8PSBUOyB0KyspIHtcbiAgICAgIGNvbnN0IGUgPSBkcmF3KClcbiAgICAgIHN1bTEgKz0gZVxuICAgICAgc3VtMiArPSBlICogZVxuICAgICAgaWYgKHQgPT09IGdyaWRba10pIHsgYXZncy5wdXNoKHt0LCBtMTogc3VtMSAvIHQsIG0yOiBzdW0yIC8gdH0pOyBrKysgfVxuICAgIH1cbiAgICByZXR1cm4ge3BhdGg6IGksIFMyLCBhdmdzfVxuICB9KVxufVxuXG4vLyBMZWZ0OiBZID0gZSwgc28gaXRzIHRpbWUgYXZlcmFnZSBpcyB0aGF0IG9mIGUuIFJpZ2h0OiBZID0gWF4yID0gU14yIGVeMiwgc28gaXRzIHRpbWUgYXZlcmFnZSBpcyBTXjIgdGltZXMgdGhhdCBvZiBlXjJcbmVyZ29Sb3dzID0gZXJnby5mbGF0TWFwKHAgPT4gcC5hdmdzXG4gIC5maWx0ZXIoZCA9PiBkLnQgPD0gVG1heClcbiAgLm1hcChkID0+ICh7cGF0aDogcC5wYXRoLCB0OiBkLnQsIG0xOiBkLm0xLCBtMjogcC5TMiAqIGQubTJ9KSkpXG5cbmF2Z1BhbmVsID0gKGtleSwgdGFyZ2V0LCBkb21haW4sIHRpdGxlKSA9PiBodG1sYDxkaXY+XG4gIDxkaXYgc3R5bGU9XCJ0ZXh0LWFsaWduOiBjZW50ZXJcIj4ke3RpdGxlfTwvZGl2PlxuICAke1Bsb3QucGxvdCh7XG4gICAgd2lkdGg6IDU5MCwgaGVpZ2h0OiAzNTAsIG1hcmdpbkxlZnQ6IDUwLCBtYXJnaW5Cb3R0b206IDQ1LFxuICAgIHN0eWxlOiB7Zm9udFNpemU6IFwiMThweFwiLCBmb250RmFtaWx5OiBcIkFyaWFsLCBBcmltbywgc2Fucy1zZXJpZlwifSxcbiAgICB4OiB7dHlwZTogXCJsb2dcIiwgZG9tYWluOiBbMSwgVG1heF0sIGxhYmVsOiBcInQgKGxvZyBzY2FsZSlcIiwgbGFiZWxBbmNob3I6IFwiY2VudGVyXCIsIGxhYmVsQXJyb3c6IFwibm9uZVwifSxcbiAgICB5OiB7bGFiZWw6IG51bGwsIGRvbWFpbiwgdGlja3M6IDV9LFxuICAgIGdyaWQ6IHRydWUsXG4gICAgbWFya3M6IFtcbiAgICAgIFBsb3QucnVsZVkoW3RhcmdldF0sIHtzdHJva2U6IFwiYmxhY2tcIiwgc3Ryb2tlRGFzaGFycmF5OiBcIjcsNVwiLCBzdHJva2VXaWR0aDogMS41fSksXG4gICAgICBQbG90LmxpbmUoZXJnb1Jvd3MuZmlsdGVyKGQgPT4gZC5wYXRoID4gMCksIHt4OiBcInRcIiwgeToga2V5LCB6OiBcInBhdGhcIiwgc3Ryb2tlOiBcIiMwMDcyQkNcIiwgc3Ryb2tlT3BhY2l0eTogMC4zLCBzdHJva2VXaWR0aDogMS4zLCBjbGlwOiB0cnVlfSksXG4gICAgICBQbG90LmxpbmUoZXJnb1Jvd3MuZmlsdGVyKGQgPT4gZC5wYXRoID09PSAwKSwge3g6IFwidFwiLCB5OiBrZXksIHN0cm9rZTogXCIjQzYyODI4XCIsIHN0cm9rZVdpZHRoOiAzLCBjbGlwOiB0cnVlfSksXG4gICAgICBQbG90LnRleHQoW2B0aGUgcGF0aCB5b3Ugc2F3OiAke2VyZ29Sb3dzLmZpbHRlcihkID0+IGQucGF0aCA9PT0gMCkuYXQoLTEpW2tleV0udG9GaXhlZCgyKX1gXSwge2ZyYW1lQW5jaG9yOiBcInRvcC1yaWdodFwiLCBkeDogLTEwLCBkeTogMTAsIGZpbGw6IFwiI0M2MjgyOFwiLCBmb250V2VpZ2h0OiBcImJvbGRcIiwgZm9udFNpemU6IDIwLCBzdHJva2U6IFwid2hpdGVcIiwgc3Ryb2tlV2lkdGg6IDZ9KVxuICAgIF1cbiAgfSl9XG48L2Rpdj5gXG5cbmh0bWxgPGRpdiBzdHlsZT1cImRpc3BsYXk6IGZsZXg7IGdhcDogMjBweDsganVzdGlmeS1jb250ZW50OiBjZW50ZXI7IGZvbnQtc2l6ZTogMTlweFwiPlxuJHthdmdQYW5lbChcIm0xXCIsIDAsIFstMS41LCAxLjVdLCBodG1sYFRpbWUgYXZlcmFnZSBvZiBlcmdvZGljIDxpPlk8c3ViPnQ8L3N1Yj48L2k+IChkYXNoZWQ6IEVbPGk+WTxzdWI+dDwvc3ViPjwvaT5dID0gMClgKX1cbiR7YXZnUGFuZWwoXCJtMlwiLCAxLCBbMCwgM10sIGh0bWxgVGltZSBhdmVyYWdlIG9mIG5vbi1lcmdvZGljIDxpPlk8c3ViPnQ8L3N1Yj48L2k+IChkYXNoZWQ6IEVbPGk+WTxzdWI+dDwvc3ViPjwvaT5dID0gMSlgKX1cbjwvZGl2PmBcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldFF1aWV0Iiwic291cmNlIjoic2hpbnlJbnB1dCgncmhvJykifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXRRdWlldCIsInNvdXJjZSI6InNoaW55SW5wdXQoJ2NvaW4nKSJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldFF1aWV0Iiwic291cmNlIjoic2hpbnlJbnB1dCgnVG1heCcpIn1dfQ==
     </script>
     <script type="module">
     if (window.location.protocol === "file:") { alert("The OJS runtime does not work with file:// URLs. Please use a web server to view this document."); }

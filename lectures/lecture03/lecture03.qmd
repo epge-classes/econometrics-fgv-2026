@@ -22,22 +22,22 @@ Common data structures in Economics:
 
 - So far: mostly cross-sectional methods (everything about $Y_i$)
 - Next step: time series methods (everything about $Y_t$)
-- Next next step: panel data methods (everything about $Y_{i,t}$), probably the most prevalent type nowadays
+- Then: panel data methods (everything about $Y_{i,t}$), the most common type today
 
 . . .
 
-- Next weeks: focus on understanding the challenges of time series data
-- This lecture: how is a time series different from cross-sectional data? $+$ important definitions
+- Next weeks: the challenges of time series data
+- This lecture: how time series differ from cross-sections, plus key definitions
 - Main reference: [_Time Series Analysis_, by James Hamilton](https://www.amazon.com/Time-Analysis-James-Douglas-Hamilton/dp/0691042896)
-- Hansen's book provides a nice introduction, but it is too short on the topic
+- Hansen's book is a nice but short introduction
 
 ## What Is a Time Series?
 
-- A _time series_ is a sequence of observations on a variable (or several variables) over time, at equally spaced intervals
+- A _time series_: observations on one or more variables at equally spaced times
 - Example: annual population of a country
 - Unlike cross-sectional data, time series data is **ordered**
-- In this course, time is discrete: we observe data at specific intervals (days, months, years...)
-- Continuous-time series (e.g., high-frequency financial data) are a more advanced topic, with a vast literature as well
+- Here, time is discrete: days, months, years...
+- Continuous time (e.g., high-frequency finance) is a more advanced topic
 
 ## Why Should You Care?
 
@@ -46,7 +46,7 @@ Common data structures in Economics:
     - A very important building block for panel data methods
 2. Forecasting: what could the future look like?
     - What will inflation be next month? How many students will enroll next semester?
-    - How much inventory should a firm hold? What's the likely path of deforestation in a given area?
+    - How much inventory should a firm hold? Where is deforestation heading?
 3. Nowcasting: high(er)-frequency monitoring of low-frequency variables
     - What is the current state of the economy? How many people are unemployed right now?
 
@@ -71,13 +71,13 @@ Examples:
 
 - If inflation is high this month, it will likely be high next month
 - If a student is doing well on every exam, they will likely do well on the next one
-- The major difference w.r.t. cross-sectional data: the future might depend on the past
+- Key difference from cross-sections: the future may depend on the past
 
 # Building Blocks {visibility="uncounted"}
 
 ## Random Variables
 
-Formally, the right way to think about a time series is as a **stochastic process**. First, what is a _random variable_?
+Formally, a time series is a **stochastic process**. First, what is a _random variable_?
 
 ::: {.thm}
 ::: {.thmhead}
@@ -153,8 +153,8 @@ plt.tight_layout()
 
 ## The Challenge Ahead
 
-- You only observe the red path, but the blue ones were equally likely to have happened
-- The main challenge: you see *one* path and want to make inference about the *whole process*
+- You observe only the red path, but the blue ones were equally likely
+- The challenge: you see *one* path but want to learn about the *whole process*
 
 . . .
 
@@ -162,11 +162,11 @@ Example: inflation in Brazil in 1989
 
 - We know it was super high
 - But we have only one reading of inflation for 1989
-- When can we say something about the "inflation process" in Brazil given **only one** observation?
+- When can **one** observation tell us about Brazil's "inflation process"?
 
 . . .
 
-We will need to impose a lot of structure! Without structure, we are lost!
+We need a lot of structure! Without it, we are lost!
 
 ## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
@@ -293,7 +293,7 @@ True or false?
 
 . . .
 
-- Let's say I want to estimate two (potentially different) quantities: $\E[m_{20}]$ and $\E[m_{80}]$
+- Goal: estimate two (possibly different) quantities, $\E[m_{20}]$ and $\E[m_{80}]$
 - How can I do that?
 
 ## Ergodicity: Motivation
@@ -345,6 +345,86 @@ plt.tight_layout()
 - Would I need stationarity for this to yield a consistent estimator?
 - Intuitively, would that be enough?
 
+## Example: One Path, Wrong Answer
+
+- A coin is flipped **once**: $Z = +2$ ("up") or $Z = -2$ ("down"), each with probability $1/2$
+- Then $Y_t = Z + \varepsilon_t$, $\varepsilon_t \iid N(0,1)$ independent of $Z$: stationary, with $\E[Y_t] = 0$
+
+```{ojs}
+//| echo: false
+viewof coin = Inputs.form({
+  play: Inputs.button("Play", {value: 0, reduce: v => v + 1}),
+  flip: Inputs.button("Flip a new coin", {value: 0, reduce: v => v + 1})
+}, {template: ({play, flip}) => {
+  for (const b of [play, flip]) { b.style.width = "auto"; b.style.margin = "0"; b.querySelector("label")?.remove() }
+  return html`<div style="display: flex; justify-content: center; align-items: center; column-gap: 30px; width: 100%; max-width: none">${play}${flip}</div>`
+}})
+```
+
+```{ojs}
+//| echo: false
+coinT = 500
+
+// One coin flip per click of "Flip a new coin", then T shocks around Z.
+// The click count is hashed into the seed: nearby LCG seeds give near-identical first draws
+coinSeed = k => {
+  let x = Math.imul(k ^ (k >>> 16), 0x85ebca6b)
+  x = Math.imul(x ^ (x >>> 13), 0xc2b2ae35)
+  return ((x ^ (x >>> 16)) >>> 0) / 4294967296
+}
+
+coinPath = {
+  const rng = d3.randomLcg(coinSeed(2227 + coin.flip))
+  const draw = d3.randomNormal.source(rng)(0, 1)
+  const Z = rng() < 0.5 ? 2 : -2
+  let sum = 0
+  const rows = Array.from({length: coinT}, (_, i) => {
+    const y = Z + draw()
+    sum += y
+    return {t: i + 1, y, avg: sum / (i + 1)}
+  })
+  return {Z, rows}
+}
+
+// Before any click, show the whole path (also what the print view shows); a click animates it.
+// Progress follows the clock (6 s in total), so slow frames skip ahead instead of dragging
+coinNow = {
+  if (coin.play + coin.flip === 0) { yield coinT; return }
+  const start = performance.now()
+  while (true) {
+    const t = Math.min(coinT, Math.max(1, Math.round((performance.now() - start) / 6000 * coinT)))
+    yield t
+    if (t === coinT) return
+    await Promises.delay(16)
+  }
+}
+
+coinShown = coinPath.rows.slice(0, coinNow)
+
+html`<div style="text-align: center; font-size: 24px; margin-top: 10px">
+  <span style="color: #0072BC; font-weight: bold">the path you see</span> &nbsp;·&nbsp;
+  <span style="color: #C62828; font-weight: bold">its time average</span> &nbsp;·&nbsp;
+  <span style="color: #EB811B; font-weight: bold">Z = ±2</span> &nbsp;·&nbsp;
+  dashed: E[<i>Y<sub>t</sub></i>] = 0
+</div>`
+
+Plot.plot({
+  width: 1200, height: 420, marginLeft: 50, marginBottom: 45,
+  style: {fontSize: "19px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {domain: [1, coinT], label: "Periods", labelAnchor: "center", labelArrow: "none"},
+  y: {domain: [-5.5, 5.5], label: null, ticks: [-4, -2, 0, 2, 4]},
+  grid: true,
+  marks: [
+    Plot.ruleY([-2, 2], {stroke: "#EB811B", strokeDasharray: "3,5", strokeWidth: 2}),
+    Plot.ruleY([0], {stroke: "black", strokeDasharray: "7,5", strokeWidth: 1.5}),
+    Plot.line(coinShown, {x: "t", y: "y", stroke: "#0072BC", strokeOpacity: 0.45, strokeWidth: 1.2}),
+    Plot.line(coinShown, {x: "t", y: "avg", stroke: "#C62828", strokeWidth: 3}),
+    Plot.text([`coin: ${coinPath.Z > 0 ? "up" : "down"} · time average after ${coinShown.length} periods: ${coinShown.at(-1).avg.toFixed(2)}`],
+      {frameAnchor: "top-right", dx: -10, dy: 10, fill: "#C62828", fontWeight: "bold", fontSize: 20, stroke: "white", strokeWidth: 6})
+  ]
+})
+```
+
 ## Ergodicity: Definition
 
 - Ergodicity is a property that some stochastic processes have
@@ -359,7 +439,7 @@ A stochastic process $\{Y_t\}$ is _ergodic_ if its realized paths are "rich enou
 
 . . .
 
-Said another way: if you observe a process for a long enough $T$, you will be able to learn everything about the process
+In other words: observe a process for long enough and you learn everything about it
 
 ## Ergodicity vs Stationarity
 
@@ -379,7 +459,7 @@ Important:
 Also important:
 
 - Stationarity does not imply ergodicity (next slide)
-- [Exercise (problem set): show that a stationary process is not ergodic]{.alert}
+- [Exercise (problem set): analyze a process that is stationary but not ergodic]{.alert}
 
 ## Time Averages vs. Ensemble Averages
 
@@ -503,12 +583,12 @@ $$
 
 ## Stationarity + Ergodicity = LLN
 
-- You will be interested in approximating means and second moments of a process
+- Goal: estimate the means and second moments of a process
 - Stationarity + ergodicity is the "right set of assumptions" to do that
 
 ::: {.thm}
 ::: {.thmhead}
-Theorem (Hannan, 1970, Theorem 2, p. 203)
+Ergodic Theorem (Hayashi, 2000, pp. 101–102)
 :::
 If $Y_t$ is strictly stationary and ergodic with $\E|Y_t| < \infty$, then
 $$
@@ -522,22 +602,20 @@ $$
 
 ## What to Do in Practice?
 
-- The last theorem assumes something we cannot test. If we only care about estimation, there is an easier way out:
+- Ergodicity cannot be tested. For estimation alone, there is an easier way out:
 
 ::: {.thm}
 ::: {.thmhead}
-Theorem (Hannan, 1970, Theorem 6, p. 210)
+Theorem (Brockwell and Davis, 1991, Theorem 7.1.1)
 :::
-If $Y_t$ is weakly stationary and $\sum_{h=1}^{\infty} |\gamma_h| < \infty$, then
+If $Y_t$ is weakly stationary and $\sum_{h=0}^{\infty} |\gamma_h| < \infty$, then
 $$
 \bar{Y}_T = \frac{1}{T} \sum_{t=1}^{T} Y_t \xrightarrow{L_2} \E[Y_t] \quad \text{as} \quad T \rightarrow \infty
 $$
-If, in addition, $\E[Y_t^4] < \infty$ and the fourth-order cumulants of $Y_t$ are absolutely summable, then $\hat{\gamma}_h \xrightarrow{L_2} \gamma_h$ as $T \rightarrow \infty$.
 :::
 
-[Check the fourth-moment condition for $\hat{\gamma}_h$ against Hannan (1970), p. 210]{.todo}
-
-- Recall: $L_2$ convergence implies convergence in probability, but it neither implies nor is implied by a.s. convergence
+- For $\hat{\gamma}_h \xrightarrow{p} \gamma_h$ we also need fourth moments (Brockwell and Davis, 1991, Prop. 7.3.4)
+- Recall: $L_2$ implies $\xrightarrow{p}$, but neither $L_2$ nor a.s. convergence implies the other
 
 ## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
@@ -550,7 +628,7 @@ Questions?
 ## White Noise
 
 - In the cross-section, it's common to write $y_i = \alpha + \beta x_i + u_i$ with $u_i$ i.i.d.
-- Now we need weaker notions of "error term": **white noise** processes and **martingale difference sequences**
+- We need weaker "error terms": **white noise** and **martingale difference sequences**
 
 . . .
 
@@ -569,16 +647,16 @@ In words: uncorrelated random variables with mean zero and constant variance.
 
 . . .
 
-Any i.i.d. sequence of variables with mean zero and finite variance is a white noise process.
+Any i.i.d. sequence with mean zero and finite variance is white noise.
 
 ## Information Sets
 
 - Conditioning on past information is common in economic models and in Econometrics
-- The correct mathematical objects here are $\sigma$-**fields** and **filtrations**. We will avoid the measure-theoretic formalism for now
-- Intuitively: the $\sigma$-field (or $\sigma$-algebra) generated by $(Y_t, Y_{t-1}, Y_{t-2}, \dots)$ is the collection of possible histories of this process up to $t$
+- The right objects are $\sigma$-**fields** and **filtrations**, but we skip the measure theory
+- Intuitively: the $\sigma$-field generated by $(Y_t, Y_{t-1}, \dots)$ collects the possible histories up to $t$
 - We write $\mathcal{F}_t = \sigma(Y_t, Y_{t-1}, Y_{t-2}, \dots)$: all information available up to time $t$
-- In other areas of Economics, we typically call $\sigma$-fields _information sets_
-- Example: $\E[Y_t | \mathcal{F}_{t-1}]$ is our best guess for $Y_t$ given information from this process, and only that, up to $t-1$
+- Elsewhere in Economics, $\sigma$-fields are called _information sets_
+- Example: $\E[Y_t | \mathcal{F}_{t-1}]$ is the best guess for $Y_t$ using only this process up to $t-1$
 
 ## Martingale Difference Sequences
 
@@ -621,6 +699,7 @@ The End
 
 ## References {visibility="uncounted"}
 
-- Hannan, E. J. (1970). _Multiple Time Series_. Wiley
+- Section 2.2 of _Econometrics_, by Fumio Hayashi (2000)
+- Chapter 7 of _Time Series: Theory and Methods_, by Peter Brockwell and Richard Davis (1991, 2nd ed.)
 - Chapters 3 and 4 of _Time Series Analysis_, by James Hamilton. MDS are covered in Chapter 7
 - Chapter 14 of _Econometrics_, by Bruce Hansen
