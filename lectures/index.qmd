@@ -31,7 +31,7 @@ format:
 - [01]{.num} [Non-Parametric Estimation]{.ttl} [[Slides](lecture01/lecture01.html){.pill} [PDF](lecture01/lecture01.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 - [02]{.num} [Bootstrap 101]{.ttl} [[Slides](lecture02/lecture02.html){.pill} [PDF](lecture02/lecture02.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 - [03]{.num} [Building Blocks for Time Series]{.ttl} [[Slides](lecture03/lecture03.html){.pill} [PDF](lecture03/lecture03.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
-- [04]{.num} [Lag Operator, MA Models, and AR Models]{.ttl} [coming soon]{.soon}
+- [04]{.num} [Lag Operator, MA Models, and AR Models]{.ttl} [[Slides](lecture04/lecture04.html){.pill} [PDF](lecture04/lecture04.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 - [05]{.num} [ARMA Models and the Wold Decomposition]{.ttl} [coming soon]{.soon}
 - [06]{.num} [Estimation of ARMA Models]{.ttl} [coming soon]{.soon}
 - [07]{.num} [LLN and CLTs for Time Series]{.ttl} [coming soon]{.soon}
