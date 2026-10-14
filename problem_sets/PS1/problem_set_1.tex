@@ -173,30 +173,33 @@ This question is about the bootstrap. Suppose that $y_i = \alpha + \beta x_i + \
 \end{enumerate}
 
 \problem{2}
-This question connects the bootstrap with the kernel density estimator from Problem 1. It is mostly about coding and explaining what you find. Let $X_1, \dots, X_n$ be i.i.d.\ $N(0, 1)$, so the true density is $f = \phi$, the standard normal density. At a point $x_0$, estimate $f(x_0)$ with
+This question connects the bootstrap with the kernel density estimator from Problem 1. It is mostly about coding and explaining what you find. Let $X_1, \dots, X_n$ be i.i.d.\ $N(0, 1)$, so the true density is $f = \phi$, the standard normal density. At a point $x$, estimate $f(x)$ with the estimator from Problem 1,
 \[
-\hat{f}_n(x_0) \equiv \frac{1}{nh} \sum_{i=1}^n \phi\left(\frac{X_i - x_0}{h}\right),
+\hat{f}_n(x) \equiv \frac{1}{nh} \sum_{i=1}^n K\left(\frac{X_i - x}{h}\right),
 \]
-a kernel density estimator with a Gaussian kernel and Silverman's rule of thumb, $h = 1.06 \cdot \hat{\sigma} \cdot n^{-1/5}$, where $\hat{\sigma}$ is the sample standard deviation.
+using the Gaussian kernel, $K = \phi$, and Silverman's rule of thumb, $h = 1.06 \cdot \hat{\sigma} \cdot n^{-1/5}$, where $\hat{\sigma}$ is the sample standard deviation.
 
 \begin{enumerate}[a)]
-	\item Write a function that receives a sample $\{X_1, \dots, X_n\}$ and a point $x_0$, and returns a 95\% bootstrap confidence interval for $f(x_0)$ based on the root $R_n = \hat{f}_n(x_0) - f(x_0)$. Specifically:
+	\item Write a function that receives a sample $\{X_1, \dots, X_n\}$ and a point $x$, and returns a 95\% bootstrap confidence interval for $f(x)$ based on the root $R_n = \hat{f}_n(x) - f(x)$. Specifically:
 	\begin{itemize}
-		\item Draw $B = 499$ bootstrap samples (with replacement) from the data;
-		\item In each bootstrap sample, recompute $\hat{f}^*_n(x_0)$, using the \textit{same} bandwidth $h$ as in the original sample;
-		\item Let $q_{0.025}$ and $q_{0.975}$ be the 2.5\% and 97.5\% quantiles of the $B$ values of $\hat{f}^*_n(x_0) - \hat{f}_n(x_0)$, and report the interval $\left[\hat{f}_n(x_0) - q_{0.975},\ \hat{f}_n(x_0) - q_{0.025}\right]$.
+		\item Draw $B$ bootstrap samples (with replacement) from the data, where $B$ is the number of bootstrap replications;
+		\item In each bootstrap sample $b = 1, \dots, B$, recompute the estimate $\hat{f}^*_{n,b}(x)$, using the \textit{same} bandwidth $h$ as in the original sample, and store the bootstrap root $R^*_{n,b} = \hat{f}^*_{n,b}(x) - \hat{f}_n(x)$;
+		\item Let $L_n$ be the empirical CDF of the $B$ bootstrap roots, and report the interval
+		\[
+		\left[\hat{f}_n(x) - L_n^{-1}(0.975),\ \hat{f}_n(x) - L_n^{-1}(0.025)\right].
+		\]
 	\end{itemize}
 
-	\item Set $n = 500$. Simulate $M = 500$ samples and, for each one, compute the confidence interval from item a) at $x_0 = 0$ and at $x_0 = 1$. Report how often each interval covers the true value $f(x_0)$.
+	\item Set $n = 500$. Simulate $m = 1{,}000$ samples and, for each one, compute the confidence interval from item a) at $x = 0$ and at $x = 1$. Report how often each interval covers the true value $f(x)$.
 
-	\item Explain the difference in coverage between $x_0 = 0$ and $x_0 = 1$.
+	\item Explain the difference in coverage between $x = 0$ and $x = 1$.
 
 	Hint: compute $f''(x)$ for the standard normal density and recall item e) from Problem 1.
 
-	\item Let $\E^*[\cdot]$ denote the expectation over bootstrap samples, holding the original data fixed. Show that $\E^*[\hat{f}^*_n(x_0)] = \hat{f}_n(x_0)$. What does this tell you about the ability of the bootstrap to detect the bias of $\hat{f}_n(x_0)$?
+	\item Let $\E^*[\cdot]$ denote the expectation over bootstrap samples, holding the original data fixed, and let $\hat{f}^*_n(x)$ be the estimate computed from one bootstrap sample. Show that $\E^*[\hat{f}^*_n(x)] = \hat{f}_n(x)$. What does this tell you about the ability of the bootstrap to detect the bias of $\hat{f}_n(x)$?
 
-	\item Redo item b) at $x_0 = 0$ with $n = 2{,}000$. Does more data fix the coverage? Explain why, comparing how the bias and the standard deviation of $\hat{f}_n(x_0)$ shrink with $n$ when $h$ follows Silverman's rule.
+	\item Redo item b) at $x = 0$ with $n = 2{,}000$. Does more data fix the coverage? Explain why, comparing how the bias and the standard deviation of $\hat{f}_n(x)$ shrink with $n$ when $h$ follows Silverman's rule.
 
-	\item Go back to $n = 500$ and $x_0 = 0$, but now use a smaller bandwidth, $h/3$, both in the original sample and in the bootstrap samples. What happens to the coverage and to the average width of the confidence interval? Explain the trade-off.
+	\item Go back to $n = 500$ and $x = 0$, but now use a smaller bandwidth, $h/3$, both in the original sample and in the bootstrap samples. What happens to the coverage and to the average width of the confidence interval? Explain the trade-off.
 \end{enumerate}
 \end{document}
