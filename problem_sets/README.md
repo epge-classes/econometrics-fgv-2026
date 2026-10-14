@@ -18,4 +18,4 @@ The repository's README explains how to clone it and push.
 - PDF: [`PS1/problem_set_1.pdf`](PS1/problem_set_1.pdf) ([LaTeX source](PS1/problem_set_1.tex))
 - Data: [`PS1/karlan.csv`](PS1/karlan.csv)
 - Submit in: `Assignment-01`
-- Due date: to be added
+- Due date: 2026-10-19
