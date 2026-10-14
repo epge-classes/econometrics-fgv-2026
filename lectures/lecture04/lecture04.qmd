@@ -28,7 +28,7 @@ jupyter: python3
 . . .
 
 - An _operator_ for us is a mapping from sequences to sequences
-- The **lag operator** $L$ generates a new sequence by lagging the original sequence by one period:
+- The **lag operator** $L$ shifts a sequence back by one period:
 
 $$
 L(y_t) = y_{t-1}
@@ -106,7 +106,7 @@ Hence, $\psi_n(L) \phi(L) y_t = y_t - a^{n+1} L^{n+1} y_t = y_t - a^{n+1} y_{t-n
 . . .
 
 - If $|a| < 1$, then $a^n \to 0$, and $a^{n+1} y_{t-n-1}$ is probably very small
-- Even if $y_t$ is stochastic, but stationary, $a^{n+1} y_{t-n-1} \to 0$ in mean square (and almost surely)
+- For a stationary $y_t$, $a^{n+1} y_{t-n-1} \to 0$ in mean square (and almost surely)
 
 . . .
 
@@ -117,15 +117,13 @@ Hence, $\psi_n(L) \phi(L) y_t = y_t - a^{n+1} L^{n+1} y_t = y_t - a^{n+1} y_{t-n
 
 ::: {.thm}
 ::: {.thmhead}
-Theorem (Neumann Series; [Rynne and Youngson](https://link.springer.com/book/10.1007/978-1-84800-005-6), Theorem 4.40)
+Theorem (Neumann Series; [Lax (2002)]{.fgv}, Chapter 17, Theorem 2)
 :::
 Let $B$ be a Banach space and, for $A: B \to B$, let $\|A\| \equiv \sup_{\|x\| \leq 1} \|Ax\|$. If $T: B \to B$ is a bounded linear operator and $\|I - T\| < 1$, then $T$ is invertible, with inverse
 $$
 T^{-1} = \sum_{k=0}^{\infty} (I - T)^k
 $$
 :::
-
-[Confirm the theorem number: the link is the 2nd edition (2008), the 2025 slide cited 2000]{.todo}
 
 - Our Banach space: random sequences $\{y_t\}_{t \in \mathbb{Z}}$ with $\|y\| \equiv \sup_t \sqrt{\E[y_t^2]} < \infty$
 - Every weakly stationary process lives in it: $\|y\| = \sqrt{\gamma_0 + \mu^2}$
@@ -149,11 +147,12 @@ $$
 In terms of notation, everything below is equivalent:
 
 - $\phi(L)^{-1} \equiv \frac{1}{1 - aL} \equiv \frac{1}{\phi(L)}$
-- Given two polynomials $\phi_1(L)$ and $\phi_2(L)$, the expression $\frac{\phi_1(L)}{\phi_2(L)}$ means *"first, apply the inverse of $\phi_2(L)$, then apply $\phi_1(L)$"*
+- $\frac{\phi_1(L)}{\phi_2(L)} \equiv \phi_1(L)\,\phi_2(L)^{-1}$: first invert $\phi_2(L)$, then apply $\phi_1(L)$
 
 ## What If $|a| \geq 1$?
 
-- $|a| > 1$: $I - aL$ is still invertible! Write $I - aL = -aL\,(I - a^{-1}L^{-1})$ and use the theorem, since $\|a^{-1}L^{-1}\| = 1/|a| < 1$
+- $|a| > 1$: $I - aL$ is still invertible! Write $I - aL = -aL\,(I - a^{-1}L^{-1})$
+- The theorem applies to the second factor, since $\|a^{-1}L^{-1}\| = 1/|a| < 1$
 - [Exercise: show that $(I - aL)^{-1} = -\sum_{k=1}^{\infty} a^{-k} L^{-k}$ when $|a| > 1$]{.alert}
 - But this inverse uses the **future**: $y_{t+1}, y_{t+2}, \dots$
 
@@ -257,7 +256,7 @@ Notice we can write $y_t = \mu + \theta(L) \varepsilon_t$, where $\theta(L) = 1 
 ## Is the MA(q) Stationary?
 
 - The mean: $\E[y_t] = \mu + \E[\varepsilon_t] + \sum_{i=1}^{q} \theta_i \E[\varepsilon_{t-i}] = \mu$
-- The variance: $\Var(y_t) = \Var(\varepsilon_t) + \sum_{i=1}^{q} \theta_i^2 \Var(\varepsilon_{t-i}) = \sigma^2\left(1 + \sum_{i=1}^{q} \theta_i^2\right)$
+- The variance (shocks are uncorrelated): $\Var(y_t) = \sum_{i=0}^{q} \theta_i^2 \sigma^2 = \sigma^2\left(1 + \sum_{i=1}^{q} \theta_i^2\right)$
 - What about autocovariances? What should $\gamma_h \equiv \Cov(y_t, y_{t-h})$ be?
 
 . . .
@@ -288,7 +287,7 @@ $$
 
 ## General Case for $\gamma_h$
 
-- If $h \leq q$, then $\gamma_h = \sigma^2\left(\theta_h + \theta_{h+1}\theta_1 + \theta_{h+2}\theta_2 + \dots + \theta_q\theta_{q-h}\right)$
+- If $h \leq q$, then $\gamma_h = \sigma^2 \sum_{i=0}^{q-h} \theta_i \theta_{i+h} = \sigma^2\left(\theta_h + \theta_1\theta_{h+1} + \dots + \theta_{q-h}\theta_q\right)$
 - If $h > q$, then $\gamma_h = 0$
 
 . . .
@@ -424,7 +423,8 @@ where $\Phi(L) \equiv I - \sum_{i=1}^{p} \phi_i L^i$.
 But $\Phi(L)^{-1}\mu$ is just a number. And $\Phi(L)^{-1}\varepsilon_t$ is an MA($\infty$) process in past shocks!
 
 - [Exercise (problem set): show that this MA($\infty$) process is weakly stationary]{.alert}
-- Roots on the unit circle: no stationary solution ($\phi_1 = 1$ is next). Roots inside: the solution depends on future shocks, which we rule out
+- Roots on the unit circle: no stationary solution ($\phi_1 = 1$ is next)
+- Roots inside: the stationary solution depends on future shocks, which we rule out
 
 # The AR(1) Model {visibility="uncounted"}
 
@@ -628,7 +628,7 @@ The End
 
 ## References {visibility="uncounted"}
 
-- Chapter 2 of _Time Series Analysis_, by James Hamilton, for the lag operator
-- Chapter 3 of _Time Series Analysis_, by James Hamilton, for AR and MA models
-- Chapter 14 of _Econometrics_, by Bruce Hansen
-- Rynne, B. P. and M. A. Youngson (2008). _Linear Functional Analysis_, 2nd edition. Springer
+- Chapter 2 of _Time Series Analysis_, by [James Hamilton (1994)]{.fgv}, for the lag operator
+- Chapter 3 of _Time Series Analysis_, by [James Hamilton (1994)]{.fgv}, for AR and MA models
+- Chapter 14 of _Econometrics_, by [Bruce Hansen (2022)]{.fgv}
+- Chapter 17 of _Functional Analysis_, by [Peter Lax (2002)]{.fgv}, for the Neumann series

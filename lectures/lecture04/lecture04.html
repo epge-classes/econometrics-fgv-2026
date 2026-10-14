@@ -6,8 +6,8 @@
 <script src="lecture04_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="lecture04_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="lecture04_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="lecture04_files/libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.10.18">
+<link href="lecture04_files/libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.19">
 
   <title>Lecture 4: Lag Operator, MA Models, and AR Models</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -290,7 +290,7 @@ $$
 <div class="fragment">
 <ul>
 <li>An <em>operator</em> for us is a mapping from sequences to sequences</li>
-<li>The <strong>lag operator</strong> <span class="math inline">\(L\)</span> generates a new sequence by lagging the original sequence by one period:</li>
+<li>The <strong>lag operator</strong> <span class="math inline">\(L\)</span> shifts a sequence back by one period:</li>
 </ul>
 <p><span class="math display">\[
 L(y_t) = y_{t-1}
@@ -375,7 +375,7 @@ L(y_t) = y_{t-1}
 <div class="fragment">
 <ul>
 <li>If <span class="math inline">\(|a| &lt; 1\)</span>, then <span class="math inline">\(a^n \to 0\)</span>, and <span class="math inline">\(a^{n+1} y_{t-n-1}\)</span> is probably very small</li>
-<li>Even if <span class="math inline">\(y_t\)</span> is stochastic, but stationary, <span class="math inline">\(a^{n+1} y_{t-n-1} \to 0\)</span> in mean square (and almost surely)</li>
+<li>For a stationary <span class="math inline">\(y_t\)</span>, <span class="math inline">\(a^{n+1} y_{t-n-1} \to 0\)</span> in mean square (and almost surely)</li>
 </ul>
 </div>
 <div class="fragment">
@@ -389,13 +389,12 @@ L(y_t) = y_{t-1}
 <h2>A Tool from Functional Analysis</h2>
 <div class="thm">
 <div class="thmhead">
-<p>Theorem (Neumann Series; <a href="https://link.springer.com/book/10.1007/978-1-84800-005-6">Rynne and Youngson</a>, Theorem 4.40)</p>
+<p>Theorem (Neumann Series; <span class="fgv">Lax (2002)</span>, Chapter 17, Theorem 2)</p>
 </div>
 <p>Let <span class="math inline">\(B\)</span> be a Banach space and, for <span class="math inline">\(A: B \to B\)</span>, let <span class="math inline">\(\|A\| \equiv \sup_{\|x\| \leq 1} \|Ax\|\)</span>. If <span class="math inline">\(T: B \to B\)</span> is a bounded linear operator and <span class="math inline">\(\|I - T\| &lt; 1\)</span>, then <span class="math inline">\(T\)</span> is invertible, with inverse <span class="math display">\[
 T^{-1} = \sum_{k=0}^{\infty} (I - T)^k
 \]</span></p>
 </div>
-<p><span class="todo">Confirm the theorem number: the link is the 2nd edition (2008), the 2025 slide cited 2000</span></p>
 <ul>
 <li>Our Banach space: random sequences <span class="math inline">\(\{y_t\}_{t \in \mathbb{Z}}\)</span> with <span class="math inline">\(\|y\| \equiv \sup_t \sqrt{\E[y_t^2]} &lt; \infty\)</span></li>
 <li>Every weakly stationary process lives in it: <span class="math inline">\(\|y\| = \sqrt{\gamma_0 + \mu^2}\)</span></li>
@@ -418,14 +417,15 @@ T^{-1} = \sum_{k=0}^{\infty} (I - T)^k
 <p>In terms of notation, everything below is equivalent:</p>
 <ul>
 <li><span class="math inline">\(\phi(L)^{-1} \equiv \frac{1}{1 - aL} \equiv \frac{1}{\phi(L)}\)</span></li>
-<li>Given two polynomials <span class="math inline">\(\phi_1(L)\)</span> and <span class="math inline">\(\phi_2(L)\)</span>, the expression <span class="math inline">\(\frac{\phi_1(L)}{\phi_2(L)}\)</span> means <em>“first, apply the inverse of <span class="math inline">\(\phi_2(L)\)</span>, then apply <span class="math inline">\(\phi_1(L)\)</span>”</em></li>
+<li><span class="math inline">\(\frac{\phi_1(L)}{\phi_2(L)} \equiv \phi_1(L)\,\phi_2(L)^{-1}\)</span>: first invert <span class="math inline">\(\phi_2(L)\)</span>, then apply <span class="math inline">\(\phi_1(L)\)</span></li>
 </ul>
 </div>
 </section>
 <section id="what-if-a-geq-1" class="slide level2">
 <h2>What If <span class="math inline">\(|a| \geq 1\)</span>?</h2>
 <ul>
-<li><span class="math inline">\(|a| &gt; 1\)</span>: <span class="math inline">\(I - aL\)</span> is still invertible! Write <span class="math inline">\(I - aL = -aL\,(I - a^{-1}L^{-1})\)</span> and use the theorem, since <span class="math inline">\(\|a^{-1}L^{-1}\| = 1/|a| &lt; 1\)</span></li>
+<li><span class="math inline">\(|a| &gt; 1\)</span>: <span class="math inline">\(I - aL\)</span> is still invertible! Write <span class="math inline">\(I - aL = -aL\,(I - a^{-1}L^{-1})\)</span></li>
+<li>The theorem applies to the second factor, since <span class="math inline">\(\|a^{-1}L^{-1}\| = 1/|a| &lt; 1\)</span></li>
 <li><span class="alert">Exercise: show that <span class="math inline">\((I - aL)^{-1} = -\sum_{k=1}^{\infty} a^{-k} L^{-k}\)</span> when <span class="math inline">\(|a| &gt; 1\)</span></span></li>
 <li>But this inverse uses the <strong>future</strong>: <span class="math inline">\(y_{t+1}, y_{t+2}, \dots\)</span></li>
 </ul>
@@ -535,7 +535,7 @@ y_t = \mu + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t
 <h2>Is the MA(q) Stationary?</h2>
 <ul>
 <li>The mean: <span class="math inline">\(\E[y_t] = \mu + \E[\varepsilon_t] + \sum_{i=1}^{q} \theta_i \E[\varepsilon_{t-i}] = \mu\)</span></li>
-<li>The variance: <span class="math inline">\(\Var(y_t) = \Var(\varepsilon_t) + \sum_{i=1}^{q} \theta_i^2 \Var(\varepsilon_{t-i}) = \sigma^2\left(1 + \sum_{i=1}^{q} \theta_i^2\right)\)</span></li>
+<li>The variance (shocks are uncorrelated): <span class="math inline">\(\Var(y_t) = \sum_{i=0}^{q} \theta_i^2 \sigma^2 = \sigma^2\left(1 + \sum_{i=1}^{q} \theta_i^2\right)\)</span></li>
 <li>What about autocovariances? What should <span class="math inline">\(\gamma_h \equiv \Cov(y_t, y_{t-h})\)</span> be?</li>
 </ul>
 <div class="fragment">
@@ -561,7 +561,7 @@ y_t = \mu + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t
 <section id="general-case-for-gamma_h" class="slide level2">
 <h2>General Case for <span class="math inline">\(\gamma_h\)</span></h2>
 <ul>
-<li>If <span class="math inline">\(h \leq q\)</span>, then <span class="math inline">\(\gamma_h = \sigma^2\left(\theta_h + \theta_{h+1}\theta_1 + \theta_{h+2}\theta_2 + \dots + \theta_q\theta_{q-h}\right)\)</span></li>
+<li>If <span class="math inline">\(h \leq q\)</span>, then <span class="math inline">\(\gamma_h = \sigma^2 \sum_{i=0}^{q-h} \theta_i \theta_{i+h} = \sigma^2\left(\theta_h + \theta_1\theta_{h+1} + \dots + \theta_{q-h}\theta_q\right)\)</span></li>
 <li>If <span class="math inline">\(h &gt; q\)</span>, then <span class="math inline">\(\gamma_h = 0\)</span></li>
 </ul>
 <div class="fragment">
@@ -583,16 +583,16 @@ y_t = \mu + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t
 <h2>Dial the MA Coefficients</h2>
 <p><span class="math inline">\(y_t = \varepsilon_t + \sum_{i=1}^{4} \theta_i \varepsilon_{t-i}\)</span> with <span class="math inline">\(\varepsilon_t \iid N(0,1)\)</span>. The shocks stay fixed: only the <span class="math inline">\(\theta\)</span>’s change</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb1" data-startfrom="311" data-source-offset="0"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 310;"><span id="cb1-311"><a href="" aria-label="311"></a><span class="co">// Four sliders in a 2x2 grid. The theme's 190px label column is too wide</span></span>
-<span id="cb1-312"><a href="" aria-label="312"></a><span class="co">// for two columns, so each slider gets a narrow label and a shorter track.</span></span>
-<span id="cb1-313"><a href="" aria-label="313"></a>viewof theta <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">form</span>(</span>
-<span id="cb1-314"><a href="" aria-label="314"></a>  [<span class="op">-</span><span class="fl">0.8</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="op">-</span><span class="fl">0.2</span>]<span class="op">.</span><span class="fu">map</span>((v<span class="op">,</span> i) <span class="kw">=&gt;</span></span>
-<span id="cb1-315"><a href="" aria-label="315"></a>    Inputs<span class="op">.</span><span class="fu">range</span>([<span class="op">-</span><span class="fl">1.5</span><span class="op">,</span> <span class="fl">1.5</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> v<span class="op">,</span> <span class="dt">step</span><span class="op">:</span> <span class="fl">0.05</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> [<span class="st">"θ₁"</span><span class="op">,</span> <span class="st">"θ₂"</span><span class="op">,</span> <span class="st">"θ₃"</span><span class="op">,</span> <span class="st">"θ₄"</span>][i]<span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">400</span>}))<span class="op">,</span></span>
-<span id="cb1-316"><a href="" aria-label="316"></a>  {<span class="dt">template</span><span class="op">:</span> inputs <span class="kw">=&gt;</span> {</span>
-<span id="cb1-317"><a href="" aria-label="317"></a>    inputs<span class="op">.</span><span class="fu">forEach</span>(f <span class="kw">=&gt;</span> f<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="fu">setProperty</span>(<span class="st">"--label-width"</span><span class="op">,</span> <span class="st">"50px"</span>))</span>
-<span id="cb1-318"><a href="" aria-label="318"></a>    <span class="cf">return</span> <span class="fu">html</span><span class="vs">`&lt;div style="display: grid; grid-template-columns: auto auto; justify-content: center; column-gap: 60px"&gt;</span><span class="sc">${</span>inputs<span class="sc">}</span><span class="vs">&lt;/div&gt;`</span></span>
-<span id="cb1-319"><a href="" aria-label="319"></a>  }}</span>
-<span id="cb1-320"><a href="" aria-label="320"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb1" data-startfrom="310" data-source-offset="0"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 309;"><span id="cb1-310"><a href="" aria-label="310"></a><span class="co">// Four sliders in a 2x2 grid. The theme's 190px label column is too wide</span></span>
+<span id="cb1-311"><a href="" aria-label="311"></a><span class="co">// for two columns, so each slider gets a narrow label and a shorter track.</span></span>
+<span id="cb1-312"><a href="" aria-label="312"></a>viewof theta <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">form</span>(</span>
+<span id="cb1-313"><a href="" aria-label="313"></a>  [<span class="op">-</span><span class="fl">0.8</span><span class="op">,</span> <span class="fl">0.5</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="op">-</span><span class="fl">0.2</span>]<span class="op">.</span><span class="fu">map</span>((v<span class="op">,</span> i) <span class="kw">=&gt;</span></span>
+<span id="cb1-314"><a href="" aria-label="314"></a>    Inputs<span class="op">.</span><span class="fu">range</span>([<span class="op">-</span><span class="fl">1.5</span><span class="op">,</span> <span class="fl">1.5</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> v<span class="op">,</span> <span class="dt">step</span><span class="op">:</span> <span class="fl">0.05</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> [<span class="st">"θ₁"</span><span class="op">,</span> <span class="st">"θ₂"</span><span class="op">,</span> <span class="st">"θ₃"</span><span class="op">,</span> <span class="st">"θ₄"</span>][i]<span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">400</span>}))<span class="op">,</span></span>
+<span id="cb1-315"><a href="" aria-label="315"></a>  {<span class="dt">template</span><span class="op">:</span> inputs <span class="kw">=&gt;</span> {</span>
+<span id="cb1-316"><a href="" aria-label="316"></a>    inputs<span class="op">.</span><span class="fu">forEach</span>(f <span class="kw">=&gt;</span> f<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="fu">setProperty</span>(<span class="st">"--label-width"</span><span class="op">,</span> <span class="st">"50px"</span>))</span>
+<span id="cb1-317"><a href="" aria-label="317"></a>    <span class="cf">return</span> <span class="fu">html</span><span class="vs">`&lt;div style="display: grid; grid-template-columns: auto auto; justify-content: center; column-gap: 60px"&gt;</span><span class="sc">${</span>inputs<span class="sc">}</span><span class="vs">&lt;/div&gt;`</span></span>
+<span id="cb1-318"><a href="" aria-label="318"></a>  }}</span>
+<span id="cb1-319"><a href="" aria-label="319"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div id="ojs-cell-1" data-nodetype="declaration">
 
@@ -600,59 +600,59 @@ y_t = \mu + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb2" data-startfrom="328" data-source-offset="-114"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 327;"><span id="cb2-328"><a href="" aria-label="328"></a>maShocks <span class="op">=</span> {</span>
-<span id="cb2-329"><a href="" aria-label="329"></a>  <span class="kw">const</span> draw <span class="op">=</span> d3<span class="op">.</span><span class="at">randomNormal</span><span class="op">.</span><span class="fu">source</span>(d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="dv">2026</span>))(<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>)</span>
-<span id="cb2-330"><a href="" aria-label="330"></a>  <span class="cf">return</span> <span class="bu">Float64Array</span><span class="op">.</span><span class="fu">from</span>({<span class="dt">length</span><span class="op">:</span> <span class="dv">304</span>}<span class="op">,</span> draw)</span>
-<span id="cb2-331"><a href="" aria-label="331"></a>}</span>
-<span id="cb2-332"><a href="" aria-label="332"></a></span>
-<span id="cb2-333"><a href="" aria-label="333"></a><span class="co">// theta_0 = 1, then the four slider values</span></span>
-<span id="cb2-334"><a href="" aria-label="334"></a>maCoefs <span class="op">=</span> [<span class="dv">1</span><span class="op">,</span> <span class="op">...</span>theta]</span>
-<span id="cb2-335"><a href="" aria-label="335"></a></span>
-<span id="cb2-336"><a href="" aria-label="336"></a><span class="co">// y_t = sum_i theta_i e_{t-i}</span></span>
-<span id="cb2-337"><a href="" aria-label="337"></a>maPath <span class="op">=</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">4</span><span class="op">,</span> maShocks<span class="op">.</span><span class="at">length</span>)<span class="op">.</span><span class="fu">map</span>(t <span class="kw">=&gt;</span> ({</span>
-<span id="cb2-338"><a href="" aria-label="338"></a>  <span class="dt">t</span><span class="op">:</span> t <span class="op">-</span> <span class="dv">3</span><span class="op">,</span></span>
-<span id="cb2-339"><a href="" aria-label="339"></a>  <span class="dt">y</span><span class="op">:</span> d3<span class="op">.</span><span class="fu">sum</span>(maCoefs<span class="op">,</span> (c<span class="op">,</span> i) <span class="kw">=&gt;</span> c <span class="op">*</span> maShocks[t <span class="op">-</span> i])</span>
-<span id="cb2-340"><a href="" aria-label="340"></a>}))</span>
-<span id="cb2-341"><a href="" aria-label="341"></a></span>
-<span id="cb2-342"><a href="" aria-label="342"></a><span class="co">// gamma_h / sigma^2 = sum_i theta_i theta_{i+h}, which is zero for h &gt; 4</span></span>
-<span id="cb2-343"><a href="" aria-label="343"></a>maGamma <span class="op">=</span> h <span class="kw">=&gt;</span> d3<span class="op">.</span><span class="fu">sum</span>(maCoefs<span class="op">.</span><span class="fu">slice</span>(<span class="dv">0</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(maCoefs<span class="op">.</span><span class="at">length</span> <span class="op">-</span> h<span class="op">,</span> <span class="dv">0</span>))<span class="op">,</span> (c<span class="op">,</span> i) <span class="kw">=&gt;</span> c <span class="op">*</span> maCoefs[i <span class="op">+</span> h])</span>
-<span id="cb2-344"><a href="" aria-label="344"></a>maACF <span class="op">=</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">13</span>)<span class="op">.</span><span class="fu">map</span>(h <span class="kw">=&gt;</span> ({h<span class="op">,</span> <span class="dt">rho</span><span class="op">:</span> <span class="fu">maGamma</span>(h) <span class="op">/</span> <span class="fu">maGamma</span>(<span class="dv">0</span>)}))</span>
-<span id="cb2-345"><a href="" aria-label="345"></a></span>
-<span id="cb2-346"><a href="" aria-label="346"></a><span class="co">// q = index of the last nonzero theta (0 means white noise)</span></span>
-<span id="cb2-347"><a href="" aria-label="347"></a>maQ <span class="op">=</span> d3<span class="op">.</span><span class="fu">max</span>(maCoefs<span class="op">.</span><span class="fu">map</span>((c<span class="op">,</span> i) <span class="kw">=&gt;</span> (c <span class="op">!==</span> <span class="dv">0</span> <span class="op">?</span> i <span class="op">:</span> <span class="dv">0</span>)))</span>
-<span id="cb2-348"><a href="" aria-label="348"></a></span>
-<span id="cb2-349"><a href="" aria-label="349"></a>maPanel <span class="op">=</span> (title<span class="op">,</span> plot) <span class="kw">=&gt;</span> <span class="fu">html</span><span class="vs">`&lt;div&gt;</span></span>
-<span id="cb2-350"><a href="" aria-label="350"></a><span class="vs">  &lt;div style="text-align: center"&gt;</span><span class="sc">${</span>title<span class="sc">}</span><span class="vs">&lt;/div&gt;</span></span>
-<span id="cb2-351"><a href="" aria-label="351"></a><span class="vs">  </span><span class="sc">${</span>plot<span class="sc">}</span></span>
-<span id="cb2-352"><a href="" aria-label="352"></a><span class="vs">&lt;/div&gt;`</span></span>
-<span id="cb2-353"><a href="" aria-label="353"></a></span>
-<span id="cb2-354"><a href="" aria-label="354"></a><span class="fu">html</span><span class="vs">`&lt;div style="display: flex; gap: 20px; justify-content: center; font-size: 19px"&gt;</span></span>
-<span id="cb2-355"><a href="" aria-label="355"></a><span class="sc">${</span><span class="fu">maPanel</span>(<span class="fu">html</span><span class="vs">`One path, Var(&lt;i&gt;y&lt;sub&gt;t&lt;/sub&gt;&lt;/i&gt;) = </span><span class="sc">${</span><span class="fu">maGamma</span>(<span class="dv">0</span>)<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> Plot<span class="op">.</span><span class="fu">plot</span>({</span>
-<span id="cb2-356"><a href="" aria-label="356"></a>  <span class="dt">width</span><span class="op">:</span> <span class="dv">590</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">380</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">50</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
-<span id="cb2-357"><a href="" aria-label="357"></a>  <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"18px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
-<span id="cb2-358"><a href="" aria-label="358"></a>  <span class="dt">x</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"Periods"</span><span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
-<span id="cb2-359"><a href="" aria-label="359"></a>  <span class="dt">y</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="op">-</span><span class="dv">6</span><span class="op">,</span> <span class="dv">6</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> <span class="dv">5</span>}<span class="op">,</span></span>
-<span id="cb2-360"><a href="" aria-label="360"></a>  <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
-<span id="cb2-361"><a href="" aria-label="361"></a>  <span class="dt">marks</span><span class="op">:</span> [</span>
-<span id="cb2-362"><a href="" aria-label="362"></a>    Plot<span class="op">.</span><span class="fu">ruleY</span>([<span class="dv">0</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"black"</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"5,4"</span>})<span class="op">,</span></span>
-<span id="cb2-363"><a href="" aria-label="363"></a>    Plot<span class="op">.</span><span class="fu">line</span>(maPath<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"t"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"y"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">1.3</span><span class="op">,</span> <span class="dt">clip</span><span class="op">:</span> <span class="kw">true</span>})</span>
-<span id="cb2-364"><a href="" aria-label="364"></a>  ]</span>
-<span id="cb2-365"><a href="" aria-label="365"></a>}))<span class="sc">}</span></span>
-<span id="cb2-366"><a href="" aria-label="366"></a><span class="sc">${</span><span class="fu">maPanel</span>(<span class="fu">html</span><span class="vs">`Autocorrelation &lt;i&gt;ρ&lt;sub&gt;h&lt;/sub&gt;&lt;/i&gt;, &lt;i&gt;ρ&lt;/i&gt;&lt;sub&gt;1&lt;/sub&gt; = </span><span class="sc">${</span>maACF[<span class="dv">1</span>]<span class="op">.</span><span class="at">rho</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> Plot<span class="op">.</span><span class="fu">plot</span>({</span>
-<span id="cb2-367"><a href="" aria-label="367"></a>  <span class="dt">width</span><span class="op">:</span> <span class="dv">590</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">380</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">50</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
-<span id="cb2-368"><a href="" aria-label="368"></a>  <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"18px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
-<span id="cb2-369"><a href="" aria-label="369"></a>  <span class="dt">x</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"Lag h"</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="op">-</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">12.5</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">0</span><span class="op">,</span> <span class="dv">13</span><span class="op">,</span> <span class="dv">2</span>)<span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
-<span id="cb2-370"><a href="" aria-label="370"></a>  <span class="dt">y</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="op">-</span><span class="dv">1</span><span class="op">,</span> <span class="dv">1</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> <span class="dv">5</span>}<span class="op">,</span></span>
-<span id="cb2-371"><a href="" aria-label="371"></a>  <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
-<span id="cb2-372"><a href="" aria-label="372"></a>  <span class="dt">marks</span><span class="op">:</span> [</span>
-<span id="cb2-373"><a href="" aria-label="373"></a>    Plot<span class="op">.</span><span class="fu">ruleY</span>([<span class="dv">0</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"black"</span>})<span class="op">,</span></span>
-<span id="cb2-374"><a href="" aria-label="374"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([maQ <span class="op">+</span> <span class="fl">0.5</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"7,5"</span>})<span class="op">,</span></span>
-<span id="cb2-375"><a href="" aria-label="375"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>(maACF<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"h"</span><span class="op">,</span> <span class="dt">y1</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span> <span class="dt">y2</span><span class="op">:</span> <span class="st">"rho"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">2.5</span>})<span class="op">,</span></span>
-<span id="cb2-376"><a href="" aria-label="376"></a>    Plot<span class="op">.</span><span class="fu">dot</span>(maACF<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"h"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"rho"</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">r</span><span class="op">:</span> <span class="dv">5</span>})<span class="op">,</span></span>
-<span id="cb2-377"><a href="" aria-label="377"></a>    Plot<span class="op">.</span><span class="fu">text</span>([maQ <span class="op">===</span> <span class="dv">0</span> <span class="op">?</span> <span class="st">"white noise: ρ = 0 at every lag h ≥ 1"</span> <span class="op">:</span> <span class="vs">`ρ = 0 at every lag h &gt; q = </span><span class="sc">${</span>maQ<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">20</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})</span>
-<span id="cb2-378"><a href="" aria-label="378"></a>  ]</span>
-<span id="cb2-379"><a href="" aria-label="379"></a>}))<span class="sc">}</span></span>
-<span id="cb2-380"><a href="" aria-label="380"></a><span class="vs">&lt;/div&gt;`</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb2" data-startfrom="327" data-source-offset="-114"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 326;"><span id="cb2-327"><a href="" aria-label="327"></a>maShocks <span class="op">=</span> {</span>
+<span id="cb2-328"><a href="" aria-label="328"></a>  <span class="kw">const</span> draw <span class="op">=</span> d3<span class="op">.</span><span class="at">randomNormal</span><span class="op">.</span><span class="fu">source</span>(d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="dv">2026</span>))(<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>)</span>
+<span id="cb2-329"><a href="" aria-label="329"></a>  <span class="cf">return</span> <span class="bu">Float64Array</span><span class="op">.</span><span class="fu">from</span>({<span class="dt">length</span><span class="op">:</span> <span class="dv">304</span>}<span class="op">,</span> draw)</span>
+<span id="cb2-330"><a href="" aria-label="330"></a>}</span>
+<span id="cb2-331"><a href="" aria-label="331"></a></span>
+<span id="cb2-332"><a href="" aria-label="332"></a><span class="co">// theta_0 = 1, then the four slider values</span></span>
+<span id="cb2-333"><a href="" aria-label="333"></a>maCoefs <span class="op">=</span> [<span class="dv">1</span><span class="op">,</span> <span class="op">...</span>theta]</span>
+<span id="cb2-334"><a href="" aria-label="334"></a></span>
+<span id="cb2-335"><a href="" aria-label="335"></a><span class="co">// y_t = sum_i theta_i e_{t-i}</span></span>
+<span id="cb2-336"><a href="" aria-label="336"></a>maPath <span class="op">=</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">4</span><span class="op">,</span> maShocks<span class="op">.</span><span class="at">length</span>)<span class="op">.</span><span class="fu">map</span>(t <span class="kw">=&gt;</span> ({</span>
+<span id="cb2-337"><a href="" aria-label="337"></a>  <span class="dt">t</span><span class="op">:</span> t <span class="op">-</span> <span class="dv">3</span><span class="op">,</span></span>
+<span id="cb2-338"><a href="" aria-label="338"></a>  <span class="dt">y</span><span class="op">:</span> d3<span class="op">.</span><span class="fu">sum</span>(maCoefs<span class="op">,</span> (c<span class="op">,</span> i) <span class="kw">=&gt;</span> c <span class="op">*</span> maShocks[t <span class="op">-</span> i])</span>
+<span id="cb2-339"><a href="" aria-label="339"></a>}))</span>
+<span id="cb2-340"><a href="" aria-label="340"></a></span>
+<span id="cb2-341"><a href="" aria-label="341"></a><span class="co">// gamma_h / sigma^2 = sum_i theta_i theta_{i+h}, which is zero for h &gt; 4</span></span>
+<span id="cb2-342"><a href="" aria-label="342"></a>maGamma <span class="op">=</span> h <span class="kw">=&gt;</span> d3<span class="op">.</span><span class="fu">sum</span>(maCoefs<span class="op">.</span><span class="fu">slice</span>(<span class="dv">0</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(maCoefs<span class="op">.</span><span class="at">length</span> <span class="op">-</span> h<span class="op">,</span> <span class="dv">0</span>))<span class="op">,</span> (c<span class="op">,</span> i) <span class="kw">=&gt;</span> c <span class="op">*</span> maCoefs[i <span class="op">+</span> h])</span>
+<span id="cb2-343"><a href="" aria-label="343"></a>maACF <span class="op">=</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">13</span>)<span class="op">.</span><span class="fu">map</span>(h <span class="kw">=&gt;</span> ({h<span class="op">,</span> <span class="dt">rho</span><span class="op">:</span> <span class="fu">maGamma</span>(h) <span class="op">/</span> <span class="fu">maGamma</span>(<span class="dv">0</span>)}))</span>
+<span id="cb2-344"><a href="" aria-label="344"></a></span>
+<span id="cb2-345"><a href="" aria-label="345"></a><span class="co">// q = index of the last nonzero theta (0 means white noise)</span></span>
+<span id="cb2-346"><a href="" aria-label="346"></a>maQ <span class="op">=</span> d3<span class="op">.</span><span class="fu">max</span>(maCoefs<span class="op">.</span><span class="fu">map</span>((c<span class="op">,</span> i) <span class="kw">=&gt;</span> (c <span class="op">!==</span> <span class="dv">0</span> <span class="op">?</span> i <span class="op">:</span> <span class="dv">0</span>)))</span>
+<span id="cb2-347"><a href="" aria-label="347"></a></span>
+<span id="cb2-348"><a href="" aria-label="348"></a>maPanel <span class="op">=</span> (title<span class="op">,</span> plot) <span class="kw">=&gt;</span> <span class="fu">html</span><span class="vs">`&lt;div&gt;</span></span>
+<span id="cb2-349"><a href="" aria-label="349"></a><span class="vs">  &lt;div style="text-align: center"&gt;</span><span class="sc">${</span>title<span class="sc">}</span><span class="vs">&lt;/div&gt;</span></span>
+<span id="cb2-350"><a href="" aria-label="350"></a><span class="vs">  </span><span class="sc">${</span>plot<span class="sc">}</span></span>
+<span id="cb2-351"><a href="" aria-label="351"></a><span class="vs">&lt;/div&gt;`</span></span>
+<span id="cb2-352"><a href="" aria-label="352"></a></span>
+<span id="cb2-353"><a href="" aria-label="353"></a><span class="fu">html</span><span class="vs">`&lt;div style="display: flex; gap: 20px; justify-content: center; font-size: 19px"&gt;</span></span>
+<span id="cb2-354"><a href="" aria-label="354"></a><span class="sc">${</span><span class="fu">maPanel</span>(<span class="fu">html</span><span class="vs">`One path, Var(&lt;i&gt;y&lt;sub&gt;t&lt;/sub&gt;&lt;/i&gt;) = </span><span class="sc">${</span><span class="fu">maGamma</span>(<span class="dv">0</span>)<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> Plot<span class="op">.</span><span class="fu">plot</span>({</span>
+<span id="cb2-355"><a href="" aria-label="355"></a>  <span class="dt">width</span><span class="op">:</span> <span class="dv">590</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">380</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">50</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
+<span id="cb2-356"><a href="" aria-label="356"></a>  <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"18px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
+<span id="cb2-357"><a href="" aria-label="357"></a>  <span class="dt">x</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"Periods"</span><span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
+<span id="cb2-358"><a href="" aria-label="358"></a>  <span class="dt">y</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="op">-</span><span class="dv">6</span><span class="op">,</span> <span class="dv">6</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> <span class="dv">5</span>}<span class="op">,</span></span>
+<span id="cb2-359"><a href="" aria-label="359"></a>  <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb2-360"><a href="" aria-label="360"></a>  <span class="dt">marks</span><span class="op">:</span> [</span>
+<span id="cb2-361"><a href="" aria-label="361"></a>    Plot<span class="op">.</span><span class="fu">ruleY</span>([<span class="dv">0</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"black"</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"5,4"</span>})<span class="op">,</span></span>
+<span id="cb2-362"><a href="" aria-label="362"></a>    Plot<span class="op">.</span><span class="fu">line</span>(maPath<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"t"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"y"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">1.3</span><span class="op">,</span> <span class="dt">clip</span><span class="op">:</span> <span class="kw">true</span>})</span>
+<span id="cb2-363"><a href="" aria-label="363"></a>  ]</span>
+<span id="cb2-364"><a href="" aria-label="364"></a>}))<span class="sc">}</span></span>
+<span id="cb2-365"><a href="" aria-label="365"></a><span class="sc">${</span><span class="fu">maPanel</span>(<span class="fu">html</span><span class="vs">`Autocorrelation &lt;i&gt;ρ&lt;sub&gt;h&lt;/sub&gt;&lt;/i&gt;, &lt;i&gt;ρ&lt;/i&gt;&lt;sub&gt;1&lt;/sub&gt; = </span><span class="sc">${</span>maACF[<span class="dv">1</span>]<span class="op">.</span><span class="at">rho</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> Plot<span class="op">.</span><span class="fu">plot</span>({</span>
+<span id="cb2-366"><a href="" aria-label="366"></a>  <span class="dt">width</span><span class="op">:</span> <span class="dv">590</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">380</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">50</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
+<span id="cb2-367"><a href="" aria-label="367"></a>  <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"18px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
+<span id="cb2-368"><a href="" aria-label="368"></a>  <span class="dt">x</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"Lag h"</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="op">-</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">12.5</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">0</span><span class="op">,</span> <span class="dv">13</span><span class="op">,</span> <span class="dv">2</span>)<span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
+<span id="cb2-369"><a href="" aria-label="369"></a>  <span class="dt">y</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="op">-</span><span class="dv">1</span><span class="op">,</span> <span class="dv">1</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> <span class="dv">5</span>}<span class="op">,</span></span>
+<span id="cb2-370"><a href="" aria-label="370"></a>  <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb2-371"><a href="" aria-label="371"></a>  <span class="dt">marks</span><span class="op">:</span> [</span>
+<span id="cb2-372"><a href="" aria-label="372"></a>    Plot<span class="op">.</span><span class="fu">ruleY</span>([<span class="dv">0</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"black"</span>})<span class="op">,</span></span>
+<span id="cb2-373"><a href="" aria-label="373"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([maQ <span class="op">+</span> <span class="fl">0.5</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"7,5"</span>})<span class="op">,</span></span>
+<span id="cb2-374"><a href="" aria-label="374"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>(maACF<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"h"</span><span class="op">,</span> <span class="dt">y1</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span> <span class="dt">y2</span><span class="op">:</span> <span class="st">"rho"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">2.5</span>})<span class="op">,</span></span>
+<span id="cb2-375"><a href="" aria-label="375"></a>    Plot<span class="op">.</span><span class="fu">dot</span>(maACF<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"h"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"rho"</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">r</span><span class="op">:</span> <span class="dv">5</span>})<span class="op">,</span></span>
+<span id="cb2-376"><a href="" aria-label="376"></a>    Plot<span class="op">.</span><span class="fu">text</span>([maQ <span class="op">===</span> <span class="dv">0</span> <span class="op">?</span> <span class="st">"white noise: ρ = 0 at every lag h ≥ 1"</span> <span class="op">:</span> <span class="vs">`ρ = 0 at every lag h &gt; q = </span><span class="sc">${</span>maQ<span class="sc">}</span><span class="vs">`</span>]<span class="op">,</span> {<span class="dt">frameAnchor</span><span class="op">:</span> <span class="st">"top-right"</span><span class="op">,</span> <span class="dt">dx</span><span class="op">:</span> <span class="op">-</span><span class="dv">10</span><span class="op">,</span> <span class="dt">dy</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">fontWeight</span><span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">20</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"white"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">6</span>})</span>
+<span id="cb2-377"><a href="" aria-label="377"></a>  ]</span>
+<span id="cb2-378"><a href="" aria-label="378"></a>}))<span class="sc">}</span></span>
+<span id="cb2-379"><a href="" aria-label="379"></a><span class="vs">&lt;/div&gt;`</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <div id="ojs-cell-2-1" data-nodetype="declaration">
@@ -756,7 +756,8 @@ y_t = \mu + \sum_{i=1}^{p} \phi_i L^i y_t + \varepsilon_t \implies \left(1 - \su
 <p>But <span class="math inline">\(\Phi(L)^{-1}\mu\)</span> is just a number. And <span class="math inline">\(\Phi(L)^{-1}\varepsilon_t\)</span> is an MA(<span class="math inline">\(\infty\)</span>) process in past shocks!</p>
 <ul>
 <li><span class="alert">Exercise (problem set): show that this MA(<span class="math inline">\(\infty\)</span>) process is weakly stationary</span></li>
-<li>Roots on the unit circle: no stationary solution (<span class="math inline">\(\phi_1 = 1\)</span> is next). Roots inside: the solution depends on future shocks, which we rule out</li>
+<li>Roots on the unit circle: no stationary solution (<span class="math inline">\(\phi_1 = 1\)</span> is next)</li>
+<li>Roots inside: the stationary solution depends on future shocks, which we rule out</li>
 </ul>
 </div>
 </section></section>
@@ -886,10 +887,10 @@ y_t = \mu + \sum_{i=1}^{p} \phi_i L^i y_t + \varepsilon_t \implies \left(1 - \su
 <section id="references" class="slide level2" data-visibility="uncounted">
 <h2>References</h2>
 <ul>
-<li>Chapter 2 of <em>Time Series Analysis</em>, by James Hamilton, for the lag operator</li>
-<li>Chapter 3 of <em>Time Series Analysis</em>, by James Hamilton, for AR and MA models</li>
-<li>Chapter 14 of <em>Econometrics</em>, by Bruce Hansen</li>
-<li>Rynne, B. P. and M. A. Youngson (2008). <em>Linear Functional Analysis</em>, 2nd edition. Springer</li>
+<li>Chapter 2 of <em>Time Series Analysis</em>, by <span class="fgv">James Hamilton (1994)</span>, for the lag operator</li>
+<li>Chapter 3 of <em>Time Series Analysis</em>, by <span class="fgv">James Hamilton (1994)</span>, for AR and MA models</li>
+<li>Chapter 14 of <em>Econometrics</em>, by <span class="fgv">Bruce Hansen (2022)</span></li>
+<li>Chapter 17 of <em>Functional Analysis</em>, by <span class="fgv">Peter Lax (2002)</span>, for the Neumann series</li>
 </ul>
 
 </section></section>
