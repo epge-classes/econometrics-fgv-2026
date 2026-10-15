@@ -19,3 +19,10 @@ The repository's README explains how to clone it and push.
 - Data: [`PS1/karlan.csv`](PS1/karlan.csv)
 - Submit in: `Assignment-01`
 - Due date: 2026-10-19
+
+## Problem Set 2
+
+- PDF: [`PS2/problem_set_2.pdf`](PS2/problem_set_2.pdf) ([LaTeX source](PS2/problem_set_2.tex))
+- Data: [`PS2/ipca_igpm.csv`](PS2/ipca_igpm.csv)
+- Submit in: `Assignment-02`
+- Due date: TBA
