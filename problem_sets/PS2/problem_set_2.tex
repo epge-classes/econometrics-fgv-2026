@@ -1,0 +1,267 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=2cm]{geometry}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\linespread{1.3}
+\parskip=12pt
+\parindent=0pt
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage[section]{placeins}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{mathpazo}
+
+\usepackage[dvipsnames]{xcolor}
+\definecolor{slateblue}{RGB}{45, 62, 80}
+\definecolor{FGVBlue}{RGB}{0, 114, 188}
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=FGVBlue,
+	urlcolor=FGVBlue,
+	citecolor=FGVBlue,
+}
+
+% Defining the question styles
+\theoremstyle{definition}
+\newtheorem{prob}{Problem}
+
+% Custom commands
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\symbf}[1]{\boldsymbol{#1}}
+
+% Command to start a new section with the word "Problem" and enumerate automatically
+\newcounter{problem}
+\renewcommand{\theproblem}{\arabic{problem}}
+
+\newcommand{\problem}[1]{
+	\stepcounter{problem}
+	\section*{Problem \theproblem{} -- (points: #1)}
+}
+
+\begin{document}
+	\begin{center}
+		{\LARGE{\textbf{Problem Set II}}}\\
+		\vspace{0.2cm}
+		Econometrics I - \textcolor{FGVBlue}{FGV EPGE}\\
+		Instructor: Raul Guarini Riva \\
+		TA: Taric Latif Padovani
+	\end{center}
+
+\problem{1}
+In this problem, we will play with different concepts.
+
+\begin{enumerate}[a)]
+	\item Consider the following process:
+	\begin{equation*}
+		y_t = \cos(t + \theta), \forall t \in \mathbb{Z}
+	\end{equation*}
+	where $\theta$ is a discrete random variable, uniformly distributed over the set $\{0, \pi/2, \pi, 3\pi/2\}$.
+
+	Show that this process is covariance stationary (or weakly stationary).
+
+	\item Show that this process is \textbf{not} strictly stationary.
+	\item Now, we consider a different process. Let $z_t$ be such that:
+	\begin{equation*}
+		z_t = \begin{cases}
+			1,\quad \forall t & \text{with probability } 0.5 \\
+			0, \quad \forall t & \text{with probability } 0.5
+		\end{cases}
+	\end{equation*}
+	Argue that this process is weakly stationary by computing its first two moments and its autocovariance function. Now, argue that the time-series mean of \textit{any} realized path will \textit{never} converge towards the mean of $z_t$, i.e., it's not mean-ergodic.
+\end{enumerate}
+
+\problem{1}
+Consider the following AR(2) process:
+\begin{equation*}
+	(I - 1.1L + 0.18L^2)y_t = \varepsilon_t
+\end{equation*}
+where $\varepsilon_t$ is a white noise process with variance $\sigma^2 > 0$. Does this equation admit a weakly stationary solution? If so, compute its mean, its variance, and its entire autocovariance function.
+
+\problem{1}
+Consider the AR(3) process:
+\begin{equation*}
+	y_t = -0.22 + 0.3y_{t-1} + 0.5y_{t-2} + 0.2y_{t-3} + \varepsilon_t
+\end{equation*}
+where $\varepsilon_t$ is a white noise process with variance $\sigma^2$.
+
+\begin{enumerate}[a)]
+	\item Does this equation admit a weakly stationary solution? If so, compute its entire autocovariance function. If not, explain why.
+	\item Determine the dynamics of $\Delta y_t \equiv y_t - y_{t-1}$. What kind of model does the differenced equation describe? Does it admit a weakly stationary solution?
+\end{enumerate}
+
+\textit{Hint}: Use the Fundamental Theorem of Algebra.
+
+\problem{1}
+This question is a ``warm-up'' exercise that will be useful for the following problem.
+
+Consider the polynomial $f(x) = a_p x^p + a_{p-1} x^{p-1} + \cdots + a_1 x + a_0$, where $a_i \in \mathbb{R}$ for all $i = 0, 1, \ldots, p$ and $a_p \neq 0$. Further assume that $a_0 \neq 0$. Let $\lambda$ be any root for this polynomial.
+
+\begin{enumerate}[a)]
+	\item Argue that $\lambda \neq 0$;
+	\item Consider another polynomial $g(x) = a_p + a_{p-1} x + \cdots + a_1 x^{p-1} + a_0 x^p$. Show that $1/\lambda$ is a root of $g(\cdot)$;
+	\item Argue that if $f(\cdot)$ has all its roots outside the unit circle, then $g(\cdot)$ has all its roots inside the unit circle.
+\end{enumerate}
+
+\newpage
+\problem{2}
+In this question, you will prove a claim we made in the slides. Consider a general AR($p$) model with $\phi_p \neq 0$:
+\begin{equation*}
+y_t = \mu + \phi_1 y_{t-1} + \phi_2 y_{t-2} + \cdots + \phi_p y_{t-p} + \varepsilon_t
+\end{equation*}
+where $\varepsilon_t$ is a white noise process. Define the operator $\Phi(L) = I - \phi_1 L - \phi_2 L^2 - \cdots - \phi_p L^p$. We assume that all roots of its associated polynomial $f(x) = 1 - \phi_1x - \phi_2x^2 - \cdots - \phi_px^p$ lie outside the unit circle. As we saw in the slides, this implies that there exists an inverse operator $\psi(L) \equiv \Phi(L)^{-1} = \psi_0 I + \psi_1 L + \psi_2 L^2 + \cdots$ such that $\psi(L)\Phi(L) = I$.
+
+The solution in current and past shocks can then be written as $y_t = \psi(L)\mu + \psi(L)\varepsilon_t$.
+
+\begin{enumerate}[a)]
+	\item Compute $\psi(L)\mu$ explicitly as a function of $\mu$ and $(\phi_1, \dots, \phi_p)$.
+
+	\textit{Hint}: what happens when you apply $\Phi(L)$ to a constant?
+
+	\item We argued in class that the invertibility condition for $\Phi(L)$ was enough to ensure that this process is stationary because its MA($\infty$) representation is stationary. We will now work in steps to prove this claim.
+
+		Recall that the MA representation is weakly stationary if $\sum\limits_{i=0}^{\infty}\psi_i^2 < \infty$. We will show that these coefficients satisfy this condition by characterizing $\psi_i$ as a function of $(\phi_1, \dots, \phi_p)$.
+
+	By definition, we have that:
+	\begin{equation*}
+			(I - \phi_1 L - \phi_2 L^2 - \cdots - \phi_p L^p)(\psi_0 I + \psi_1 L + \psi_2 L^2 + \cdots) = I
+	\end{equation*}
+
+	After performing these infinite multiplications, you will get constant terms, terms that depend on $L$, terms that depend on $L^2$, terms that depend on $L^3$, and so on. Any terms that depend on powers of $L$ should be identically zero, by definition.
+
+		Show that $\psi_0 = 1$ and, taking $\psi_j = 0$ for $j < 0$, that
+	\begin{equation}
+		\label{eq:recurrence}
+			\psi_k = \phi_1 \psi_{k-1} + \phi_2 \psi_{k-2} + \cdots + \phi_p \psi_{k-p}, \qquad k \geq 1.
+	\end{equation}
+
+	\item For $k \geq p$, recognize that \eqref{eq:recurrence} is a linear, homogeneous, $p$th-order difference equation in the $\psi$'s. Find its characteristic polynomial and explain why all its roots lie inside the unit circle.
+
+	\item A standard result for linear homogeneous difference equations is that every solution is a linear combination of terms $k^j r^k$, where $r$ is a root of the characteristic polynomial and $j = 0, \dots, d_r-1$, with $d_r$ denoting the multiplicity of that root. There are $p$ such terms in total, counting multiplicities. For a review, see \href{https://wwz.unibas.ch/fileadmin/user_upload/wwz/00_Professuren/Kleiber_Oekonometrie_und_Statistik/Downloads/Topics/Skript008_DifferenceEquations.pdf}{Section 3.1 of these notes}.
+
+	Using this fact, explain why $\sum\limits_{i=0}^{\infty}\psi_i^2 < \infty$.
+
+	\emph{Hint}: think about the different tests for the convergence of infinite sums.
+\end{enumerate}
+
+\newpage
+\problem{2}
+In this question, you will analyze two common price indexes for the Brazilian economy: IPCA and \mbox{IGP-M}. The data for this question, \texttt{ipca\_igpm.csv}, is in the \texttt{problem\_sets/PS2} folder of the class GitHub repo. You have access to the monthly time series of the month-over-month changes for these price indexes.
+
+For a series with $T$ observations, use the sample-moment definitions from Lecture 3:
+\[
+\begin{aligned}
+\bar{y}_T &= \frac{1}{T}\sum_{t=1}^T y_t,
+&\qquad \hat{\rho}_h &= \frac{\hat{\gamma}_h}{\hat{\gamma}_0},\\
+\hat{\gamma}_h &= \frac{1}{T}\sum_{t=1}^{T-h}(y_t-\bar{y}_T)(y_{t+h}-\bar{y}_T),
+& h &= 0,1,\dots,24.
+\end{aligned}
+\]
+
+\begin{enumerate}[a)]
+	\item What are the main conceptual differences between IPCA and IGP-M? What are they measuring?
+	\item Create a time-series plot with the two series.
+	\item Assume both series are stationary. Estimate their mean, variance, and autocovariances up to lag 24. Which one displays the most volatility?
+	\item Plot the sample autocorrelation function of both series. How would you describe the differences in persistence between them?
+	\item \textbf{Seasonality and stationarity.} Some prices are readjusted at the same time every year, so the calendar month may matter.
+	\begin{enumerate}[(i)]
+		\item For each series, compute the average monthly change for each calendar month (the average over all Januaries, all Februaries, and so on) and plot the twelve averages. Which months stand out for IPCA? Can you think of an economic reason?
+		\item Consider the model $y_t = s_{m(t)} + x_t$, where $m(t) \in \{1, \dots, 12\}$ is the calendar month of period $t$, $s_1, \dots, s_{12}$ are constants that are not all equal, and $x_t$ is a weakly stationary process with mean zero. Show that $y_t$ is \textbf{not} weakly stationary. Which condition in the definition fails?
+		\item To see how seasonality shows up in the autocorrelation function, shut down $x_t$ for a moment, so that $y_t = s_{m(t)}$ is a deterministic sequence that repeats every 12 months. Show that, as $T \to \infty$, the sample autocovariance at lag $h$ converges to $\frac{1}{12}\sum_{m=1}^{12}(s_m - \bar{s})(s_{m+h} - \bar{s})$, where $\bar{s}$ is the average of the $s_m$'s and the month index wraps around ($s_{13} = s_1$, and so on). What is its value at $h = 12, 24, 36, \dots$? Why?
+		\item Remove the seasonal pattern from IPCA: let $z_t = y_t - \hat{s}_{m(t)}$, where $\hat{s}_m$ are the calendar-month averages from item (i). Redo items c), d) and e)(i) for $z_t$. Does the spike at lag 12 disappear?
+	\end{enumerate}
+
+	\item Given your answers, how appropriate is it to model monthly inflation as a stationary process?
+	\end{enumerate}
+
+\newpage
+\problem{2}
+In Lecture 2, we developed the bootstrap for i.i.d.\ data. This question explores what happens under serial dependence and whether resampling blocks can improve inference. You should use AI to help you be faster with plots and with the whole implementation. But make sure you understand what the code is doing and what you are asking AI to help with.
+
+Consider the stationary AR(1) process
+\begin{equation*}
+	y_t = \mu + \phi_1 y_{t-1} + \varepsilon_t, \qquad |\phi_1| < 1,
+\end{equation*}
+where $\varepsilon_t$ is i.i.d.\ $N(0, \sigma^2)$. Let $\nu \equiv \E[y_t] = \mu/(1-\phi_1)$ and let $\gamma_h$ be the autocovariance function of $y_t$. You observe $y_1, \dots, y_T$ and estimate $\nu$ with the sample mean $\bar{y}_T = \frac{1}{T}\sum_{t=1}^T y_t$.
+
+\begin{enumerate}[a)]
+	\item \textbf{The true variance of $\bar{y}_T$.}
+	\begin{enumerate}[(i)]
+		\item Show that
+		\begin{equation*}
+			\Var\left(\sqrt{T}\,\bar{y}_T\right) = \sum_{h=-(T-1)}^{T-1}\left(1 - \frac{|h|}{T}\right)\gamma_h.
+		\end{equation*}
+		\textit{Hint}: write $\Var(\sum_t y_t) = \sum_t \sum_s \mathrm{Cov}(y_t, y_s)$ and count how many pairs $(t, s)$ satisfy $t - s = h$.
+		\item Using $\gamma_h = \phi_1^{|h|}\gamma_0$ from the slides, show that
+		\begin{equation*}
+			\Var\left(\sqrt{T}\,\bar{y}_T\right) \xrightarrow{T \to \infty} \omega^2 \equiv \gamma_0\,\frac{1+\phi_1}{1-\phi_1} = \frac{\sigma^2}{(1-\phi_1)^2}.
+		\end{equation*}
+		\textit{Hint}: split the sum into $\sum_h \phi_1^{|h|}$ and $\frac{1}{T}\sum_h |h|\,\phi_1^{|h|}$.
+		\item If the data were i.i.d., we would have $\Var(\sqrt{T}\,\bar{y}_T) = \gamma_0$. For which values of $\phi_1$ is $\omega^2$ larger than $\gamma_0$?
+	\end{enumerate}
+	From now on, take as given that $\sqrt{T}(\bar{y}_T - \nu) \xrightarrow{d} N(0, \omega^2)$. We will justify this claim later in the course. You may also take the ergodicity of this stationary Gaussian AR(1) process as given and assume the data have as many moments as you need.
+
+	\item \textbf{What the i.i.d.\ bootstrap estimates.} Suppose we \textit{ignore} the time ordering and apply the bootstrap from Lecture 2: conditional on the data, draw $y^*_1, \dots, y^*_T$ i.i.d.\ from $\hat{P}_T$, the empirical distribution of $\{y_1, \dots, y_T\}$, and compute $\bar{y}^*_T$. Throughout this problem, $\E^*$, $\Var^*$ and $\mathrm{Cov}^*$ denote conditional moments under the resampling scheme, holding the observed data fixed.
+	\begin{enumerate}[(i)]
+		\item Argue that $\E^*[y^*_t] = \bar{y}_T$ and $\Var^*(y^*_t) = \hat{\gamma}_0 \equiv \frac{1}{T}\sum_{t=1}^T (y_t - \bar{y}_T)^2$.
+		\item Explain why $\mathrm{Cov}^*(y^*_t, y^*_s) = 0$ for $t \neq s$, even though $\mathrm{Cov}(y_t, y_s) \neq 0$ in the data. Conclude that $\Var^*(\sqrt{T}\,\bar{y}^*_T) = \hat{\gamma}_0$.
+		\item Use the ergodic theorem from Lecture 3 to find the probability limit of $\Var^*(\sqrt{T}\,\bar{y}^*_T)$. Compare it with $\omega^2$ from item a). Which feature of the data does the bootstrap throw away?
+		\item Define the bootstrap root $R_T^* = \bar{y}_T^* - \bar{y}_T$ and let $q_\alpha^*$ be its conditional $\alpha$-quantile. The nominal 95\% bootstrap confidence interval for $\nu$ is $\left[\bar{y}_T - q_{0.975}^*,\ \bar{y}_T - q_{0.025}^*\right]$. Take as given that the bootstrap distribution of $\sqrt{T}R_T^*$ is approximately $N(0, \gamma_0)$. Show that the interval is approximately $\bar{y}_T \pm 1.96\sqrt{\gamma_0/T}$, and that its coverage probability converges to
+		\begin{equation*}
+			2\,\Phi\left(1.96\sqrt{\frac{1-\phi_1}{1+\phi_1}}\right) - 1,
+		\end{equation*}
+		where $\Phi(\cdot)$ here denotes the cdf of a $N(0, 1)$ (not the lag polynomial from Problem 5).
+		\item Evaluate this formula for $\phi_1 \in \{-0.5, 0, 0.5, 0.9\}$. Is the interval too narrow or too wide in each case?
+	\end{enumerate}
+
+	\item \textbf{Watch it fail.} Set $\mu = 0$, $\sigma^2 = 1$ and $T = 200$. For each $\phi_1 \in \{-0.5, 0, 0.5, 0.9\}$, simulate $M = 500$ samples and, in each one, compute the i.i.d.\ bootstrap interval from item b) with $B = 499$ bootstrap samples. Report how often the interval covers the true mean $\nu = 0$, together with its average width, and compare the coverage with your formula from item b).
+
+	As in Lecture 2, estimate the bootstrap quantiles using the empirical cdf $L_T$ of the $B$ simulated bootstrap roots. Use the same procedure for the block bootstrap below.
+
+	\textit{Hint}: draw $y_1$ from the stationary distribution, $N\left(\nu, \sigma^2/(1-\phi_1^2)\right)$, and generate the rest of the path recursively. Why does this matter?
+
+	\item \textbf{The bootstrap erases time.} Use the monthly IPCA series from Problem 6. Let $\hat{\rho}_1 = \hat{\gamma}_1/\hat{\gamma}_0$ be its first-order sample autocorrelation.
+	\begin{enumerate}[(i)]
+		\item Draw one i.i.d.\ bootstrap sample and plot it next to the original series, on the same axes. What has been lost?
+		\item Compute $\hat{\rho}_1$ in the data. Then draw $B = 999$ i.i.d.\ bootstrap samples, compute $\hat{\rho}^*_1$ in each one, and plot the histogram of $\hat{\rho}^*_1$ with the value from the data marked on it.
+		\item Explain why the bootstrap distribution of $\hat{\rho}^*_1$ is centered near zero.
+	\end{enumerate}
+
+	\item \textbf{Resampling blocks.} The \textit{circular block bootstrap} resamples blocks of consecutive observations instead of single observations. This retains some of the time ordering, but does not automatically yield valid confidence intervals. Fix a block length $b$ and let $k = \lceil T/b \rceil$. Extend the data circularly, setting $y_{T+j} = y_j$ for $j \geq 1$. Then:
+	\begin{itemize}
+		\item Draw $k$ starting points $I_1, \dots, I_k$ i.i.d.\ uniform on $\{1, \dots, T\}$;
+		\item Form the blocks $(y_{I_j}, y_{I_j+1}, \dots, y_{I_j+b-1})$ for $j = 1, \dots, k$;
+		\item Put the blocks one after the other and keep the first $T$ observations. This is $y^*_1, \dots, y^*_T$.
+	\end{itemize}
+	\begin{enumerate}[(i)]
+		\item Show that $b = 1$ gives back the i.i.d.\ bootstrap.
+		\item Show that each $y^*_t$, taken on its own, is a uniform draw from $\{y_1, \dots, y_T\}$, so that $\E^*[\bar{y}^*_T] = \bar{y}_T$. Where did you use the circular extension?
+		\item In the bootstrap world, are $y^*_t$ and $y^*_{t+1}$ correlated? Does your answer depend on $t$?
+		\item Repeat item c) with the circular block bootstrap for $b \in \{1, 2, 3, 5, 10, 20, 30, 50, 75, 100\}$, using $\phi_1 \in \{-0.5, 0.5, 0.9\}$. Use the same $M = 500$ original samples for all block lengths, with $B = 499$ bootstrap samples for each interval. Report the coverage in a table, with one row per $\phi_1$ and one column per $b$. Also plot coverage and average interval width as functions of $b$, with one curve per $\phi_1$. Mark the nominal 95\% coverage on the coverage plot.
+		\item Which block lengths give coverage closest to 95\% for each $\phi_1$? Does the same choice work best in all three cases? Describe what happens as the blocks become longer, allowing for Monte Carlo noise. Do not assume that coverage changes monotonically with $b$.
+		\item Why is $\phi_1 = 0.9$ the hardest case?
+	\end{enumerate}
+
+	\textit{Hint}: the circular extension is just modular arithmetic on the indices, and the whole bootstrap can be vectorized.
+
+	\item \textbf{Back to the data.} Use the monthly IPCA series again.
+	\begin{enumerate}[(i)]
+		\item Compute 95\% circular block bootstrap confidence intervals for the mean of monthly IPCA, for $b \in \{1, 3, 6, 12, 24, 48, 96\}$, with $B = 999$. Use the interval construction from item b). Report each interval and its width relative to $b = 1$.
+		\item Validity of the block bootstrap still depends on suitable stationarity and dependence assumptions. Given your answers to Problem 6, how much do you trust these intervals? Does using a longer block address all your concerns?
+	\end{enumerate}
+
+	\item \textbf{Choosing the block length.} Use your results to think about the trade-off involved in choosing $b$.
+	\begin{enumerate}[(i)]
+		\item Consider the extreme case $b = T$. What happens to the bootstrap distribution of the sample mean? What confidence interval results? Derive your answer without running a simulation.
+		\item Compare $b = 1$, the intermediate block lengths in your simulations, and $b = T$. Explain what is lost when blocks are too short and when they are too long. Support your answer with the coverage and interval-width plots. \textit{Hint}: distinguish the length of each block from the number of independently sampled block starts. Relate this trade-off to the choice of bandwidth in Lecture 1.
+		\item Suppose $T$ increases while the underlying dependent AR(1) process, with $\phi_1 \neq 0$, stays the same. Should $b$ remain fixed? Should it remain a fixed fraction of $T$? Explain how you would want both the block length and the number of sampled blocks to change. Give intuitive arguments, without proving a consistency result.
+	\end{enumerate}
+\end{enumerate}
+
+\end{document}
