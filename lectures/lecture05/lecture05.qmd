@@ -1,0 +1,919 @@
+---
+title: "Lecture 5: ARMA Models and the Wold Decomposition"
+talkdate: "October 2026"
+jupyter: python3
+---
+
+# Introduction {visibility="uncounted"}
+
+## Where We Are
+
+- Last lecture: MA and AR models, two very different ways to model dependence over time
+- An **ARMA** model combines both $\implies$ a very flexible model
+
+. . .
+
+- We will also talk about forecasting with ARMA models: really useful in the real world!
+- **Wold's decomposition**: _the_ class of stationary processes to worry about
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# ARMA(p,q) Models {visibility="uncounted"}
+
+## The ARMA(p,q) Model
+
+- Let $\varepsilon_t$ be a white noise with variance $\sigma^2$
+- An ARMA$(p,q)$ process $y_t$ satisfies
+
+$$
+y_t = \mu + \phi_1 y_{t-1} + \dots + \phi_p y_{t-p} + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \dots + \theta_q \varepsilon_{t-q}
+$$
+
+- Equivalently, in lag-operator notation:
+
+$$
+\phi(L)\, y_t = \mu + \theta(L)\, \varepsilon_t
+$$
+
+where $\phi(L) = 1 - \phi_1 L - \dots - \phi_p L^p$ and $\theta(L) = 1 + \theta_1 L + \dots + \theta_q L^q$
+
+. . .
+
+- What conditions ensure that $y_t$ is stationary?
+
+## When Is an ARMA(p,q) Stationary?
+
+- If the roots of $\phi(L)$ are outside the unit circle, then $\phi(L)^{-1}$ is well defined
+- Inverting $\phi(L)$ gives an MA($\infty$):
+
+$$
+y_t = \frac{\mu}{1 - \phi_1 - \dots - \phi_p} + \underbrace{\phi(L)^{-1}\theta(L)}_{\equiv\, \psi(L)}\, \varepsilon_t
+$$
+
+- So $\E[y_t] = \frac{\mu}{1 - \phi_1 - \dots - \phi_p}$
+
+. . .
+
+::: {.thm .takeaway}
+::: {.thmhead}
+Takeaway
+:::
+Stationarity depends only on the roots of $\phi(L)$, never on the roots of $\theta(L)$
+:::
+
+## What Autocovariances Do We Get?
+
+- For $h > q$, the MA terms in $y_t$ are uncorrelated with $y_{t-h}$, so
+
+$$
+\gamma_h = \phi_1 \gamma_{h-1} + \dots + \phi_p \gamma_{h-p}, \qquad h > q
+$$
+
+- Roots of $\phi(L)$ outside the unit circle $\implies \gamma_h \to 0$ exponentially fast
+
+. . .
+
+- For $h \leq q$, things are way more complicated ([Brockwell and Davis (1991)]{.fgv}, Section 3.3)
+- The last $q$ shocks can create very complex dynamics without affecting stationarity
+
+. . .
+
+::: {.thm .takeaway}
+::: {.thmhead}
+Takeaway
+:::
+After lag $q$ the decay is fast and exponential. The MA part never creates trouble for stationarity
+:::
+
+## A Simulated ARMA(1,4)
+
+$$
+y_t = 0.9\, y_{t-1} + \varepsilon_t - 0.8\, \varepsilon_{t-1} + 0.6\, \varepsilon_{t-2} + 0.4\, \varepsilon_{t-3} + 0.8\, \varepsilon_{t-4}, \qquad \varepsilon_t \iid N(0,1)
+$$
+
+```{python}
+#| fig-align: center
+import numpy as np
+import matplotlib.pyplot as plt
+# Set font to Arial
+plt.rcParams['font.family'] = 'Arial'
+from statsmodels.tsa.arima_process import ArmaProcess
+
+# Parameters for an ARMA(1,4) process
+ar_params = [0.9]
+ma_params = [-0.8, 0.6, 0.4, 0.8]
+
+# Create the ARMA process
+arma_process = ArmaProcess(
+    np.r_[1, -np.array(ar_params)],
+    np.r_[1, np.array(ma_params)]
+)
+
+# Simulate one path from this ARMA process
+np.random.seed(42)
+n_samples = 200
+simulated_data = arma_process.generate_sample(nsample=n_samples, burnin=200)
+
+# Plot simulated data
+plt.figure(figsize=(6.5, 2.6))
+plt.plot(simulated_data, lw=0.5)
+plt.grid(True, alpha=0.3)
+plt.xlabel('Time')
+plt.tight_layout()
+plt.show()
+```
+
+## Dial the AR Coefficient
+
+Same MA part, $\theta = (-0.8, 0.6, 0.4, 0.8)$, and the same shocks: only $\phi_1$ changes. $T = 200$
+
+```{ojs}
+//| echo: false
+viewof acfPhi = {
+  const input = Inputs.range([-0.95, 0.95], {value: 0.9, step: 0.05, label: "φ₁", width: 500})
+  input.style.setProperty("--label-width", "50px")
+  input.style.margin = "0 auto"
+  return input
+}
+```
+
+```{ojs}
+//| echo: false
+// Fixed shocks: the slider changes phi only, never the draws.
+// The first 200 periods are burn-in.
+acfShocks = {
+  const draw = d3.randomNormal.source(d3.randomLcg(2026))(0, 1)
+  return Float64Array.from({length: 404}, draw)
+}
+acfTheta = [1, -0.8, 0.6, 0.4, 0.8]
+acfQ = 4
+
+// y_t = phi y_{t-1} + sum_i theta_i e_{t-i}, started at 0
+acfPath = {
+  const y = []
+  let prev = 0
+  for (let t = 4; t < acfShocks.length; t++) {
+    prev = acfPhi * prev + d3.sum(acfTheta, (c, i) => c * acfShocks[t - i])
+    y.push(prev)
+  }
+  return y.slice(200)
+}
+
+// True ACF from the MA(infinity) weights: psi_j = phi psi_{j-1} + theta_j
+acfTrue = {
+  const psi = [1]
+  for (let j = 1; j < 600; j++) psi.push(acfPhi * psi[j - 1] + (acfTheta[j] ?? 0))
+  const g = h => d3.sum(psi.slice(0, psi.length - h), (p, j) => p * psi[j + h])
+  return d3.range(1, 21).map(h => ({h, rho: g(h) / g(0)}))
+}
+
+// Sample ACF: (1/T) sum (y_t - ybar)(y_{t-h} - ybar), divided by the sample variance
+acfSample = {
+  const T = acfPath.length, m = d3.mean(acfPath)
+  const c = h => d3.sum(d3.range(h, T), t => (acfPath[t] - m) * (acfPath[t - h] - m)) / T
+  return d3.range(1, 21).map(h => ({h, rho: c(h) / c(0)}))
+}
+
+acfPanel = (title, plot) => html`<div>
+  <div style="text-align: center">${title}</div>
+  ${plot}
+</div>`
+
+html`<div style="display: flex; gap: 20px; justify-content: center; font-size: 19px">
+${acfPanel("One path", Plot.plot({
+  width: 560, height: 400, marginLeft: 50, marginBottom: 45,
+  style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {label: "Periods", labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, nice: true, ticks: 5},
+  grid: true,
+  marks: [
+    Plot.ruleY([0], {stroke: "black", strokeDasharray: "5,4"}),
+    Plot.line(acfPath, {x: (d, i) => i + 1, y: d => d, stroke: "#0072BC", strokeWidth: 1.3})
+  ]
+}))}
+${acfPanel(html`Autocorrelation <i>ρ<sub>h</sub></i>: <span style="color: #0072BC">true</span> vs. <span style="color: #EB811B">sample</span>`, Plot.plot({
+  width: 620, height: 400, marginLeft: 50, marginBottom: 45,
+  style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {label: "Lag h", domain: [0.5, 20.5], ticks: d3.range(2, 21, 2), labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: [-1, 1], ticks: 5},
+  grid: true,
+  marks: [
+    Plot.ruleY([0], {stroke: "black"}),
+    Plot.ruleX([acfQ + 0.5], {stroke: "#EB811B", strokeWidth: 2, strokeDasharray: "7,5"}),
+    Plot.ruleX(acfTrue, {x: "h", y1: 0, y2: "rho", stroke: "#0072BC", strokeWidth: 2.5}),
+    Plot.dot(acfTrue, {x: "h", y: "rho", fill: "#0072BC", r: 5}),
+    Plot.dot(acfSample, {x: "h", y: "rho", stroke: "#EB811B", symbol: "times", r: 6, strokeWidth: 2.5}),
+    Plot.text([`after q = ${acfQ}: ρₕ = φ₁ ρₕ₋₁`], {frameAnchor: "top-right", dx: -10, dy: 10, fill: "#EB811B", fontWeight: "bold", fontSize: 20, stroke: "white", strokeWidth: 6})
+  ]
+}))}
+</div>`
+```
+
+## Example: ARMA(1,1)
+
+- Consider an ARMA(1,1) process:
+
+$$
+y_t = \mu + \phi_1 y_{t-1} + \varepsilon_t + \theta_1 \varepsilon_{t-1}, \qquad |\phi_1| < 1
+$$
+
+- We already know that $\gamma_h = \phi_1 \gamma_{h-1}$ for $h \geq 2$
+- So we just need $\gamma_0$ and $\gamma_1$
+
+. . .
+
+- Two facts we will use, both from the MA($\infty$) representation:
+
+$$
+\Cov(\varepsilon_t, y_t) = \sigma^2, \qquad \Cov(\varepsilon_{t-1}, y_t) = \phi_1 \sigma^2 + \theta_1 \sigma^2
+$$
+
+- And $\Cov(\varepsilon_t, y_{t-1}) = 0$, since $y_{t-1}$ only depends on past shocks
+
+## Solving for $\gamma_0$ and $\gamma_1$ {.tightmath}
+
+Take covariances of both sides of the model with $y_t$ and with $y_{t-1}$:
+$$
+\begin{aligned}
+\gamma_0 &= \phi_1 \gamma_1 + \Cov(\varepsilon_t, y_t) + \theta_1 \Cov(\varepsilon_{t-1}, y_t) = \phi_1 \gamma_1 + \sigma^2 + \theta_1 (\phi_1 + \theta_1) \sigma^2 \\
+\gamma_1 &= \phi_1 \gamma_0 + \Cov(\varepsilon_t, y_{t-1}) + \theta_1 \Cov(\varepsilon_{t-1}, y_{t-1}) = \phi_1 \gamma_0 + \theta_1 \sigma^2
+\end{aligned}
+$$
+
+. . .
+
+Plug the second equation into the first and solve the linear system:
+$$
+\begin{aligned}
+\gamma_0 &= \frac{1 + \theta_1^2 + 2 \theta_1 \phi_1}{1 - \phi_1^2}\, \sigma^2 \\
+\gamma_1 &= \frac{(1 + \theta_1 \phi_1)(\phi_1 + \theta_1)}{1 - \phi_1^2}\, \sigma^2 \\
+\gamma_h &= \phi_1^{h-1} \gamma_1, \qquad h \geq 2
+\end{aligned}
+$$
+
+. . .
+
+- Wait a minute... what happens if $\theta_1 = -\phi_1$?
+
+## The Minimal Representation
+
+- In that case $\gamma_h = 0$ for all $h \geq 1$: $y_t$ is white noise!!!
+
+. . .
+
+- ARMA models can be **overparameterized**
+- Factor the lag polynomials using their roots:
+
+$$
+\phi(L) = (1 - r_1 L)(1 - r_2 L) \cdots (1 - r_p L), \qquad \theta(L) = (1 + s_1 L)(1 + s_2 L) \cdots (1 + s_q L)
+$$
+
+. . .
+
+- A common factor cancels: same autocovariances with $p-1$ lags of $y_t$ and $q-1$ lags of $\varepsilon_t$
+- A theoretical reason to prefer small $p$ and $q$ when estimating ARMA models
+- When we write "ARMA(p,q)", we implicitly mean the **minimal representation**
+
+## Cancelling Roots
+
+$y_t = \phi\, y_{t-1} + \varepsilon_t + \theta\, \varepsilon_{t-1}$, same shocks throughout. Try $\theta = -\phi$
+
+```{ojs}
+//| echo: false
+// The button lives inside the form template, so it sets the very theta input
+// on the slide; the input event bubbles up and updates the form's value.
+viewof cancel = Inputs.form(
+  [
+    Inputs.range([-0.95, 0.95], {value: 0.8, step: 0.05, label: "φ", width: 400}),
+    Inputs.range([-0.95, 0.95], {value: 0.4, step: 0.05, label: "θ", width: 400})
+  ],
+  {template: inputs => {
+    inputs.forEach(f => f.style.setProperty("--label-width", "40px"))
+    const button = html`<button type="button" style="font: 19px Arial, Arimo, sans-serif; padding: 4px 14px; cursor: pointer">Set θ = −φ</button>`
+    button.onclick = () => {
+      inputs[1].value = -inputs[0].value
+      inputs[1].dispatchEvent(new Event("input", {bubbles: true}))
+    }
+    return html`<div style="display: flex; gap: 40px; justify-content: center; align-items: center">${inputs}${button}</div>`
+  }}
+)
+```
+
+```{ojs}
+//| echo: false
+cancelPhi = cancel[0]
+cancelTheta = cancel[1]
+
+cancelShocks = {
+  const draw = d3.randomNormal.source(d3.randomLcg(1938))(0, 1)
+  return Float64Array.from({length: 301}, draw)
+}
+
+// Treat theta = -phi up to slider rounding as an exact cancellation
+cancelled = Math.abs(cancelPhi + cancelTheta) < 0.025
+
+// y_t = phi y_{t-1} + e_t + theta e_{t-1}; the first 100 periods are burn-in
+cancelPath = {
+  const y = []
+  let prev = 0
+  for (let t = 1; t < cancelShocks.length; t++) {
+    prev = cancelPhi * prev + cancelShocks[t] + cancelTheta * cancelShocks[t - 1]
+    y.push(prev)
+  }
+  return y.slice(100)
+}
+
+// Closed form: rho_1 = (1 + theta phi)(phi + theta) / (1 + theta^2 + 2 theta phi), rho_h = phi^(h-1) rho_1
+cancelRho1 = cancelled ? 0 :
+  (1 + cancelTheta * cancelPhi) * (cancelPhi + cancelTheta) / (1 + cancelTheta ** 2 + 2 * cancelTheta * cancelPhi)
+cancelACF = d3.range(0, 13).map(h => ({h, rho: h === 0 ? 1 : cancelRho1 * cancelPhi ** (h - 1)}))
+
+html`<div style="display: flex; gap: 20px; justify-content: center; font-size: 19px">
+${acfPanel("One path", Plot.plot({
+  width: 590, height: 370, marginLeft: 50, marginBottom: 45,
+  style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {label: "Periods", labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: [-8, 8], ticks: 5},
+  grid: true,
+  marks: [
+    Plot.ruleY([0], {stroke: "black", strokeDasharray: "5,4"}),
+    Plot.line(cancelPath, {x: (d, i) => i + 1, y: d => d, stroke: "#0072BC", strokeWidth: 1.3, clip: true})
+  ]
+}))}
+${acfPanel(html`Autocorrelation <i>ρ<sub>h</sub></i>, <i>ρ</i><sub>1</sub> = ${cancelRho1.toFixed(2)}`, Plot.plot({
+  width: 590, height: 370, marginLeft: 50, marginBottom: 45,
+  style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {label: "Lag h", domain: [-0.5, 12.5], ticks: d3.range(0, 13, 2), labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: [-1, 1], ticks: 5},
+  grid: true,
+  marks: [
+    Plot.ruleY([0], {stroke: "black"}),
+    Plot.ruleX(cancelACF, {x: "h", y1: 0, y2: "rho", stroke: "#0072BC", strokeWidth: 2.5}),
+    Plot.dot(cancelACF, {x: "h", y: "rho", fill: "#0072BC", r: 5}),
+    cancelled ? Plot.text(["θ = −φ: white noise!"], {frameAnchor: "top-right", dx: -10, dy: 10, fill: "#EB811B", fontWeight: "bold", fontSize: 20, stroke: "white", strokeWidth: 6}) : null
+  ]
+}))}
+</div>`
+```
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# Forecasting with ARMA Models {visibility="uncounted"}
+
+## Forecasting: The Setup
+
+- ARMA models are extremely useful for forecasting
+- They are a simple way to capture complicated dynamics
+
+. . .
+
+- Our job: compute conditional expectations of some process $y_t$
+- Our data: $\{y_1, y_2, \dots, y_T\}$, a _strip_ of _one_ realized path with $T$ observations
+
+. . .
+
+- Exact forecasts depend on the _infinite_ past of the process
+- We will use the _available_ information to compute approximate forecasts
+
+## Forecasting with Infinite Data
+
+- Suppose $y_t$ is a stationary ARMA and we have its MA($\infty$) representation:
+
+$$
+y_t - \mu = \psi(L)\, \varepsilon_t = \sum_{i=0}^{\infty} \psi_i \varepsilon_{t-i}, \qquad \psi_0 = 1, \quad \sum_{i=0}^{\infty} |\psi_i| < \infty
+$$
+
+. . .
+
+- We want $\E[y_{t+s} \mid \varepsilon_t, \varepsilon_{t-1}, \dots]$. Split the shocks into future and past:
+
+$$
+y_{t+s} - \mu = \underbrace{\varepsilon_{t+s} + \psi_1 \varepsilon_{t+s-1} + \dots + \psi_{s-1} \varepsilon_{t+1}}_{\text{future: mean zero}} + \underbrace{\psi_s \varepsilon_t + \psi_{s+1} \varepsilon_{t-1} + \dots}_{\text{known at } t}
+$$
+
+. . .
+
+- This implies
+
+$$
+\E[y_{t+s} \mid \varepsilon_t, \varepsilon_{t-1}, \dots] = \mu + \sum_{i=s}^{\infty} \psi_i \varepsilon_{t+s-i}
+$$
+
+## The Annihilation Operator
+
+- A useful shorthand. Notice that
+
+$$
+\frac{\psi(L)}{L^s} = L^{-s} + \psi_1 L^{1-s} + \dots + \psi_{s-1} L^{-1} + \psi_s + \psi_{s+1} L + \psi_{s+2} L^2 + \dots
+$$
+
+- The **annihilation operator** $[\,\cdot\,]_+$ keeps only the nonnegative powers of $L$:
+
+$$
+\left[\frac{\psi(L)}{L^s}\right]_+ \equiv \psi_s + \psi_{s+1} L + \psi_{s+2} L^2 + \dots
+$$
+
+. . .
+
+- Now we can write
+
+$$
+\E[y_{t+s} \mid \varepsilon_t, \varepsilon_{t-1}, \dots] = \mu + \left[\frac{\psi(L)}{L^s}\right]_+ \varepsilon_t
+$$
+
+## Wait, This Feels Like Cheating...
+
+- We never really observe the shocks $\varepsilon_t$. How can this be useful?
+
+. . .
+
+- Sometimes we can back them out from infinite data!
+- Back to the ARMA representation: $\phi(L)(y_t - \mu) = \theta(L)\, \varepsilon_t$
+- Roots of $\phi(L)$ outside the unit circle $\implies \phi(L)^{-1}$ is well defined
+- Roots of $\theta(L)$ outside the unit circle $\implies \theta(L)^{-1}$ is well defined as well!
+
+. . .
+
+- In this case, the model is **invertible**:
+
+$$
+\theta(L)^{-1} \phi(L)\, (y_t - \mu) = \varepsilon_t \implies \varepsilon_t = \eta(L)\, (y_t - \mu)
+$$
+
+where $\eta(L) \equiv \theta(L)^{-1} \phi(L) = \psi(L)^{-1} = \eta_0 + \eta_1 L + \eta_2 L^2 + \dots$
+
+## The General Formula
+
+::: {.thm}
+::: {.thmhead}
+Wiener–Kolmogorov Prediction Formula
+:::
+If $y_t$ is a stationary and invertible ARMA$(p,q)$, i.e., the roots of both $\phi(L)$ and $\theta(L)$ lie outside the unit circle, then
+$$
+\E[y_{t+s} \mid y_t, y_{t-1}, \dots] = \mu + \left[\frac{\psi(L)}{L^s}\right]_+ \eta(L)\, (y_t - \mu)
+$$
+:::
+
+- Conditioning on past $y$'s = conditioning on past $\varepsilon$'s: each is linear in the other
+- In practice, a computer does the algebra to get the coefficients
+- But it is really important to understand _why_ a computer can do that!
+
+## Example: AR(1)
+
+- Assume that $(1 - \phi L)(y_t - \mu) = \varepsilon_t$ with $|\phi| < 1$
+- Then $\psi(L) = (1 - \phi L)^{-1} = 1 + \phi L + \phi^2 L^2 + \dots$ and $\eta(L) = 1 - \phi L$
+
+. . .
+
+- The annihilation operator gives
+
+$$
+\left[\frac{\psi(L)}{L^s}\right]_+ = \phi^s + \phi^{s+1} L + \phi^{s+2} L^2 + \dots = \phi^s \left(1 + \phi L + \phi^2 L^2 + \dots\right) = \frac{\phi^s}{1 - \phi L}
+$$
+
+. . .
+
+- Multiplying by $\eta(L) = 1 - \phi L$:
+
+$$
+\E[y_{t+s} \mid y_t, y_{t-1}, \dots] = \mu + \phi^s\, (y_t - \mu)
+$$
+
+. . .
+
+- What happens when $s \to \infty$? What's the intuition?
+
+## Example: MA(q)
+
+- Now assume $y_t = \mu + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \dots + \theta_q \varepsilon_{t-q}$
+- Then $\psi(L) = \theta(L)$ and $\eta(L) = \theta(L)^{-1}$
+
+. . .
+
+- If $s > q$, the annihilation operator gives zero, so $\E[y_{t+s} \mid y_t, y_{t-1}, \dots] = \mu$
+- What's the intuition for this result?
+
+. . .
+
+- If $s \leq q$:
+
+$$
+\left[\frac{\psi(L)}{L^s}\right]_+ = \theta_s + \theta_{s+1} L + \dots + \theta_q L^{q-s}
+$$
+
+- So the forecast is
+
+$$
+\E[y_{t+s} \mid y_t, y_{t-1}, \dots] = \mu + \frac{\theta_s + \theta_{s+1} L + \dots + \theta_q L^{q-s}}{\theta(L)}\, (y_t - \mu)
+$$
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# Forecasting with _Finite_ Data {visibility="uncounted"}
+
+## Forecasting with Finite Data
+
+- Bad news: so far we assumed infinite data. That is never the case...
+- Two main ways of dealing with this problem:
+  1. Build an "approximate" forecast
+  2. Use a method that explicitly accounts for the "missing data"
+
+. . .
+
+- The most common method for (2) is the **Kalman filter**
+- No time to cover it, but super useful in Macro, Finance, DSGE estimation, etc.
+- Most statistical software uses (2) to construct forecasts
+- But learning (1) is instructive, and it gives the same results if $T$ is large!
+
+## Approximating the Forecasts
+
+- Consider an ARMA$(p,q)$ process:
+
+$$
+y_t - \mu = \phi_1 (y_{t-1} - \mu) + \dots + \phi_p (y_{t-p} - \mu) + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \dots + \theta_q \varepsilon_{t-q}
+$$
+
+- We have data $\{y_1, \dots, y_T\}$ and want to forecast $y_{T+h}$ for $h > 0$
+- The issue: the data are finite, and we never observe $\varepsilon_t$
+
+. . .
+
+- Main trick: use the equation above to back out "estimated" shocks $\hat\varepsilon_t$
+- Presample convention: set $\varepsilon_t = 0$ and $y_t = \E[y_t] = \mu$ for $t \leq 0$
+
+## Backing Out the Shocks
+
+With the presample convention ($y_s - \mu = 0$ and $\hat\varepsilon_s = 0$ for $s \leq 0$), recursively for $t = 1, \dots, T$:
+$$
+\hat\varepsilon_t = (y_t - \mu) - \sum_{i=1}^{p} \phi_i (y_{t-i} - \mu) - \sum_{j=1}^{q} \theta_j \hat\varepsilon_{t-j}
+$$
+
+. . .
+
+The first few steps:
+$$
+\begin{aligned}
+\hat\varepsilon_1 &= y_1 - \mu \\
+\hat\varepsilon_2 &= (y_2 - \mu) - \phi_1 (y_1 - \mu) - \theta_1 \hat\varepsilon_1 \\
+\hat\varepsilon_3 &= (y_3 - \mu) - \phi_1 (y_2 - \mu) - \phi_2 (y_1 - \mu) - \theta_1 \hat\varepsilon_2 - \theta_2 \hat\varepsilon_1
+\end{aligned}
+$$
+
+. . .
+
+- Essentially, $\hat\varepsilon_t \equiv y_t - \hat y_{t|t-1}$: the one-step forecast error, given the presample convention
+
+## Iterating Forward
+
+From here on, just iterate forward ([Hamilton (1994)]{.fgv}, Equation 4.2.25):
+$$
+\hat y_{T+h|T} - \mu = \sum_{i=1}^{p} \phi_i \left(\hat y_{T+h-i|T} - \mu\right) + \sum_{j=h}^{q} \theta_j \hat\varepsilon_{T+h-j}
+$$
+
+- Convention: $\hat y_{\tau|T} = y_\tau$ for $\tau \leq T$, and the second sum is empty when $h > q$
+- In practice: compute $\hat y_{T+1|T}$, then $\hat y_{T+2|T}$, then $\hat y_{T+3|T}$, and so on
+
+. . .
+
+- For $h > q$ only the AR part is left, so the forecast approaches $\mu$ exponentially fast
+- What's the intuition for this result?
+- What ensures that the forecast does not explode exponentially fast, by the way?
+
+## Example: ARMA(1,2)
+
+$y_t = 0.9\, y_{t-1} + \varepsilon_t + 0.8\, \varepsilon_{t-1} - 0.3\, \varepsilon_{t-2}$: a short sample ($T = 50$) inside a long one ($T = 500$)
+
+```{python}
+# | fig-align: center
+
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+
+# ARMA(1,2) parameters
+phi = 0.9
+theta1 = 0.8
+theta2 = -0.3
+
+horizons = 20
+n_path_short = 50
+n_path_long = 500
+np.random.seed(42)
+
+# Generate one ARMA(1,2) path; the short sample is its first 50 observations
+y_long = ArmaProcess(
+    np.r_[1, -phi],
+    np.r_[1, theta1, theta2]
+).generate_sample(nsample=n_path_long, burnin=400)
+y_short = y_long[:n_path_short]
+
+plt.figure(figsize=(6.5, 3))
+plt.plot(y_long, label='Long Path (ARMA(1,2))', color='blue', lw=1)
+plt.plot(y_short, label='Short Path (ARMA(1,2))', color='orange', lw=1, ls='--')
+plt.axvline(n_path_short-1, color='red', lw=0.5, ls='--')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.xlabel('Time')
+plt.tight_layout()
+
+# Create the SARIMAX objects for ARMA(1,2)
+model_short = SARIMAX(y_short, order=(1, 0, 2))
+model_long = SARIMAX(y_long, order=(1, 0, 2))
+
+# Estimate the parameters
+model_short_fit = model_short.fit(disp=False)
+model_long_fit = model_long.fit(disp=False)
+
+# Extract params (no constant: ar.L1, ma.L1, ma.L2, sigma2)
+phi_hat_short = model_short_fit.params[0]
+theta1_hat_short = model_short_fit.params[1]
+theta2_hat_short = model_short_fit.params[2]
+
+phi_hat_long = model_long_fit.params[0]
+theta1_hat_long = model_long_fit.params[1]
+theta2_hat_long = model_long_fit.params[2]
+```
+
+```{python}
+def forecast_kalman(model, params, h=horizons):
+    model_fit = model.filter(params)
+    forecast = model_fit.get_forecast(steps=h)
+    return forecast.predicted_mean
+
+def conditional_css_forecast(y, phi_hat, theta1_hat, theta2_hat, h=horizons):
+    """
+    Conditional (CSS-style) multi-step forecast for ARMA(1,2) with zero mean:
+    y_t = phi_hat * y_{t-1} + eps_t + theta1_hat * eps_{t-1} + theta2_hat * eps_{t-2}
+
+    Assumes past unobserved epsilons before the sample are zero.
+    """
+    # initialize recursion
+    y_prev = 0.0
+    eps_prev = 0.0      # eps_{t-1}
+    eps_prev2 = 0.0     # eps_{t-2}
+
+    # 1) In-sample recursion to recover last two innovations: eps_n and eps_{n-1}
+    for t in range(len(y)):
+        eps_t = y[t] - phi_hat * y_prev - theta1_hat * eps_prev - theta2_hat * eps_prev2
+        eps_prev2 = eps_prev
+        eps_prev = eps_t
+        y_prev = y[t]
+
+    # After loop:
+    # y_prev -> last observed y (y_n)
+    # eps_prev -> eps_n
+    # eps_prev2 -> eps_{n-1}
+    eps_n = eps_prev
+    eps_n_minus1 = eps_prev2
+    y_last = y_prev
+
+    # Allocate forecast array
+    yhat = np.empty(h, dtype=float)
+    # 1-step ahead
+    yhat[0] = phi_hat * y_last + theta1_hat * eps_n + theta2_hat * eps_n_minus1
+
+    if h == 1:
+        return yhat
+
+    # 2-step ahead: theta1 term drops (eps_{n+1}=0), theta2 uses eps_n
+    yhat[1] = phi_hat * yhat[0] + theta2_hat * eps_n
+
+    # 3+ steps: MA contributions vanish, pure AR propagation
+    for k in range(2, h):
+        yhat[k] = phi_hat * yhat[k - 1]
+
+    return yhat
+
+kalman_short = forecast_kalman(model_short, model_short_fit.params)
+kalman_long = forecast_kalman(model_long, model_long_fit.params)
+css_short = conditional_css_forecast(y_short, phi_hat_short, theta1_hat_short, theta2_hat_short)
+css_long = conditional_css_forecast(y_long, phi_hat_long, theta1_hat_long, theta2_hat_long)
+```
+
+## Small vs. Large Sample Forecasts
+
+```{python}
+# | fig-align: center
+# Plot short and long forecasts side-by-side
+kalman_short = np.asarray(kalman_short)
+css_short = np.asarray(css_short)
+kalman_long = np.asarray(kalman_long)
+css_long = np.asarray(css_long)
+
+# Create connected forecast series that start at the last observed value
+kalman_conn_short = np.r_[y_short[-1], kalman_short]
+css_conn_short = np.r_[y_short[-1], css_short]
+
+kalman_conn_long = np.r_[y_long[-1], kalman_long]
+css_conn_long = np.r_[y_long[-1], css_long]
+
+# X coordinates
+x_obs_short = np.arange(n_path_short)
+x_fc_short = np.arange(n_path_short - 1, n_path_short + horizons)
+
+x_obs_long = np.arange(n_path_long)
+x_fc_long = np.arange(n_path_long - 1, n_path_long + horizons)
+
+fig, axs = plt.subplots(1, 2, figsize=(6, 3), sharey=True)
+
+# Left: short data and forecasts
+axs[0].plot(x_obs_short[30:], y_short[30:], label='Observed Path', color='black', lw=1)
+axs[0].plot(x_fc_short, kalman_conn_short, label='Kalman Forecast', color='blue', lw=1)
+axs[0].plot(x_fc_short, css_conn_short, label='Approximate', color='orange', lw=1, ls='--')
+axs[0].axvline(n_path_short - 1, color='red', lw=0.5, ls='--')
+axs[0].set_title('Short Data')
+axs[0].legend()
+axs[0].set_xlabel('Time')
+axs[0].grid(True, alpha=0.3)
+
+# Right: long data and forecasts
+axs[1].plot(x_obs_long[490:], y_long[490:], label='Observed Path', color='k', lw=1)
+axs[1].plot(x_fc_long, kalman_conn_long, label='Kalman Forecast', color='blue', lw=1)
+axs[1].plot(x_fc_long, css_conn_long, label='Approximate', color='orange', lw=1, ls='--')
+axs[1].axvline(n_path_long - 1, color='red', lw=0.5, ls='--')
+axs[1].set_title('Long Data')
+axs[1].legend()
+axs[1].set_xlabel('Time')
+axs[1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+## Forecasts Decay to the Mean
+
+$y_t - 2 = \phi\, (y_{t-1} - 2) + \varepsilon_t + 0.8\, \varepsilon_{t-1} - 0.3\, \varepsilon_{t-2}$. Bands: $\pm 2$ s.d. of the forecast error
+
+```{ojs}
+//| echo: false
+viewof fc = Inputs.form(
+  [
+    Inputs.range([0, 0.95], {value: 0.9, step: 0.05, label: "φ", width: 400}),
+    Inputs.range([20, 120], {value: 80, step: 1, label: "Origin T", width: 400})
+  ],
+  {template: inputs => {
+    inputs.forEach(f => f.style.setProperty("--label-width", "90px"))
+    return html`<div style="display: grid; grid-template-columns: auto auto; justify-content: center; column-gap: 60px">${inputs}</div>`
+  }}
+)
+```
+
+```{ojs}
+//| echo: false
+fcMu = 2
+fcTheta = [0.8, -0.3]
+fcH = 24
+fcN = 150
+
+// Fixed shocks; the first 200 periods are burn-in
+fcShocks = {
+  const draw = d3.randomNormal.source(d3.randomLcg(4225))(0, 1)
+  return Float64Array.from({length: fcN + 202}, draw)
+}
+
+// Simulated path y_1, ..., y_150 and the shocks that produced it
+fcSim = {
+  const [phi] = fc
+  let prev = 0
+  const y = [], e = []
+  for (let t = 2; t < fcShocks.length; t++) {
+    prev = phi * prev + fcShocks[t] + fcTheta[0] * fcShocks[t - 1] + fcTheta[1] * fcShocks[t - 2]
+    if (t >= 202) { y.push(fcMu + prev); e.push(fcShocks[t]) }
+  }
+  return {y, e}
+}
+
+// Forecast from origin T with the true shocks (infinite-data forecast), h = 1..24.
+// The MA terms only matter for h <= q = 2; the variance uses the psi weights.
+fcPath = {
+  const [phi, T] = fc
+  const {y, e} = fcSim
+  const psi = [1, phi + fcTheta[0]]
+  psi.push(phi * psi[1] + fcTheta[1])
+  for (let j = 3; j < fcH; j++) psi.push(phi * psi[j - 1])
+  const out = [{t: T, f: y[T - 1], sd: 0}]
+  let prev = y[T - 1] - fcMu, v = 0
+  for (let h = 1; h <= fcH; h++) {
+    let f = phi * prev
+    if (h === 1) f += fcTheta[0] * e[T - 1] + fcTheta[1] * e[T - 2]
+    if (h === 2) f += fcTheta[1] * e[T - 1]
+    v += psi[h - 1] ** 2
+    out.push({t: T + h, f: fcMu + f, sd: Math.sqrt(v)})
+    prev = f
+  }
+  return out
+}
+
+// The y-axis follows the data, so a persistent phi never clips the path
+fcDomain = {
+  const lo = Math.min(d3.min(fcSim.y), d3.min(fcPath, d => d.f - 2 * d.sd))
+  const hi = Math.max(d3.max(fcSim.y), d3.max(fcPath, d => d.f + 2 * d.sd))
+  return [Math.floor(lo) - 1, Math.ceil(hi) + 1]
+}
+
+html`<div style="text-align: center; font-size: 19px">
+  <span style="color: #0072BC">observed</span>, <span style="color: #EB811B">forecast</span>, <span style="color: #999">realized future</span>
+</div>`
+
+Plot.plot({
+  width: 1150, height: 390, marginLeft: 50, marginBottom: 45,
+  style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {label: "Periods", domain: [1, fcN], labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: fcDomain, ticks: 6},
+  grid: true,
+  marks: [
+    Plot.areaY(fcPath, {x: "t", y1: d => d.f - 2 * d.sd, y2: d => d.f + 2 * d.sd, fill: "#EB811B", fillOpacity: 0.2, clip: true}),
+    Plot.ruleY([fcMu], {stroke: "black", strokeDasharray: "5,4"}),
+    Plot.line(fcSim.y.slice(fc[1] - 1), {x: (d, i) => fc[1] + i, y: d => d, stroke: "#999", strokeWidth: 1.1, clip: true}),
+    Plot.line(fcSim.y.slice(0, fc[1]), {x: (d, i) => i + 1, y: d => d, stroke: "#0072BC", strokeWidth: 1.4, clip: true}),
+    Plot.ruleX([fc[1]], {stroke: "#2D3E50", strokeWidth: 1}),
+    Plot.line(fcPath, {x: "t", y: "f", stroke: "#EB811B", strokeWidth: 3, clip: true})
+  ]
+})
+```
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# The Wold Decomposition {visibility="uncounted"}
+
+## Why So Much Attention to ARMA?
+
+- Why have we paid so much attention to ARMA models?
+
+. . .
+
+- The **Wold decomposition theorem** is a powerful result
+- It essentially says that any stationary process has an MA($\infty$) representation
+
+. . .
+
+- By playing with $p$ and $q$, we can approximate that representation **arbitrarily well**
+- In a certain sense, ARMA models are _"dense"_ in the space of stationary processes
+- Think of computers approximating real numbers with rationals all the time!
+
+## Wold's Decomposition {.sc92}
+
+::: {.thm}
+::: {.thmhead}
+Theorem (Wold's Decomposition; [Hamilton (1994)]{.fgv}, Section 4.8)
+:::
+Let $y_t$ be a zero-mean covariance-stationary process. Let $\mathcal{P}_{t-m}[y_t]$ be the linear projection of $y_t$ on $\{y_{t-m}, y_{t-m-1}, \dots\}$, and let $e_t \equiv y_t - \mathcal{P}_{t-1}[y_t]$ be the projection error. Then $y_t$ has a unique representation
+$$
+y_t = \mu_t + \sum_{j=0}^{\infty} \psi_j e_{t-j}
+$$
+where $e_t$ is white noise, $\psi_0 = 1$, $\sum_{j=0}^{\infty} \psi_j^2 < \infty$, $\mu_t \equiv \lim_{m \to \infty} \mathcal{P}_{t-m}[y_t]$ is uncorrelated with $e_{t-j}$ for all $j$, and $\mu_t$ is perfectly predictable from the distant past of $y_t$
+:::
+
+## Why Wold Matters
+
+- The only assumption is covariance stationarity: no linearity imposed anywhere
+- Yet every such process is a linear combination of its own one-step forecast errors
+- $\psi_j$: how $y_{t+j}$ responds to a shock today. Linear models are the natural language here
+- Catch: Wold has infinitely many $\psi_j$, and we only have $T$ observations
+
+. . .
+
+- AR(1), $\psi_j = 0.95^j$: dropping lags $j > q$ loses under 1% of $\Var(y_t)$ iff
+
+$$
+\frac{\sum_{j>q} 0.95^{2j}}{\sum_{j\geq 0} 0.95^{2j}} = 0.95^{2(q+1)} \leq 0.01 \iff q + 1 \geq \frac{\ln 0.01}{2 \ln 0.95} \approx 44.9 \iff q \geq 44
+$$
+
+. . .
+
+- As a _ratio_, $\psi(L) = \frac{1}{1 - 0.95 L}$: one parameter, and the approximation is exact
+- A polynomial must cut off; a ratio generates long, smooth decay cheaply
+- ARMA methodology: approximate $\psi(L)$ by $\theta(L)/\phi(L)$ with small $p$ and $q$
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+The End
+:::
+
+## References {visibility="uncounted"}
+
+- Chapter 3 of _Time Series Analysis_, by [James Hamilton (1994)]{.fgv}, for the basics of ARMA models
+- Chapter 4 of _Time Series Analysis_, by [James Hamilton (1994)]{.fgv}, for forecasting and Wold's decomposition
+- Section 3.3 of _Time Series: Theory and Methods_, by [Brockwell and Davis (1991)]{.fgv}, for ARMA autocovariances
+- Chapter 14 of _Econometrics_, by [Bruce Hansen (2022)]{.fgv}
