@@ -682,14 +682,14 @@ True or false?
 
 ## Example
 
-- Let $u_t$ be an i.i.d. sequence with mean zero and variance $\sigma^2 < \infty$
+- Let $u_t$ be an i.i.d. sequence with mean zero and variance $\sigma^2 < \infty$, and let $\mathcal{F}_t = \sigma(u_t, u_{t-1}, \dots)$ be the natural filtration of $u_t$
 - Define $v_t = u_t \cdot u_{t-1}$
-    - Is this process i.i.d.? Is it an MDS with respect to its natural filtration? Is it white noise?
+    - Is this process i.i.d.? Is it an MDS with respect to $\{\mathcal{F}_t\}$? Is it white noise?
 
 . . .
 
 - Now define $m_t = u_t + u_{t-1}\cdot u_{t-2}$
-    - Is this process i.i.d.? Is it an MDS with respect to its natural filtration? Is it white noise?
+    - Is this process i.i.d.? Is it an MDS with respect to $\{\mathcal{F}_t\}$? Is it white noise?
 
 ## &nbsp; {.standout background-color="var(--slate)"}
 

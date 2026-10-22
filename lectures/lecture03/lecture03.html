@@ -1013,17 +1013,17 @@ F_{t_1,\ldots,t_n}(y_1,\ldots,y_n)=F_{t_1+\tau,\ldots,t_n+\tau}(y_1,\ldots,y_n) 
 <section id="example-1" class="slide level2">
 <h2>Example</h2>
 <ul>
-<li>Let <span class="math inline">\(u_t\)</span> be an i.i.d. sequence with mean zero and variance <span class="math inline">\(\sigma^2 &lt; \infty\)</span></li>
+<li>Let <span class="math inline">\(u_t\)</span> be an i.i.d. sequence with mean zero and variance <span class="math inline">\(\sigma^2 &lt; \infty\)</span>, and let <span class="math inline">\(\mathcal{F}_t = \sigma(u_t, u_{t-1}, \dots)\)</span> be the natural filtration of <span class="math inline">\(u_t\)</span></li>
 <li>Define <span class="math inline">\(v_t = u_t \cdot u_{t-1}\)</span>
 <ul>
-<li>Is this process i.i.d.? Is it an MDS with respect to its natural filtration? Is it white noise?</li>
+<li>Is this process i.i.d.? Is it an MDS with respect to <span class="math inline">\(\{\mathcal{F}_t\}\)</span>? Is it white noise?</li>
 </ul></li>
 </ul>
 <div class="fragment">
 <ul>
 <li>Now define <span class="math inline">\(m_t = u_t + u_{t-1}\cdot u_{t-2}\)</span>
 <ul>
-<li>Is this process i.i.d.? Is it an MDS with respect to its natural filtration? Is it white noise?</li>
+<li>Is this process i.i.d.? Is it an MDS with respect to <span class="math inline">\(\{\mathcal{F}_t\}\)</span>? Is it white noise?</li>
 </ul></li>
 </ul>
 </div>
