@@ -221,12 +221,26 @@ Given a polynomial $\phi(L) = I - a_1 L - a_2 L^2 - \dots - a_p L^p$:
 - Find the roots of $f$ (numerically, of course)
 - Check the modulus of all roots: if they are all greater than 1, then $\phi(L)$ is invertible
 
-. . .
+## Checking the Roots in Code
 
 In Python:
 
 - `np.roots` expects the coefficients from the **highest** power down: `[-ap, ..., -a1, 1]`
 - `statsmodels`: `ArmaProcess(ar=[1, -a1, ..., -ap])` has `.arroots` and `.isstationary`
+
+. . .
+
+In R:
+
+- Base `polyroot` expects the coefficients from the **lowest** power up
+- `r <- polyroot(c(1, -a1, ..., -ap))`, then check `all(Mod(r) > 1)`
+
+. . .
+
+In Julia, with `Polynomials.jl`:
+
+- `Polynomial` also goes from the **lowest** power up
+- `r = roots(Polynomial([1, -a1, ..., -ap]))`, then check `all(abs.(r) .> 1)`
 
 ## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
