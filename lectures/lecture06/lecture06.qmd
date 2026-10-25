@@ -389,10 +389,10 @@ An ARMA(1,1) with $\phi = 0.5$, $\theta = 0.2$, $\mu = 0$ and $\sigma^2 = 1$. On
 
 ```{python}
 #| fig-align: center
-# ====== Helpers (defined once; reused across cells) ======
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
+from scipy.signal import lfilter
 plt.rcParams['font.family'] = 'Arial'
 
 def simulate_arma11(phi: float, theta: float, T: int, seed: int | None = None):
@@ -406,86 +406,25 @@ def simulate_arma11(phi: float, theta: float, T: int, seed: int | None = None):
     return y[1:]  # drop initial zero
 
 def cond_loglik(phi: float, theta: float, y: np.ndarray):
-    """Conditional log-likelihood up to a constant (sigma^2 profiled out)."""
-    T = len(y)
-    eps_hat = np.zeros(T)
-    for t in range(1, T):
-        eps_hat[t] = y[t] - phi * y[t - 1] - theta * eps_hat[t - 1]
-    return -0.5 * np.sum(eps_hat[1:] ** 2)
-
-def cond_loglik_grid(y: np.ndarray, phi_grid: np.ndarray, theta_grid: np.ndarray):
-    """Evaluate conditional log-likelihood on a parameter grid."""
-    L = np.zeros((len(phi_grid), len(theta_grid)))
-    for i, phi in enumerate(phi_grid):
-        for j, theta in enumerate(theta_grid):
-            L[i, j] = cond_loglik(phi, theta, y)
-    Phi, Theta = np.meshgrid(phi_grid, theta_grid, indexing="ij")
-    return Phi, Theta, L
+    """Conditional log-likelihood up to a constant, with sigma^2 fixed at its true value 1.
+    Backs out eps_t = y_t - phi*y_{t-1} - theta*eps_{t-1}, starting from eps_0 = 0."""
+    eps_hat = lfilter([1.0], [1.0, theta], y[1:] - phi * y[:-1])
+    return -0.5 * np.sum(eps_hat ** 2)
 
 def estimate_mle(y: np.ndarray, phi_true: float, theta_true: float,
                  starts: list[tuple[float, float]] | None = None,
                  bounds: tuple[tuple[float, float], tuple[float, float]] = ((-0.98, 0.98), (-0.98, 0.98))):
-    """
-    Estimate (phi, theta) by maximizing conditional log-likelihood.
-    """
-    def neg_ll(params):
-        phi, theta = params
-        if not (bounds[0][0] < phi < bounds[0][1] and bounds[1][0] < theta < bounds[1][1]):
-            return 1e9
-        return -cond_loglik(phi, theta, y)
-
-    # default starts
+    """Estimate (phi, theta) by maximizing the conditional log-likelihood from several starts."""
     if starts is None:
         starts = [(0.0, 0.0), (0.5, 0.5), (-0.3, 0.6), (0.6, -0.3), (phi_true, theta_true)]
 
     best_val, best_xy = np.inf, None
     for s in starts:
-        res = minimize(neg_ll, x0=np.array(s, dtype=float), method="L-BFGS-B", bounds=bounds,
-                       options={"maxiter": 2000})
+        res = minimize(lambda p: -cond_loglik(p[0], p[1], y), x0=np.array(s, dtype=float),
+                       method="L-BFGS-B", bounds=bounds, options={"maxiter": 2000})
         if res.fun < best_val:
             best_val, best_xy = res.fun, res.x
     return float(best_xy[0]), float(best_xy[1])
-
-def likelihood_surface(T: int, phi_true: float, theta_true: float, seed: int = 123):
-    """Simulate a path and return the normalized likelihood surface on a grid."""
-    y = simulate_arma11(phi_true, theta_true, T, seed=seed)
-    phi_grid = np.linspace(-0.4, 0.9, 20)
-    theta_grid = np.linspace(-0.4, 0.9, 20)
-    Phi, Theta, L = cond_loglik_grid(y, phi_grid, theta_grid)
-    return y, Phi, Theta, L - np.max(L)
-
-def plot_likelihood_analysis(T: int, phi_true: float, theta_true: float, seed: int = 123):
-    """Complete likelihood analysis: simulate, estimate, and plot for given sample size."""
-    y, Phi, Theta, L_norm = likelihood_surface(T, phi_true, theta_true, seed)
-
-    # Estimate (phi, theta)
-    phi_hat, theta_hat = estimate_mle(y, phi_true, theta_true)
-
-    fig = plt.figure(figsize=(10, 4))
-
-    # 3D surface
-    ax1 = fig.add_subplot(1, 2, 1, projection='3d')
-    ax1.plot_surface(Theta, Phi, L_norm, cmap='viridis', alpha=1, edgecolor='gray')
-    ax1.set_xlabel(r"$\theta$")
-    ax1.set_ylabel(r"$\phi$")
-    ax1.set_title("3D Likelihood")
-    ax1.view_init(elev=35, azim=130)
-
-    # Contour with markers
-    ax2 = fig.add_subplot(1, 2, 2)
-    cs = ax2.contourf(Theta, Phi, L_norm, levels=30, cmap='viridis')
-    ax2.set_xlabel(r"$\theta$")
-    ax2.set_ylabel(r"$\phi$")
-    ax2.set_title(f"Contour: True vs MLE (T={T})")
-    ax2.scatter(theta_true, phi_true, s=150, color='red', edgecolors='white',
-                linewidths=1.5, label=r"True ($\phi, \theta$)", zorder=10)
-    ax2.scatter(theta_hat,  phi_hat,  s=250, color='gold', marker='*',
-                edgecolors='black', linewidths=1.5, label=r"MLE ($\hat{\phi}, \hat{\theta}$)", zorder=10)
-    ax2.legend(loc='lower left')
-    fig.colorbar(cs, ax=ax2, shrink=0.7)
-
-    plt.tight_layout()
-    plt.show()
 
 # Parameters
 phi_true, theta_true = 0.5, 0.2
@@ -501,57 +440,219 @@ plt.tight_layout()
 plt.show()
 ```
 
-## The Likelihood Surface ($T = 100$)
+## The Likelihood as $T$ Grows
 
 ```{python}
-#| fig-align: center
-plot_likelihood_analysis(T=100, phi_true=0.5, theta_true=0.2, seed=123)
+# One long path; each sample size T uses its first T observations.
+# Same seed, so the first 100 observations are the path on the previous slide.
+y_long = simulate_arma11(phi_true, theta_true, 2500, seed=123)
+Ts = np.unique(np.round(np.geomspace(20, 2500, 30)).astype(int))
+
+phi_grid = np.linspace(-0.4, 0.9, 35)
+theta_grid = np.linspace(-0.4, 0.9, 35)
+Phi, Theta = np.meshgrid(phi_grid, theta_grid, indexing="ij")
+
+# Running sum of squared residuals on the whole grid: one pass gives every T
+ssr = np.zeros_like(Phi)
+eps_prev = np.zeros_like(Phi)
+ssr_at = {}
+for t in range(1, Ts[-1]):
+    e = y_long[t] - Phi * y_long[t - 1] - Theta * eps_prev
+    ssr += e ** 2
+    eps_prev = e
+    if t + 1 in Ts:
+        ssr_at[t + 1] = ssr.copy()
+
+surfaces, mles, dl_true = [], [], []
+for T in Ts:
+    phi_hat, theta_hat = estimate_mle(y_long[:T], phi_true, theta_true)
+    ll_hat = cond_loglik(phi_hat, theta_hat, y_long[:T])
+    # Log-likelihood minus its maximum: 0 at the MLE, negative elsewhere
+    surfaces.append(np.round(np.minimum(-0.5 * ssr_at[T] - ll_hat, 0), 2).tolist())
+    mles.append([phi_hat, theta_hat])
+    dl_true.append(cond_loglik(phi_true, theta_true, y_long[:T]) - ll_hat)
+
+ojs_define(likData={
+    "Ts": Ts.tolist(), "phi": phi_grid.tolist(), "theta": theta_grid.tolist(),
+    "surfaces": surfaces, "mles": mles, "dlTrue": dl_true,
+    "truth": [phi_true, theta_true],
+})
 ```
 
-## The Likelihood Surface ($T = 5000$)
-
-```{python}
-#| fig-align: center
-plot_likelihood_analysis(T=5000, phi_true=0.5, theta_true=0.2, seed=123)
+```{ojs}
+//| echo: false
+Plotly = require("plotly.js-dist-min@2.35.2")
 ```
 
-## The Likelihood Surface ($T = 10000$)
+```{ojs}
+//| echo: false
+// View controls for the plots: shown in the control row, wired up in likPlots
+likSpin = html`<label style="display: flex; align-items: center; gap: 6px; cursor: pointer"><input type="checkbox" style="width: 18px; height: 18px"> Spin</label>`
+likReset = html`<button style="font: inherit; padding: 2px 14px; cursor: pointer">⟲ Reset view</button>`
+```
 
-```{python}
-#| fig-align: center
-plot_likelihood_analysis(T=10000, phi_true=0.5, theta_true=0.2, seed=123)
+```{ojs}
+//| echo: false
+// Slider over the precomputed sample sizes, plus a button that sweeps T upwards
+viewof likIdx = {
+  const n = likData.Ts.length
+  const input = Inputs.range([0, n - 1], {value: 0, step: 1, label: "Sample size", width: 380})
+  input.style.setProperty("--label-width", "110px")
+  input.querySelector("input[type=number]").style.display = "none"
+  const shown = html`<span style="display: inline-block; width: 110px; font-weight: bold">T = ${likData.Ts[0]}</span>`
+  const button = html`<button style="font: inherit; padding: 2px 14px; cursor: pointer">▶ Play</button>`
+  const set = i => {
+    input.value = i
+    input.dispatchEvent(new Event("input", {bubbles: true}))
+  }
+  let timer
+  button.onclick = () => {
+    clearInterval(timer)
+    let i = 0
+    set(i)
+    timer = setInterval(() => (++i < n ? set(i) : clearInterval(timer)), 350)
+  }
+  input.addEventListener("input", () => shown.textContent = `T = ${likData.Ts[input.value]}`)
+  invalidation.then(() => clearInterval(timer))
+  const wrap = html`<div style="display: flex; justify-content: center; align-items: center; gap: 20px; font-size: 20px; margin-bottom: 10px">${input}${shown}${button}${likSpin}${likReset}</div>`
+  Object.defineProperty(wrap, "value", {get: () => input.value, set: v => { input.value = v }})
+  return wrap
+}
+```
+
+```{ojs}
+//| echo: false
+likFont = ({family: "Arial, Arimo, sans-serif", size: 15, color: "#2D3E50"})
+
+// One fixed z-range for every T, set by the largest sample, so the surface visibly sharpens
+likZmin = d3.min(likData.surfaces.at(-1).flat())
+
+// The contour shows -log10(1 + |gap|): log-spaced levels stay readable at every T
+likLog = v => -Math.log10(1 - v)
+likTicks = [0, -1, -10, -100, -1000, -10000].filter(v => v >= likZmin)
+
+// Bright cyan with a dark outline stands out against the viridis colors
+likStar = "#00E5FF"
+
+likTraces = i => {
+  const z = likData.surfaces[i]
+  const [phiHat, thetaHat] = likData.mles[i]
+  const [phiTrue, thetaTrue] = likData.truth
+  // Every MLE up to the current T: the path the star has travelled
+  const path = likData.mles.slice(0, i + 1)
+  const pathPhi = path.map(m => m[0]), pathTheta = path.map(m => m[1])
+  return {
+    surface: [
+      {type: "surface", x: likData.theta, y: likData.phi, z, cmin: likZmin, cmax: 0,
+       colorscale: "Viridis", showscale: false, hoverinfo: "skip"},
+      {type: "scatter3d", mode: "markers", x: [thetaTrue], y: [phiTrue], z: [likData.dlTrue[i]],
+       marker: {size: 11, color: "red", line: {color: "white", width: 1}}, hoverinfo: "skip"},
+      {type: "scatter3d", mode: "markers", x: [thetaHat], y: [phiHat], z: [0],
+       marker: {size: 9, color: likStar, symbol: "diamond", line: {color: "black", width: 1}}, hoverinfo: "skip"},
+      // The same points traced on the floor of the box
+      {type: "scatter3d", mode: "lines", x: pathTheta, y: pathPhi, z: path.map(() => likZmin),
+       line: {color: likStar, width: 4}, hoverinfo: "skip"},
+      {type: "scatter3d", mode: "markers", x: [thetaTrue], y: [phiTrue], z: [likZmin],
+       marker: {size: 11, color: "red", line: {color: "white", width: 1}}, hoverinfo: "skip"},
+      {type: "scatter3d", mode: "markers", x: [thetaHat], y: [phiHat], z: [likZmin],
+       marker: {size: 9, color: likStar, symbol: "diamond", line: {color: "black", width: 1}}, hoverinfo: "skip"}
+    ],
+    contour: [
+      {type: "contour", x: likData.theta, y: likData.phi, z: z.map(r => r.map(likLog)),
+       zmin: likLog(likZmin), zmax: 0, ncontours: 24, colorscale: "Viridis", line: {width: 0.5},
+       colorbar: {tickvals: likTicks.map(likLog), ticktext: likTicks.map(v => d3.format(",")(v)),
+                  thickness: 14, len: 0.9, title: {text: "gap", side: "top"}},
+       hoverinfo: "skip", showlegend: false},
+      {type: "scatter", mode: "lines", x: pathTheta, y: pathPhi, name: "MLE path",
+       line: {color: likStar, width: 1.5}, opacity: 0.8},
+      {type: "scatter", mode: "markers", x: [thetaTrue], y: [phiTrue], name: "True (φ, θ)",
+       marker: {size: 22, color: "red", line: {color: "white", width: 1.5}}},
+      {type: "scatter", mode: "markers", x: [thetaHat], y: [phiHat], name: "MLE",
+       marker: {size: 24, color: likStar, symbol: "star", line: {color: "black", width: 1.5}}}
+    ]
+  }
+}
+
+likPlots = {
+  const left = html`<div style="width: 580px; height: 500px"></div>`
+  const right = html`<div style="width: 580px; height: 500px"></div>`
+  const config = {displayModeBar: false, responsive: false}
+  const eye0 = {x: 1.36, y: 1.02, z: 0.75}
+  const t0 = likTraces(0)
+  await Plotly.newPlot(left, t0.surface, {
+    width: 580, height: 500, margin: {l: 0, r: 0, t: 30, b: 0}, font: likFont, showlegend: false,
+    title: {text: "Log-likelihood minus its maximum", font: {size: 17}},
+    uirevision: "keep",
+    scene: {
+      xaxis: {title: {text: "θ"}}, yaxis: {title: {text: "φ"}},
+      zaxis: {title: {text: ""}, range: [likZmin, 0]},
+      aspectmode: "manual", aspectratio: {x: 1, y: 1, z: 0.75},
+      camera: {eye: eye0}
+    }
+  }, config)
+  await Plotly.newPlot(right, t0.contour, {
+    width: 580, height: 500, margin: {l: 55, r: 10, t: 30, b: 50}, font: likFont,
+    title: {text: "Contours: true value vs. MLE", font: {size: 17}},
+    xaxis: {title: {text: "θ"}, range: [likData.theta[0], likData.theta.at(-1)]},
+    yaxis: {title: {text: "φ"}, range: [likData.phi[0], likData.phi.at(-1)]},
+    legend: {x: 0.02, y: 0.02, bgcolor: "rgba(255,255,255,0.85)"}
+  }, config)
+
+  // Reset view: the starting camera on the left, the full grid on the right
+  likReset.onclick = () => {
+    angle = Math.atan2(eye0.y, eye0.x)
+    Plotly.relayout(left, {"scene.camera": {eye: eye0, center: {x: 0, y: 0, z: 0}, up: {x: 0, y: 0, z: 1}}})
+    Plotly.relayout(right, {"xaxis.range": [likData.theta[0], likData.theta.at(-1)],
+                            "yaxis.range": [likData.phi[0], likData.phi.at(-1)]})
+  }
+
+  // Spin the surface while the Spin box is ticked and the slide is showing;
+  // hovering the plot pauses it so it can be dragged
+  const spinBox = likSpin.querySelector("input")
+  let angle = Math.atan2(eye0.y, eye0.x), hovering = false, stopped = false, busy = false, last = performance.now()
+  left.addEventListener("mouseenter", () => hovering = true)
+  left.addEventListener("mouseleave", () => {
+    hovering = false
+    const eye = left.layout.scene.camera?.eye
+    if (eye) angle = Math.atan2(eye.y, eye.x)
+  })
+  const spin = now => {
+    if (stopped) return
+    const dt = (now - last) / 1000
+    if (dt > 1 / 30) {
+      last = now
+      if (spinBox.checked && !hovering && !busy && left.closest("section")?.classList.contains("present")) {
+        angle += 0.3 * Math.min(dt, 0.1)
+        busy = true
+        Plotly.relayout(left, {"scene.camera.eye": {x: 1.7 * Math.cos(angle), y: 1.7 * Math.sin(angle), z: 0.75}})
+          .then(() => busy = false)
+      }
+    }
+    requestAnimationFrame(spin)
+  }
+  requestAnimationFrame(spin)
+  invalidation.then(() => { stopped = true; Plotly.purge(left); Plotly.purge(right) })
+
+  const wrap = html`<div style="display: flex; justify-content: center; gap: 20px">${left}${right}</div>`
+  wrap.left = left
+  wrap.right = right
+  return wrap
+}
+
+// Redraw both panels whenever T changes
+likRedraw = {
+  const t = likTraces(likIdx)
+  Plotly.react(likPlots.left, t.surface, likPlots.left.layout)
+  Plotly.react(likPlots.right, t.contour, likPlots.right.layout)
+  return likIdx
+}
 ```
 
 ## The Likelihood Gets More Concentrated!
 
-:::: {.columns}
-::: {.column width="50%"}
-```{python}
-#| fig-align: center
-# All three surfaces on one 3D plot
-fig = plt.figure(figsize=(6, 5.5))
-ax = fig.add_subplot(111, projection='3d')
-for T, alpha in [(100, 0.4), (5000, 0.5), (10000, 0.6)]:
-    _, Phi, Theta, L_norm = likelihood_surface(T, 0.5, 0.2, seed=123)
-    ax.plot_surface(Theta, Phi, L_norm, cmap='viridis', alpha=alpha, edgecolor='none')
-
-ax.set_xlabel(r"$\theta$", fontsize=12, labelpad=5)
-ax.set_ylabel(r"$\phi$", fontsize=12, labelpad=5)
-ax.view_init(elev=25, azim=130)
-plt.tight_layout()
-plt.show()
-```
-:::
-
-::: {.column width="50%"}
-::: {.gap}
-:::
-
 - $\uparrow T \implies$ tighter likelihood. Why?
 - How is the Hessian at the optimum related to this?
 - What is the connection with the asymptotic distribution of the MLE?
-:::
-::::
 
 ## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
