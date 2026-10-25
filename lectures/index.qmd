@@ -33,7 +33,7 @@ format:
 - [03]{.num} [Building Blocks for Time Series]{.ttl} [[Slides](lecture03/lecture03.html){.pill} [PDF](lecture03/lecture03.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 - [04]{.num} [Lag Operator, MA Models, and AR Models]{.ttl} [[Slides](lecture04/lecture04.html){.pill} [PDF](lecture04/lecture04.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 - [05]{.num} [ARMA Models and the Wold Decomposition]{.ttl} [[Slides](lecture05/lecture05.html){.pill} [PDF](lecture05/lecture05.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
-- [06]{.num} [Estimation of ARMA Models]{.ttl} [coming soon]{.soon}
+- [06]{.num} [Estimation of ARMA Models]{.ttl} [[Slides](lecture06/lecture06.html){.pill} [PDF](lecture06/lecture06.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 - [07]{.num} [LLN and CLTs for Time Series]{.ttl} [coming soon]{.soon}
 - [08]{.num} [Unit Roots, AR-DL Models, and Granger Causality]{.ttl} [coming soon]{.soon}
 - [09]{.num} [The GMM Estimator - Part I]{.ttl} [coming soon]{.soon}
