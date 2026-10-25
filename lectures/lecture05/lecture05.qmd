@@ -127,30 +127,39 @@ plt.tight_layout()
 plt.show()
 ```
 
-## Dial the AR Coefficient
+## Dial the Coefficients
 
-Same MA part, $\theta = (-0.8, 0.6, 0.4, 0.8)$, and the same shocks: only $\phi_1$ changes. $T = 200$
+Same shocks throughout: only $\phi_1$ and $\theta = (\theta_1, \dots, \theta_4)$ change. $T = 200$
 
 ```{ojs}
 //| echo: false
-viewof acfPhi = {
-  const input = Inputs.range([-0.95, 0.95], {value: 0.9, step: 0.05, label: "φ₁", width: 500})
-  input.style.setProperty("--label-width", "50px")
-  input.style.margin = "0 auto"
-  return input
-}
+viewof acfPar = Inputs.form(
+  [
+    Inputs.range([-0.95, 0.95], {value: 0.9, step: 0.05, label: "φ₁", width: 300}),
+    Inputs.range([-1, 1], {value: -0.8, step: 0.1, label: "θ₁", width: 300}),
+    Inputs.range([-1, 1], {value: 0.6, step: 0.1, label: "θ₂", width: 300}),
+    Inputs.range([-1, 1], {value: 0.4, step: 0.1, label: "θ₃", width: 300}),
+    Inputs.range([-1, 1], {value: 0.8, step: 0.1, label: "θ₄", width: 300})
+  ],
+  {template: inputs => {
+    inputs.forEach(f => f.style.setProperty("--label-width", "40px"))
+    return html`<div style="display: grid; grid-template-columns: auto auto auto; justify-content: center; column-gap: 40px">${inputs}</div>`
+  }}
+)
 ```
 
 ```{ojs}
 //| echo: false
-// Fixed shocks: the slider changes phi only, never the draws.
+// Fixed shocks: the sliders change the coefficients only, never the draws.
 // The first 200 periods are burn-in.
 acfShocks = {
   const draw = d3.randomNormal.source(d3.randomLcg(2026))(0, 1)
   return Float64Array.from({length: 404}, draw)
 }
-acfTheta = [1, -0.8, 0.6, 0.4, 0.8]
-acfQ = 4
+acfPhi = acfPar[0]
+acfTheta = [1, ...acfPar.slice(1)]
+// Effective MA order: the last nonzero theta
+acfQ = d3.max(acfTheta.map((c, i) => Math.abs(c) > 1e-9 ? i : 0))
 
 // y_t = phi y_{t-1} + sum_i theta_i e_{t-i}, started at 0
 acfPath = {
@@ -185,7 +194,7 @@ acfPanel = (title, plot) => html`<div>
 
 html`<div style="display: flex; gap: 20px; justify-content: center; font-size: 19px">
 ${acfPanel("One path", Plot.plot({
-  width: 560, height: 400, marginLeft: 50, marginBottom: 45,
+  width: 560, height: 340, marginLeft: 50, marginBottom: 45,
   style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
   x: {label: "Periods", labelAnchor: "center", labelArrow: "none"},
   y: {label: null, nice: true, ticks: 5},
@@ -196,7 +205,7 @@ ${acfPanel("One path", Plot.plot({
   ]
 }))}
 ${acfPanel(html`Autocorrelation <i>ρ<sub>h</sub></i>: <span style="color: #0072BC">true</span> vs. <span style="color: #EB811B">sample</span>`, Plot.plot({
-  width: 620, height: 400, marginLeft: 50, marginBottom: 45,
+  width: 620, height: 340, marginLeft: 50, marginBottom: 45,
   style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
   x: {label: "Lag h", domain: [0.5, 20.5], ticks: d3.range(2, 21, 2), labelAnchor: "center", labelArrow: "none"},
   y: {label: null, domain: [-1, 1], ticks: 5},
@@ -732,7 +741,7 @@ axs[0].plot(x_fc_short, kalman_conn_short, label='Kalman Forecast', color='blue'
 axs[0].plot(x_fc_short, css_conn_short, label='Approximate', color='orange', lw=1, ls='--')
 axs[0].axvline(n_path_short - 1, color='red', lw=0.5, ls='--')
 axs[0].set_title('Short Data')
-axs[0].legend()
+axs[0].legend(fontsize=7)
 axs[0].set_xlabel('Time')
 axs[0].grid(True, alpha=0.3)
 
@@ -742,7 +751,7 @@ axs[1].plot(x_fc_long, kalman_conn_long, label='Kalman Forecast', color='blue', 
 axs[1].plot(x_fc_long, css_conn_long, label='Approximate', color='orange', lw=1, ls='--')
 axs[1].axvline(n_path_long - 1, color='red', lw=0.5, ls='--')
 axs[1].set_title('Long Data')
-axs[1].legend()
+axs[1].legend(fontsize=7)
 axs[1].set_xlabel('Time')
 axs[1].grid(True, alpha=0.3)
 
