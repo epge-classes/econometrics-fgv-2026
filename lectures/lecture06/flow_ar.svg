@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1034 124" width="1034" height="124" font-family="Arial, Arimo, sans-serif" font-size="24" fill="#2D3E50">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#EB811B"/></marker></defs>
+<rect x="2" y="2" width="270" height="120" rx="12" fill="#FDF0E4" stroke="#EB811B" stroke-width="2"/>
+<text x="137.0" y="54.0" text-anchor="middle">Data {<tspan font-style="italic">y</tspan><tspan font-size="17" dy="5">t</tspan><tspan dy="-5">}</tspan></text>
+<text x="137.0" y="86.0" text-anchor="middle">Parameters <tspan font-weight="bold" font-style="italic">Θ</tspan></text>
+<line x1="278" y1="62.0" x2="376" y2="62.0" stroke="#EB811B" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="382" y="2" width="270" height="120" rx="12" fill="#FDF0E4" stroke="#EB811B" stroke-width="2"/>
+<text x="517.0" y="54.0" text-anchor="middle">Compute the</text>
+<text x="517.0" y="86.0" text-anchor="middle">log-likelihood</text>
+<line x1="658" y1="62.0" x2="756" y2="62.0" stroke="#EB811B" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="762" y="2" width="270" height="120" rx="12" fill="#FDF0E4" stroke="#EB811B" stroke-width="2"/>
+<text x="897.0" y="54.0" text-anchor="middle">Numerical</text>
+<text x="897.0" y="86.0" text-anchor="middle">optimization</text>
+</svg>
