@@ -26,3 +26,10 @@ The repository's README explains how to clone it and push.
 - Data: [`PS2/ipca_igpm.csv`](PS2/ipca_igpm.csv)
 - Submit in: `Assignment-02`
 - Due date: 2026-10-28
+
+## Problem Set 3
+
+- PDF: [`PS3/problem_set_3.pdf`](PS3/problem_set_3.pdf) ([LaTeX source](PS3/problem_set_3.tex))
+- Data: [`PS2/ipca_igpm.csv`](PS2/ipca_igpm.csv) (same as Problem Set 2)
+- Submit in: `Assignment-03`
+- Due date: TBA
