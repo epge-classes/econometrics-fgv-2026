@@ -60,64 +60,119 @@ Consider an AR($p$) process:
 	y_t - \mu = \phi_1 (y_{t-1} - \mu) + \phi_2 (y_{t-2} - \mu) + \cdots + \phi_p (y_{t-p} - \mu) + \varepsilon_t,
 	\label{eq:ar_p}
 \end{equation}
-where $\varepsilon_t \sim \text{i.i.d. } (0, \sigma^2)$. This question will explore the dynamics of conditional moments of $y_{t+h}$ given $\mathcal{I}_t$, where $\mathcal{I}_t = \{y_t, y_{t-1}, \ldots\}$ represents the information set available at time $t$.
+where $\varepsilon_t \sim \text{i.i.d. } (0, \sigma^2)$. This question explores the dynamics of the conditional moments of $y_{t+h}$ given $\mathcal{I}_t$, where $\mathcal{I}_t = \{y_t, y_{t-1}, \ldots\}$ is the information set available at time $t$.
 
 \begin{enumerate}[a)]
-	\item Consider $p\times 1$ vector $Y_t = (y_t - \mu, y_{t-1} - \mu, \ldots, y_{t-p+1} - \mu)'$. Show that there exists a $p \times p$ matrix $A$ and a $p \times 1$ vector $U_t$ such that:
-	\[Y_t = A Y_{t-1} + U_t, \quad \forall t\]
+	\item Consider the $p \times 1$ vector $Y_t = (y_t - \mu, y_{t-1} - \mu, \ldots, y_{t-p+1} - \mu)'$. Show that there exist a $p \times p$ matrix $A$ and a $p \times 1$ vector $U_t$ such that
+	\[Y_t = A Y_{t-1} + U_t, \quad \forall t.\]
 
 	Additionally, show that $\Omega \equiv \mathbb{E}[U_tU_t']$ is a $p \times p$ matrix with all elements equal to zero, except for the first element of the main diagonal, which is equal to $\sigma^2$.
 
-	\textit{Hint}: Matrix $A$ will only have 0's and 1's, except for the first row.
+	\textit{Hint}: except for its first row, the matrix $A$ contains only zeros and ones.
 
 	\item Show that $\mathbb{E}[Y_{t+h}|\mathcal{I}_t] = A^h Y_t$.
-	\item Find an expression for $\Var[Y_{t+h}|\mathcal{I}_t]$ that depends only on $A$, $\Omega$ and $h$;
-	\item Show that the eigenvalues of $A$ are the roots of the polynomial \[\Phi(z) = (-1)^{p}\left(z^p - \phi_1 z^{p-1} - \phi_2 z^{p-2} - \cdots - \phi_p\right),\] i.e., this is its characteristic polynomial;
+	\item Find an expression for $\Var[Y_{t+h}|\mathcal{I}_t]$ that depends only on $A$, $\Omega$ and $h$.
+	\item Show that the eigenvalues of $A$ are the roots of the polynomial \[\Phi(z) = (-1)^{p}\left(z^p - \phi_1 z^{p-1} - \phi_2 z^{p-2} - \cdots - \phi_p\right),\] i.e., that this is the characteristic polynomial of $A$.
 	
-	\textit{Hint 1}: Recall that the determinant of a triangular matrix is equal to the product of its main diagonal elements.
-	
-	\textit{Hint 2}: Recall that if we multiply a column of a matrix by a constant and add the result to another column, the determinant does not change. Try applying operations on $(A - \lambda I)$ to make it triangular -- this is a good refresher in Linear Algebra, isn't it? 
+	\textit{Hint}: recall that if we multiply a column of a matrix by a constant and add the result to another column, the determinant does not change. Try applying such operations to $(A - \lambda I)$ to make it triangular. This is a good linear algebra refresher, isn't it?
 
-	\item Even if you have not completed the previous item, argue that the eigenvalues of $A$ are all smaller than one in absolute value if the AR($p$) process is stationary;
+	\item Even if you have not completed the previous item, argue that the eigenvalues of $A$ are all smaller than one in absolute value if the AR($p$) process is stationary.
 	\item Find the limits of $\mathbb{E}[Y_{t+h}|\mathcal{I}_t]$ and $\Var[Y_{t+h}|\mathcal{I}_t]$ as $h \to \infty$ if the process is stationary. What is the intuition for this result?
 \end{enumerate}
 
-\problem{2}
-In this question, we will explore one example of a stationary process that is not an ARMA process. Let $\psi_j = \frac{1}{j^2}$ for $j \neq 0$ and $\psi_0 = 1$. Consider the process $y_t$ defined in the following way:
+\problem{1}
+In this question, we explore an example of a stationary process that is not an ARMA process. Let $\psi_0 = 1$ and $\psi_j = \frac{1}{j^2}$ for $j \geq 1$. Consider the process
 \[
 y_t = \sum_{j=0}^{\infty} \psi_j \varepsilon_{t-j}, \quad \varepsilon_t \sim \text{i.i.d. } (0, \sigma^2).
 \]
 
 \begin{enumerate}[a)]
-	\item Compute the mean and variance of $y_t$;
-	\item Compute the autocovariance function $\gamma(h) = \mathrm{Cov}(y_t, y_{t-h})$ for $h = 1, 2, 3, \ldots$. Is this process covariance-stationary? Why?
-	\item Show that there are positive constants $c_1$ and $c_2$ such that $c_1 \leq h^2 \cdot \gamma(h) \leq c_2$. Conclude that $\gamma(h) = O(1/h^2)$;
-	\item Now, assume by contradiction that $y_t$ is an ARMA($p,q$) process for some finite $p$ and $q$. Let $\tilde{\gamma}(h)$ be the $h$-th autocovariance implied by the coefficients of this ARMA process. Show that 
+	\item Compute the mean and variance of $y_t$.
+	\item Compute the autocovariance function $\gamma(h) = \mathrm{Cov}(y_t, y_{t-h})$ for $h = 1, 2, 3, \ldots$ Is this process covariance stationary? Why?
+	\item Show that there are positive constants $c_1$ and $c_2$ such that $c_1 \leq h^2 \cdot \gamma(h) \leq c_2$. Conclude that $\gamma(h) = O(1/h^2)$.
+	\item Now, suppose, by way of contradiction, that $y_t$ is an ARMA($p,q$) process for some finite $p$ and $q$. Let $\tilde{\gamma}(h)$ be the $h$th autocovariance implied by the coefficients of this ARMA process. Show that
 	\[
-	\lim_{h \to \infty}\frac{\gamma(h)}{|\tilde{\gamma}(h)|} = + \infty
+	\lim_{h \to \infty}\frac{\gamma(h)}{|\tilde{\gamma}(h)|} = + \infty.
 	\]
 	Conclude that $y_t$ can never be an ARMA($p,q$) process.
 \end{enumerate}
 
-\problem{6}
-On the last problem set, you analyzed Brazilian inflation data. Now, we will create a full pipeline for the estimation of an ARMA model for inflation and we will use it for forecasting. Please use the same dataset \texttt{ipca\_igpm.csv} as last time; it is in the \texttt{problem\_sets/PS2} folder of the class GitHub repo. We will concentrate on the IPCA time series for this problem set. We will model it as an ARMA($p,q$) process with unknown $p$ and $q$:
+\problem{2}
+Lecture 5 showed that an ARMA(1,1) with $\theta = -\phi$ is just white noise. Here you will show that this breaks the inference from Lecture 6: the information matrix is singular exactly when the roots cancel.
 
+Consider the Gaussian ARMA(1,1) model
 \begin{equation}
-	y_t = c + \phi_1 y_{t-1} + \phi_2 y_{t-2} + \cdots + \phi_p y_{t-p} + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2} + \cdots + \theta_q \varepsilon_{t-q}
+	y_t = \phi y_{t-1} + \varepsilon_t + \theta \varepsilon_{t-1}, \qquad \varepsilon_t \sim \text{i.i.d. } N(0, \sigma^2), \qquad |\phi| < 1, \quad |\theta| < 1.
+	\label{eq:arma11}
+\end{equation}
+As in Lecture 6, back out the shocks with $\varepsilon_t(\phi, \theta) = y_t - \phi y_{t-1} - \theta \varepsilon_{t-1}(\phi, \theta)$. To keep the algebra clean, assume that we observe the infinite past, so $\varepsilon_t(\phi, \theta) = (1 + \theta L)^{-1}(1 - \phi L)\, y_t$. The log-likelihood contribution of observation $t$ is $\ell_t = -\frac{1}{2}\log(2\pi\sigma^2) - \varepsilon_t(\phi, \theta)^2/(2\sigma^2)$. Notice that $\varepsilon_t(\phi, -\phi) = y_t$ for every $\phi$: the likelihood is flat along the line $\theta = -\phi$.
+
+\begin{enumerate}[a)]
+	\item Let $u_t \equiv -\partial \varepsilon_t(\phi, \theta)/\partial \phi$ and $v_t \equiv -\partial \varepsilon_t(\phi, \theta)/\partial \theta$. Show that, at the true parameters,
+	\[
+		u_t = \phi\, u_{t-1} + \varepsilon_{t-1}, \qquad v_t = -\theta\, v_{t-1} + \varepsilon_{t-1}.
+	\]
+	\textit{Hint}: differentiate the recursion (remember that $\varepsilon_{t-1}(\phi, \theta)$ depends on $\phi$ and $\theta$ too) to get $(1 + \theta L)u_t = y_{t-1}$ and $(1 + \theta L)v_t = \varepsilon_{t-1}$. Then use \eqref{eq:arma11} to replace $y_{t-1}$.
+
+	\item The score for $(\phi, \theta)$ is $\varepsilon_t (u_t, v_t)'/\sigma^2$, and you may take as given that the $\sigma^2$ block decouples. Show that the $(\phi, \theta)$ block of $\mathcal{I}(\symbf{\Theta}_0) = \E[\mathcal{S}_t \mathcal{S}_t']$ is
+	\[
+		\mathcal{I}_{\phi\theta} =
+		\begin{pmatrix}
+			\dfrac{1}{1 - \phi^2} & \dfrac{1}{1 + \phi\theta} \\[1em]
+			\dfrac{1}{1 + \phi\theta} & \dfrac{1}{1 - \theta^2}
+		\end{pmatrix}.
+	\]
+	\textit{Hint}: $u_t$ and $v_t$ depend only on past shocks, so they are independent of $\varepsilon_t$.
+
+	\item Show that
+	\[
+		\det(\mathcal{I}_{\phi\theta}) = \frac{(\phi + \theta)^2}{(1 - \phi^2)(1 - \theta^2)(1 + \phi\theta)^2}
+		\qquad \text{and} \qquad
+		\left[\mathcal{I}_{\phi\theta}^{-1}\right]_{11} = \frac{(1 - \phi^2)(1 + \phi\theta)^2}{(\phi + \theta)^2}.
+	\]
+	The second expression is the asymptotic variance of $\sqrt{T}(\hat{\phi} - \phi)$. With $T = 200$, compute the standard error of $\hat{\phi}$ at $(\phi, \theta) = (0.5, 0.45)$ and at $(0.5, -0.45)$. What does this say about ARMA models whose roots nearly cancel?
+
+	\item Simulate $T = 500$ observations of white noise, $y_t \sim N(0, 1)$, that is, \eqref{eq:arma11} with $\phi = \theta = 0$. Fix $\sigma^2 = 1$. For each $(\phi, \theta)$ on a grid over $[-0.9, 0.9]^2$ with step $0.02$, back out the shocks with the recursion above, starting from $y_0 = \varepsilon_0 = 0$, and compute the log-likelihood $\sum_{t=1}^T \ell_t$. Plot it as a heat map, capping the color scale (e.g., show the log-likelihood minus its maximum, floored at $-60$), and add the line $\theta = -\phi$. Evaluate the log-likelihood at a few points on this line. 
+	
+	What do you find, and why does it hold exactly even though $T$ is finite? Finally, redo the plot with data simulated from $(\phi, \theta) = (0.5, 0.45)$. What changes?
+\end{enumerate}
+
+\problem{2}
+Lecture 6 showed that with non-Gaussian shocks, the Gaussian MLE is a quasi-MLE with sandwich variance $\mathcal{H}_0^{-1}\mathcal{J}_0\mathcal{H}_0^{-1}$. This exercise checks which standard errors survive fat tails. Use AI to code faster, but understand every line.
+
+Consider the AR(1) model $y_t = c + \phi y_{t-1} + \varepsilon_t$, where $\varepsilon_t$ is i.i.d.\ with mean zero, variance $\sigma^2$ and $\E[\varepsilon_t^4] = \kappa\sigma^4$ ($\kappa = 3$ for a Gaussian). Estimate $\symbf{\Theta} = (c, \phi, \sigma^2)$ by Gaussian conditional MLE: $\hat\beta = (\hat c, \hat\phi)'$ is the OLS estimator from regressing $y_t$ on $x_t = (1, y_{t-1})'$, and $\hat\sigma^2$ is the mean of the squared residuals. With $\varepsilon_t = \varepsilon_t(\beta) \equiv y_t - x_t'\beta$, the score and Hessian of the Gaussian log-likelihood contribution $\ell_t$ are (as functions of $\symbf{\Theta}$)
+\[
+	\mathcal{S}_t = \begin{pmatrix} x_t \varepsilon_t/\sigma^2 \\[0.5em] -\dfrac{1}{2\sigma^2} + \dfrac{\varepsilon_t^2}{2\sigma^4} \end{pmatrix}, \qquad
+	\frac{\partial^2 \ell_t}{\partial\symbf{\Theta}\partial\symbf{\Theta}'} = \begin{pmatrix} -x_t x_t'/\sigma^2 & -x_t\varepsilon_t/\sigma^4 \\[0.5em] -x_t'\varepsilon_t/\sigma^4 & \dfrac{1}{2\sigma^4} - \dfrac{\varepsilon_t^2}{\sigma^6} \end{pmatrix}.
+\]
+
+\begin{enumerate}[a)]
+	\item At the true parameters, show that $-\mathcal{H}_0$ and $\mathcal{J}_0$ have the same top-left $2 \times 2$ block (the rows and columns for $c$ and $\phi$), but different bottom-right entries (the one for $\sigma^2$): $\frac{1}{2\sigma^4}$ and $\frac{\kappa - 1}{4\sigma^4}$. When are these two entries equal?
+
+
+	\item Write a function that returns $\hat{\symbf{\Theta}}$ and three standard errors: the square roots of the diagonals of $[-\mathcal{H}]^{-1}/(T-1)$ (Hessian), $\mathcal{O}^{-1}/(T-1)$ (OPG) and $\mathcal{H}^{-1}\mathcal{O}\mathcal{H}^{-1}/(T-1)$ (sandwich), with $\mathcal{H}$ and $\mathcal{O}$ evaluated at $\hat{\symbf{\Theta}}$ as in Lecture 6. Then set $c = 0$, $\phi = 0.5$, $\sigma^2 = 1$ and, for $T \in \{200, 1000\}$, simulate $M = 2000$ samples with (i) $N(0, 1)$ shocks and (ii) $\varepsilon_t = \sqrt{5/7}\, z_t$, where $z_t \sim t_7$ (unit variance, $\kappa = 5$). Report the coverage of the 95\% intervals $\hat{\symbf{\Theta}}_k \pm 1.96\, \text{se}_k$ for each parameter and standard error.
+
+	\item Which intervals fail? Use a) to explain why.
+\end{enumerate}
+
+\problem{3}
+In the last problem set, you analyzed Brazilian inflation data. Now, we will build a full pipeline to estimate an ARMA model for inflation and use it for forecasting. Please use the same dataset \texttt{ipca\_igpm.csv} as last time; it is in the \texttt{problem\_sets/PS2} folder of the class GitHub repo. We will focus on the IPCA series. We will model it as an ARMA($p,q$) process with unknown $p$ and $q$:
+\begin{equation}
+	y_t = c + \phi_1 y_{t-1} + \phi_2 y_{t-2} + \cdots + \phi_p y_{t-p} + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2} + \cdots + \theta_q \varepsilon_{t-q},
 	\label{eq:arma_pq}
 \end{equation}
 where $\varepsilon_t \sim \text{i.i.d. } N(0, \sigma^2)$. We will assume that the process is stationary and invertible, so that the parameters are identified.
 
 \begin{enumerate}[a)]
-	\item Create a plot showing the time series evolution of the IPCA series;
-	\item For given values of $p$ and $q$ (and the associated parameters), write a function that returns the conditional log-likelihood function of an ARMA($p,q$) model.
-	\item Consider $p,q \in \{0,1,2\}$. For each of the 8 possible combinations of $p$ and $q$ (4 proper ARMA models, 2 AR models, and 2 MA models), estimate parameters by conditional maximum likelihood. Create a table in which you report, for each model, the estimated parameters, 95\% confidence intervals, and the AIC and BIC values;
-	\item Based on the AIC and BIC values, which model would you choose? Why? Do they disagree in terms of the best model? If the model chosen by BIC is different than the one chosen by AIC, pick your favorite and justify your choice.
-	\item For the model with the best possible fit, create two plots: (i) the fitted values against the actual series; (ii) the residuals of the model against time. Comment on these plots. 
-	\item Create a plot showing the autocorrelation function of residuals. Comment on this plot;
-	\item Now we will do some forecasting. For the model with the best fit, simulate 24 realizations of a random variable distributed as $N(0, \hat{\sigma}^2)$. Given the estimated parameters and these simulated shocks, iterate $y_t$ forward following \eqref{eq:arma_pq} to get a path of simulated future realizations of $y_t$. Plot the original series followed by your forecast.
-	\item Repeat the item above 1000 times and keep track of the forecasts. For each point in time, compute the realizations in the $5\%$ and $95\%$ percentiles of the forecasts. Plot your forecast with these bounds around it.
-	\item Intuitively, how similar is this process to the non-parametric boostrap we saw in the beginning of the class?
+	\item Plot the IPCA series over time.
+	\item For given values of $p$ and $q$ (and the associated parameters), write a function that returns the conditional log-likelihood of an ARMA($p,q$) model.
+	\item Consider $p,q \in \{0,1,2\}$. For each of the 8 combinations other than $p = q = 0$ (4 proper ARMA models, 2 AR models and 2 MA models), estimate the parameters by conditional maximum likelihood. Create a table in which you report, for each model, the estimated parameters, 95\% confidence intervals, and the AIC and BIC values.
+	\item Based on the AIC and BIC values, which model would you choose? Why? Do the two criteria agree on the best model? If BIC and AIC choose different models, pick your favorite and justify your choice.
+	\item For the model you chose in item d), create two plots: (i) the fitted values against the actual series; (ii) the residuals against time. Comment on these plots.
+	\item Plot the autocorrelation function of the residuals. Comment on this plot.
+	\item Now we will do some forecasting. For the same model, simulate 24 independent draws from $N(0, \hat{\sigma}^2)$. Given the estimated parameters and these simulated shocks, iterate $y_t$ forward following \eqref{eq:arma_pq} to get a simulated path of future values of $y_t$. Plot the original series followed by your forecast.
+	\item Repeat the previous item 1000 times and store the simulated paths. For each forecast horizon, compute the $5$th and $95$th percentiles across the simulated paths. Plot your forecast together with these bounds.
+	\item Intuitively, how similar is this procedure to the nonparametric bootstrap we saw at the beginning of the course?
 \end{enumerate}
 
 \end{document}
