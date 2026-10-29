@@ -461,6 +461,14 @@ $padx: 40px;
   font-size: 0.5em;
 }
 
+// Uncounted slides (section headers, "Questions?", References, appendix) would
+// repeat the last counted number, so hide the counter there, on screen and in print.
+// !important beats the inline display:block that reveal.js sets on every slide change.
+.reveal:has(.slides section.present[data-visibility="uncounted"]) .slide-number,
+.reveal .pdf-page:has(section[data-visibility="uncounted"]) .slide-number-pdf {
+  display: none !important;
+}
+
 .reveal .progress {
   color: $FGVBlue;
   height: 3px;
