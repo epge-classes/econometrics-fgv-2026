@@ -1,0 +1,700 @@
+---
+title: "Lecture 7: LLN and CLTs for Time Series"
+talkdate: "October 2026"
+---
+
+# Introduction {visibility="uncounted"}
+
+## Where We Are
+
+- Lecture 6: ARMA estimation by (quasi-)MLE, with a sandwich variance
+- Applied work often regresses $y_t$ on $x_t$, $x_{t-1}$, $y_{t-1}$, etc. by OLS
+- OLS asks for less than MLE: moment conditions, no full distribution
+- To do inference, we need asymptotic theory for _dependent_ data
+
+. . .
+
+- Lindeberg–Lévy and Lindeberg–Feller need independent observations
+- Time series are dependent by design: that was the whole point of ARMA models!
+- So the textbook LLN and CLT do not apply. Where exactly do their proofs break?
+
+## Today
+
+- Does $\bar y_T$ still converge to $\mu$?
+- What is the asymptotic variance of $\sqrt{T}(\bar y_T - \mu)$?
+- How do we get standard errors that are robust to autocorrelation?
+
+. . .
+
+- Spoiler: yes; it is the _long-run variance_, not $\gamma_0$; Newey-West
+- We will sketch some proofs and give references for the rest
+- Focus on the main ideas, not the technical details
+
+# The Law of Large Numbers {visibility="uncounted"}
+
+## The Variance of the Sample Mean
+
+- $\{y_t\}$ is covariance-stationary with mean $\mu$ and autocovariances $\gamma_h$
+- As usual, assume absolute summability: $\sum_{h=-\infty}^{\infty} |\gamma_h| < \infty$
+- The sample mean $\bar y_T = \frac{1}{T}\sum_{t=1}^T y_t$ is unbiased: $\E[\bar y_T] = \mu$
+
+. . .
+
+- Stack $\symbf{Y}_T = (y_1 - \mu, \ldots, y_T - \mu)'$ and let $\symbf{1}_T$ be a $T \times 1$ vector of ones
+- Then $\bar y_T - \mu = \frac{1}{T}\symbf{1}_T'\symbf{Y}_T$. With $\symbf{V}_T \equiv \Var(\symbf{Y}_T)$:
+
+$$
+\E\left(\bar y_T - \mu\right)^2 = \frac{1}{T^2}\,\symbf{1}_T'\symbf{V}_T\symbf{1}_T = \frac{\text{sum of all entries of } \symbf{V}_T}{T^2}
+$$
+
+- Sanity check: i.i.d. data give $\symbf{V}_T = \gamma_0\symbf{I}_T$, hence $\gamma_0/T$
+
+## Summing the Covariance Matrix {.tightmath}
+
+$$
+\symbf{V}_T = \begin{pmatrix}
+\gamma_0 & \gamma_1 & \gamma_2 & \cdots & \gamma_{T-1} \\
+\gamma_1 & \gamma_0 & \gamma_1 & \cdots & \gamma_{T-2} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+\gamma_{T-1} & \gamma_{T-2} & \gamma_{T-3} & \cdots & \gamma_0
+\end{pmatrix}
+$$
+
+- Lag $h$ fills the $h$-th diagonals above and below the main one: $T - |h|$ entries each
+
+$$
+\sum_{i=1}^T\sum_{j=1}^T \gamma_{|i-j|} = T\gamma_0 + 2(T-1)\gamma_1 + \cdots + 2\gamma_{T-1} = \sum_{h=-(T-1)}^{T-1}(T - |h|)\,\gamma_h
+$$
+
+$$
+\implies \boxed{\E\left(\bar y_T - \mu\right)^2 = \frac{1}{T}\sum_{h=-(T-1)}^{T-1}\left(1 - \frac{|h|}{T}\right)\gamma_h}
+$$
+
+## A Weak Law of Large Numbers
+
+- Each weight $1 - |h|/T$ lies in $[0, 1]$, so:
+
+$$
+\E\left(\bar y_T - \mu\right)^2 \le \frac{1}{T}\sum_{h=-(T-1)}^{T-1}|\gamma_h| \le \frac{1}{T}\underbrace{\sum_{h=-\infty}^{\infty}|\gamma_h|}_{< \infty} \longrightarrow 0
+$$
+
+- $\bar y_T \to \mu$ in mean square, hence $\bar y_T \xrightarrow{p} \mu$ by Chebyshev's inequality
+
+. . .
+
+- This is a weak LLN for covariance-stationary time series
+- No independence needed: only covariance stationarity and absolute summability
+- Absolute summability: "the process can be dependent, but not _too_ dependent"
+
+## The Long-Run Variance {#long-run-variance}
+
+- $\Var(\bar y_T)$ shrinks like $1/T$. Does $T \cdot \Var(\bar y_T)$ settle down?
+
+::: {.thm}
+::: {.thmhead}
+Proposition (Hamilton, Prop. 7.5)
+:::
+If $\{y_t\}$ is covariance-stationary with absolutely summable autocovariances, then
+$$
+\lim_{T\to\infty} T\cdot\E\left(\bar y_T - \mu\right)^2 = \sum_{h=-\infty}^{\infty}\gamma_h \equiv \omega^2
+$$
+:::
+
+- $\omega^2$ is the **long-run variance** of $\{y_t\}$
+- Proof: each weight $1 - |h|/T \to 1$, and $|\gamma_h|$ dominates. An $\varepsilon$-proof is in the [appendix](#lrv-proof)
+
+. . .
+
+- AR(1): $\omega^2 = \frac{\sigma^2}{(1-\phi)^2}$ versus $\gamma_0 = \frac{\sigma^2}{1-\phi^2}$, a ratio of $\frac{1+\phi}{1-\phi}$. With $\phi = 0.9$: $19$!
+
+## Dependence Changes the Variance
+
+AR(1) with $\sigma^2 = 1$, started at its stationary distribution. Left: $\sqrt{T}\,\bar y_T$ across 2,000 samples
+
+```{ojs}
+//| echo: false
+viewof lrv = Inputs.form({
+  phi: Inputs.range([-0.9, 0.95], {value: 0.6, step: 0.05, label: "φ"}),
+  T: Inputs.range([10, 1000], {value: 100, step: 1, transform: Math.log, label: "T"}),
+  seed: Inputs.button("Draw new samples", {value: 1, reduce: v => v + 1})
+}, {template: ({phi, T, seed}) => {
+  for (const f of [phi, T]) {
+    f.style.setProperty("--input-width", "300px")
+    f.style.setProperty("--label-width", "30px")
+    f.style.maxWidth = "none"
+  }
+  return html`<div style="display: flex; justify-content: center; align-items: center; column-gap: 30px">${phi}${T}${seed}</div>`
+}})
+```
+
+```{ojs}
+//| echo: false
+// 2,000 samples of up to 1,000 periods, each with one extra shock for the stationary start.
+// The shocks depend on the seed only: moving the sliders reuses them.
+lrvR = 2000
+lrvMaxT = 1000
+lrvSeed = k => {
+  let x = Math.imul(k ^ (k >>> 16), 0x85ebca6b)
+  x = Math.imul(x ^ (x >>> 13), 0xc2b2ae35)
+  return ((x ^ (x >>> 16)) >>> 0) / 4294967296
+}
+lrvShocks = {
+  const draw = d3.randomNormal.source(d3.randomLcg(lrvSeed(7031 + lrv.seed)))(0, 1)
+  return Float32Array.from({length: lrvR * (lrvMaxT + 1)}, draw)
+}
+
+lrvGamma0 = 1 / (1 - lrv.phi ** 2)
+lrvOmega2 = 1 / (1 - lrv.phi) ** 2
+
+// sqrt(T) * ybar_T for each sample
+lrvStats = {
+  const {phi, T} = lrv
+  const out = new Float64Array(lrvR)
+  for (let r = 0; r < lrvR; r++) {
+    const base = r * (lrvMaxT + 1)
+    let y = lrvShocks[base] * Math.sqrt(lrvGamma0), s = 0
+    for (let t = 1; t <= T; t++) {
+      y = phi * y + lrvShocks[base + t]
+      s += y
+    }
+    out[r] = s / Math.sqrt(T)
+  }
+  return out
+}
+
+// Exact T * Var(ybar_T) = gamma_0 [1 + 2 sum_{h<T} (1 - h/T) phi^h], on a log grid of T
+lrvCurve = {
+  const phi = lrv.phi
+  const Ts = Array.from(new Set(d3.range(0, 301).map(i => Math.round(10 * 100 ** (i / 300)))))
+  return Ts.map(T => {
+    let s = 1, p = 1
+    for (let h = 1; h < T; h++) { p *= phi; s += 2 * (1 - h / T) * p }
+    return {T, v: lrvGamma0 * s}
+  })
+}
+lrvNow = {
+  let s = 1, p = 1
+  for (let h = 1; h < lrv.T; h++) { p *= lrv.phi; s += 2 * (1 - h / lrv.T) * p }
+  return lrvGamma0 * s
+}
+
+lrvSd = Math.sqrt(Math.max(lrvOmega2, lrvGamma0))
+lrvDensity = (v) => d3.range(-4.2 * lrvSd, 4.2 * lrvSd + 1e-9, lrvSd / 40)
+  .map(x => ({x, f: Math.exp(-x * x / (2 * v)) / Math.sqrt(2 * Math.PI * v)}))
+
+lrvPanel = (title, plot) => html`<div>
+  <div style="text-align: center">${title}</div>
+  ${plot}
+</div>`
+
+html`<div style="display: flex; gap: 20px; justify-content: center; font-size: 19px">
+${lrvPanel(html`<span style="color: #0072BC">N(0, ω²)</span> vs. <span style="color: #EB811B">N(0, γ<sub>0</sub>)</span>`, Plot.plot({
+  width: 560, height: 400, marginLeft: 55, marginBottom: 45,
+  style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {label: null, domain: [-4.2 * lrvSd, 4.2 * lrvSd], ticks: 5},
+  y: {label: null, ticks: 4},
+  grid: true,
+  marks: [
+    Plot.rectY(lrvStats, Plot.binX({y: "proportion"}, {x: d => d, thresholds: d3.range(-4.2 * lrvSd, 4.2 * lrvSd + 1e-9, lrvSd / 6), fill: "#2D3E50", fillOpacity: 0.25, inset: 0.5})),
+    Plot.line(lrvDensity(lrvOmega2), {x: "x", y: d => d.f * lrvSd / 6, stroke: "#0072BC", strokeWidth: 3}),
+    Plot.line(lrvDensity(lrvGamma0), {x: "x", y: d => d.f * lrvSd / 6, stroke: "#EB811B", strokeWidth: 3, strokeDasharray: "7,5"}),
+    Plot.ruleY([0])
+  ]
+}))}
+${lrvPanel(html`<i>T</i>·Var(<i>ȳ<sub>T</sub></i>) against <i>T</i>: it tends to <span style="color: #0072BC">ω² = ${lrvOmega2.toFixed(2)}</span>, not <span style="color: #EB811B">γ<sub>0</sub> = ${lrvGamma0.toFixed(2)}</span>`, Plot.plot({
+  width: 600, height: 400, marginLeft: 55, marginBottom: 45,
+  style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {type: "log", label: "T", domain: [10, 1000], labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: [0, 1.08 * Math.max(lrvOmega2, lrvGamma0, d3.max(lrvCurve, d => d.v))], ticks: 5},
+  grid: true,
+  marks: [
+    Plot.ruleY([lrvOmega2], {stroke: "#0072BC", strokeWidth: 2, strokeDasharray: "7,5"}),
+    Plot.ruleY([lrvGamma0], {stroke: "#EB811B", strokeWidth: 2, strokeDasharray: "7,5"}),
+    Plot.line(lrvCurve, {x: "T", y: "v", stroke: "#2D3E50", strokeWidth: 3}),
+    Plot.dot([{T: lrv.T, v: lrvNow}], {x: "T", y: "v", fill: "#2D3E50", r: 7})
+  ]
+}))}
+</div>`
+```
+
+## The Vector Case
+
+- Same algebra for a mean-zero, covariance-stationary vector $\symbf{g}_t \in \R^k$
+- Autocovariance matrices: $\symbf{\Gamma}_h \equiv \E\left[\symbf{g}_t\symbf{g}_{t-h}'\right]$. Notice that $\symbf{\Gamma}_{-h} = \symbf{\Gamma}_h'$
+- The long-run variance becomes a matrix:
+
+$$
+\symbf{\Omega} \equiv \lim_{T\to\infty} T\cdot\Var\left(\bar{\symbf{g}}_T\right) = \sum_{h=-\infty}^{\infty}\symbf{\Gamma}_h = \symbf{\Gamma}_0 + \sum_{h=1}^{\infty}\left(\symbf{\Gamma}_h + \symbf{\Gamma}_h'\right)
+$$
+
+. . .
+
+- Keep an eye on $\symbf{\Omega}$: it shows up in every limit distribution today
+- OLS: $\symbf{g}_t = \symbf{x}_t u_t$, the regression scores
+- GMM, later in the course: $\symbf{g}_t$ is the vector of moment functions
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# Central Limit Theorems {visibility="uncounted"}
+
+## Martingale Difference Sequences
+
+- Independence is one thing. Dependence comes in all shapes and forms!
+- So there is no such thing as "**the** CLT for time series"
+
+. . .
+
+::: {.thm}
+::: {.thmhead}
+Definition (Martingale Difference Sequence)
+:::
+$\{y_t\}$ is an MDS with respect to the information sets $\{\mathcal{F}_t\}$ if $y_t$ is known given $\mathcal{F}_t$, $\E|y_t| < \infty$, and $\E[y_t \mid \mathcal{F}_{t-1}] = 0$ almost surely.
+:::
+
+- An MDS has mean zero and $\gamma_h = 0$ for $h \neq 0$: uncorrelated, yet possibly dependent
+
+. . .
+
+- Example: $y_t = e_t e_{t-1}$ with $e_t$ i.i.d., mean zero, variance $\sigma^2$, and $\mathcal{F}_t = \sigma(e_s : s \le t)$
+- MDS: $\E[y_t \mid \mathcal{F}_{t-1}] = e_{t-1}\E[e_t] = 0$
+- Dependent: $\Cov(y_t^2, y_{t-1}^2) = \sigma^4\left(\E[e_t^4] - \sigma^4\right) = \sigma^4\Var(e_t^2) > 0$ unless $e_t^2$ is constant
+
+## A CLT for MDS
+
+::: {.thm}
+::: {.thmhead}
+Theorem (MDS CLT, Hamilton, Prop. 7.8)
+:::
+Let $\{y_t\}$ be a scalar MDS with $\E[y_t^2] = \sigma_t^2 > 0$ such that:
+
+- $\frac{1}{T}\sum_{t=1}^T\sigma_t^2 \to \sigma^2 > 0$
+- $\E|y_t|^r < \infty$ for some $r > 2$ and all $t$
+- $\frac{1}{T}\sum_{t=1}^T y_t^2 \xrightarrow{p} \sigma^2$
+
+Then $\sqrt{T}\,\bar y_T = \frac{1}{\sqrt{T}}\sum_{t=1}^T y_t \xrightarrow{d} N(0, \sigma^2)$.
+:::
+
+- No autocovariances to add up: the long-run variance is just $\sigma^2$
+- Strictly stationary and ergodic MDS: finite variance suffices ([Hansen, Thm. 14.11]{.fgv})
+- Extends to vectors (Cramér–Wold) and to triangular arrays
+
+## Strong Mixing
+
+- Without the MDS structure, we must control how fast dependence fades
+- For two events $A$ and $B$: $\alpha(A, B) \equiv \left|\Pr(A \cap B) - \Pr(A)\Pr(B)\right|$, zero under independence
+
+. . .
+
+- $\mathcal{F}_{-\infty}^{t} = \sigma(\ldots, y_{t-1}, y_t)$ collects the past, and $\mathcal{F}_{t}^{\infty} = \sigma(y_t, y_{t+1}, \ldots)$ the future
+
+$$
+\alpha(\ell) \equiv \sup_t\ \sup_{A \in \mathcal{F}_{-\infty}^{t-\ell},\ B \in \mathcal{F}_{t}^{\infty}} \alpha(A, B)
+$$
+
+- The process is **strong mixing** if $\alpha(\ell) \to 0$ as $\ell \to \infty$
+- Far-apart events become nearly independent. Faster decay means weaker dependence
+
+. . .
+
+- i.i.d. data: $\alpha(\ell) = 0$ for $\ell \ge 1$
+- Stationary ARMA with well-behaved shocks are strong mixing ([Hansen, Thm. 14.26]{.fgv})
+
+## A CLT for Mixing Processes
+
+::: {.thm}
+::: {.thmhead}
+Theorem ([Hansen, Thm. 14.15]{.fgv})
+:::
+Let $\symbf{g}_t$ be strictly stationary, mean zero, and strong mixing, with, for some $r > 2$:
+$$
+\E\lVert\symbf{g}_t\rVert^r < \infty \qquad \text{and} \qquad \sum_{\ell=1}^{\infty}\alpha(\ell)^{1 - 2/r} < \infty
+$$
+Then $\symbf{\Omega} = \sum_{h}\symbf{\Gamma}_h$ converges and $\sqrt{T}\,\bar{\symbf{g}}_T \xrightarrow{d} N(0, \symbf{\Omega})$.
+:::
+
+- Trade-off: more finite moments (larger $r$) allow slower mixing
+- Linear processes $y_t = \mu + \sum_j\psi_j e_{t-j}$, $e_t$ i.i.d., $\sum_j|\psi_j| < \infty$: no mixing needed
+- For them, $\sqrt{T}(\bar y_T - \mu) \xrightarrow{d} N(0, \omega^2)$, with $\omega^2 = \sigma^2\left(\sum_j\psi_j\right)^2$ ([Hamilton, Prop. 7.11]{.fgv})
+- The message is always the same: the asymptotic variance is the **long-run variance**
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# OLS with Time Series {visibility="uncounted"}
+
+## Setup and Consistency
+
+- Linear model $y_t = \symbf{x}_t'\symbf{\beta} + u_t$ with $\E[\symbf{x}_t u_t] = 0$
+- $\symbf{x}_t$ is $K \times 1$, includes the intercept, and may contain lags of $y_t$
+- $(y_t, \symbf{x}_t)$ is strictly stationary and ergodic, and $\symbf{Q} \equiv \E[\symbf{x}_t\symbf{x}_t'] > 0$
+- Then $\symbf{\beta} = \symbf{Q}^{-1}\E[\symbf{x}_t y_t]$ is identified
+
+. . .
+
+$$
+\hat{\symbf{\beta}}_T - \symbf{\beta} = \left(\frac{1}{T}\sum_{t=1}^T\symbf{x}_t\symbf{x}_t'\right)^{-1}\left(\frac{1}{T}\sum_{t=1}^T\symbf{x}_t u_t\right)
+$$
+
+- Ergodic theorem (Lecture 3): both averages converge, so $\hat{\symbf{\beta}}_T \xrightarrow{p} \symbf{\beta}$
+- Inference hinges on $\frac{1}{\sqrt{T}}\sum_t\symbf{x}_t u_t$: are the scores $\symbf{g}_t = \symbf{x}_t u_t$ serially correlated?
+
+## Unforecastable Errors
+
+- Assume $\E[u_t \mid \mathcal{F}_{t-1}] = 0$, where $\mathcal{F}_{t-1}$ contains $\symbf{x}_t$ and past errors
+- Example: an AR(2), with $\symbf{x}_t = (1, y_{t-1}, y_{t-2})'$
+- Then $\E[\symbf{x}_t u_t \mid \mathcal{F}_{t-1}] = \symbf{x}_t\,\E[u_t \mid \mathcal{F}_{t-1}] = 0$: the scores are an MDS
+
+. . .
+
+- MDS CLT plus finite fourth moments of $y_t$ and $\symbf{x}_t$ ([Hansen, Thm. 14.35]{.fgv}):
+
+$$
+\boxed{\sqrt{T}\left(\hat{\symbf{\beta}}_T - \symbf{\beta}\right) \xrightarrow{d} N\left(0, \symbf{Q}^{-1}\symbf{\Sigma}\symbf{Q}^{-1}\right), \qquad \symbf{\Sigma} = \E\left[\symbf{x}_t\symbf{x}_t' u_t^2\right]}
+$$
+
+- The same sandwich as in the heteroskedastic cross section
+
+## When Are the Scores Serially Correlated? {.tightmath}
+
+**Too few lags.** Inflation $\pi_t$ follows an AR(2), but we fit an AR(1):
+
+$$
+\pi_t = \alpha + \rho\,\pi_{t-1} + u_t
+$$
+
+- The error absorbs the omitted lag: $u_t$ still depends on $\pi_{t-2}$, which is known at $t-1$
+- So $\E[u_t \mid \mathcal{F}_{t-1}] \neq 0$, and the scores are not an MDS
+
+. . .
+
+**Overlapping horizons.** Monthly data, 12-month stock returns on the dividend yield $d_t$:
+
+$$
+r_{t+1} + r_{t+2} + \cdots + r_{t+12} = \alpha + \beta\,d_t + u_{t+12}
+$$
+
+- Errors one month apart share 11 of their 12 monthly returns
+- Even if monthly returns are unforecastable, $u_t$ is an MA(11): $\symbf{\Gamma}_h = 0$ only for $h \ge 12$
+
+## Persistent Errors {.tightmath}
+
+**Static regression.** Aggregate consumption $c_t$ on income $w_t$:
+
+$$
+c_t = \alpha + \beta\,w_t + u_t
+$$
+
+- $u_t$ collects slow-moving forces (wealth, habits, demographics), so it is persistent
+- Income $w_t$ is persistent too
+
+. . .
+
+- If $w_t$ and $u_t$ are independent with mean zero, the slope's score $w_t u_t$ has
+
+$$
+\E\left[w_t u_t \cdot w_{t-h}u_{t-h}\right] = \E\left[w_t w_{t-h}\right]\E\left[u_t u_{t-h}\right] = \gamma_w(h)\,\gamma_u(h)
+$$
+
+- Two AR(1)s with coefficient 0.9: $w_t u_t$ has first autocorrelation $0.9 \times 0.9 = 0.81$
+
+## Serially Correlated Scores
+
+- In all three cases, $\symbf{x}_t u_t$ is serially correlated, so the MDS CLT does not apply
+- Consistency survives: $\hat{\symbf{\beta}}_T$ still converges to the projection coefficient
+- What changes is the asymptotic variance, hence inference
+
+. . .
+
+- If $y_t$ and $\symbf{x}_t$ have finite $r$-th moments and $\sum_{\ell}\alpha(\ell)^{1 - 4/r} < \infty$, for some $r > 4$:
+
+$$
+\boxed{\sqrt{T}\left(\hat{\symbf{\beta}}_T - \symbf{\beta}\right) \xrightarrow{d} N\left(0, \symbf{Q}^{-1}\symbf{\Omega}\symbf{Q}^{-1}\right), \qquad \symbf{\Omega} = \sum_{h=-\infty}^{\infty}\E\left[\symbf{x}_t\symbf{x}_{t-h}' u_t u_{t-h}\right]}
+$$
+
+- $\symbf{\Omega}$ is the long-run variance of $\symbf{g}_t = \symbf{x}_t u_t$ ([Hansen, Thm. 14.35]{.fgv})
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# HAC Estimation {visibility="uncounted"}
+
+## The Easy Case: MDS Scores
+
+- $\hat{\symbf{Q}} = \frac{1}{T}\sum_t\symbf{x}_t\symbf{x}_t'$ is the easy part. The work is in the "meat"
+- With MDS scores, use the sample analogue of $\symbf{\Sigma}$:
+
+$$
+\hat{\symbf{\Sigma}} = \frac{1}{T}\sum_{t=1}^T\symbf{x}_t\symbf{x}_t'\hat u_t^2, \qquad \hat u_t = y_t - \symbf{x}_t'\hat{\symbf{\beta}}_T
+$$
+
+- This is [White (1980)]{.fgv}'s estimator, exactly as in the cross section
+- Robust to heteroskedasticity, **not** to autocorrelation
+- Standard errors: square roots of the diagonal of $\hat{\symbf{Q}}^{-1}\hat{\symbf{\Sigma}}\hat{\symbf{Q}}^{-1}/T$
+- Usual $t$-tests and Wald tests are valid
+
+## Estimating the Long-Run Variance
+
+- Write $\hat{\symbf{g}}_t = \symbf{x}_t\hat u_t$ and estimate each autocovariance matrix:
+
+$$
+\hat{\symbf{\Gamma}}_h = \frac{1}{T}\sum_{t=h+1}^T\hat{\symbf{g}}_t\hat{\symbf{g}}_{t-h}', \qquad \hat{\symbf{\Gamma}}_{-h} = \hat{\symbf{\Gamma}}_h'
+$$
+
+- Infinitely many $\symbf{\Gamma}_h$, but they _must_ fade as $h$ grows. Far lags are estimated from few terms
+
+. . .
+
+- Idea: pick a truncation lag $q$ and drop the rest: $\hat{\symbf{\Omega}}_q = \hat{\symbf{\Gamma}}_0 + \sum_{h=1}^{q}\left(\hat{\symbf{\Gamma}}_h + \hat{\symbf{\Gamma}}_h'\right)$
+- Fine if $\symbf{\Gamma}_h = 0$ beyond lag $q$, e.g. overlapping forecasts ([Hansen and Hodrick (1980)]{.fgv})
+
+. . .
+
+- Two problems: $\hat{\symbf{\Omega}}_q$ jumps around as $q$ changes, and it need not be positive semi-definite
+- In the scalar case, it can even be negative: a negative variance! 🙃
+
+## A Negative Variance
+
+- Scalar case with $q = 1$. Since $\hat\gamma_1 = \hat\rho_1\hat\gamma_0$:
+
+$$
+\hat\Omega_1 = \hat\gamma_0 + 2\hat\gamma_1 = \hat\gamma_0\left(1 + 2\hat\rho_1\right) < 0 \iff \hat\rho_1 < -\frac{1}{2}
+$$
+
+. . .
+
+- Example: difference a white noise $e_t$ by mistake ("over-differencing")
+
+$$
+y_t = e_t - e_{t-1}: \qquad \gamma_0 = 2\sigma^2, \quad \gamma_1 = -\sigma^2, \quad \gamma_h = 0 \text{ for } h \ge 2, \quad \rho_1 = -\frac{1}{2}
+$$
+
+- Truncating at $q = 1$ is exact here: $\omega^2 = \gamma_0 + 2\gamma_1 = 0$
+
+## The Newey-West Estimator {#newey-west}
+
+- [Newey and West (1987)]{.fgv}: downweight far lags with the Bartlett kernel
+
+$$
+\hat{\symbf{\Omega}}_{NW} = \hat{\symbf{\Gamma}}_0 + \sum_{h=1}^{q}w_h\left(\hat{\symbf{\Gamma}}_h + \hat{\symbf{\Gamma}}_h'\right), \qquad w_h = 1 - \frac{h}{q+1}
+$$
+
+- Positive semi-definite for every sample and every $q$ (proof in the [appendix](#nw-psd))
+- Smooth in $q$: no jumps as lags enter
+- Called a _HAC_ estimator: heteroskedasticity and autocorrelation consistent
+- Standard errors: square roots of the diagonal of $\hat{\symbf{Q}}^{-1}\hat{\symbf{\Omega}}_{NW}\hat{\symbf{Q}}^{-1}/T$
+
+. . .
+
+- Consistency needs $q \to \infty$, but not too fast
+- Under mixing, $q^3/T = O(1)$ is sufficient ([Hansen, Thm. 14.34]{.fgv})
+
+## Newey-West in Action
+
+One AR(1) path with $\sigma^2 = 1$; $\hat g_t = y_t - \bar y_T$. Estimates of $\omega^2 = 1/(1-\phi)^2$ against the lag $q$
+
+```{ojs}
+//| echo: false
+viewof nw = Inputs.form({
+  phi: Inputs.range([-0.9, 0.95], {value: 0.5, step: 0.05, label: "φ"}),
+  T: Inputs.range([50, 5000], {value: 200, step: 1, transform: Math.log, label: "T"}),
+  seed: Inputs.button("Draw a new path", {value: 1, reduce: v => v + 1})
+}, {template: ({phi, T, seed}) => {
+  for (const f of [phi, T]) {
+    f.style.setProperty("--input-width", "300px")
+    f.style.setProperty("--label-width", "30px")
+    f.style.maxWidth = "none"
+  }
+  return html`<div style="display: flex; justify-content: center; align-items: center; column-gap: 30px">${phi}${T}${seed}</div>`
+}})
+```
+
+```{ojs}
+//| echo: false
+// One stream of 5,001 shocks per seed: the path of length T uses the first T + 1,
+// so raising T extends the same path.
+nwMaxT = 5000
+nwMaxQ = 30
+nwSeed = k => {
+  let x = Math.imul(k ^ (k >>> 16), 0x85ebca6b)
+  x = Math.imul(x ^ (x >>> 13), 0xc2b2ae35)
+  return ((x ^ (x >>> 16)) >>> 0) / 4294967296
+}
+nwShocks = {
+  const draw = d3.randomNormal.source(d3.randomLcg(nwSeed(4111 + nw.seed)))(0, 1)
+  return Float64Array.from({length: nwMaxT + 1}, draw)
+}
+nwOmega2 = 1 / (1 - nw.phi) ** 2
+
+// Demeaned path, sample autocovariances, and both estimators for q = 0, ..., 30
+nwEst = {
+  const {phi, T} = nw
+  const y = new Float64Array(T)
+  let prev = nwShocks[0] / Math.sqrt(1 - phi ** 2)
+  for (let t = 0; t < T; t++) { prev = phi * prev + nwShocks[t + 1]; y[t] = prev }
+  const m = d3.mean(y)
+  for (let t = 0; t < T; t++) y[t] -= m
+  const H = Math.min(nwMaxQ, T - 1)
+  const g = d3.range(H + 1).map(h => {
+    let s = 0
+    for (let t = h; t < T; t++) s += y[t] * y[t - h]
+    return s / T
+  })
+  return d3.range(H + 1).map(q => ({
+    q,
+    trunc: g[0] + 2 * d3.sum(d3.range(1, q + 1), h => g[h]),
+    nw: g[0] + 2 * d3.sum(d3.range(1, q + 1), h => (1 - h / (q + 1)) * g[h])
+  }))
+}
+
+// Rule of thumb from Andrews (1991) with rho = 0.25
+nwRule = Math.round(0.75 * Math.cbrt(nw.T))
+nwAtRule = nwEst[Math.min(nwRule, nwEst.length - 1)].nw
+
+nwDomain = {
+  const vals = [nwOmega2, 0, ...nwEst.flatMap(d => [d.trunc, d.nw])]
+  const lo = d3.min(vals), hi = d3.max(vals)
+  return [lo - 0.06 * (hi - lo), hi + 0.06 * (hi - lo)]
+}
+
+html`<div style="text-align: center; font-size: 19px">
+  <span style="color: #0072BC">Newey-West</span>, <span style="color: #EB811B">plain truncation</span>, truth ω² = ${nwOmega2.toFixed(2)} (dashed).
+  At the rule of thumb <i>q</i> = 0.75 <i>T</i><sup>1/3</sup> ≈ ${nwRule}: Newey-West = ${nwAtRule.toFixed(2)}
+</div>`
+
+Plot.plot({
+  width: 1150, height: 420, marginLeft: 60, marginBottom: 45,
+  style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
+  x: {label: "Truncation lag q", domain: [0, nwMaxQ], labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: nwDomain, ticks: 6},
+  grid: true,
+  marks: [
+    Plot.ruleY([0], {stroke: "#C62828", strokeWidth: 1.5}),
+    Plot.ruleY([nwOmega2], {stroke: "black", strokeWidth: 2, strokeDasharray: "7,5"}),
+    Plot.ruleX([nwRule], {stroke: "#2D3E50", strokeWidth: 1.5, strokeDasharray: "3,4"}),
+    Plot.line(nwEst, {x: "q", y: "trunc", stroke: "#EB811B", strokeWidth: 2.5}),
+    Plot.dot(nwEst, {x: "q", y: "trunc", fill: "#EB811B", r: 4}),
+    Plot.line(nwEst, {x: "q", y: "nw", stroke: "#0072BC", strokeWidth: 3}),
+    Plot.dot(nwEst, {x: "q", y: "nw", fill: "#0072BC", r: 4.5})
+  ]
+})
+```
+
+## Choosing the Bandwidth $q$
+
+- $q$ trades bias against variance:
+  - Small $q$: ignores the tail autocovariances, so $\hat{\symbf{\Omega}}_{NW}$ is biased
+  - Large $q$: adds noisy $\hat{\symbf{\Gamma}}_h$'s, and the variance grows like $q/T$
+- The MSE-optimal rate is $q \propto T^{1/3}$ ([Andrews (1991)]{.fgv})
+
+. . .
+
+- Andrews' rule for Bartlett weights, with $\rho$ the first autocorrelation of $g_t$:
+
+$$
+q = \left(\frac{6\rho^2}{(1 - \rho^2)^2}\right)^{1/3} T^{1/3}
+$$
+
+- Plug in an estimate of $\rho$, or a default: $\rho = 0.25$ gives $q \approx 0.75\,T^{1/3}$
+- Example: $T = 200$ quarters gives $q \approx 4$
+
+## In Practice
+
+- If your main results swing with $q$, that is a bad sign
+- Report $q$ and keep it fixed throughout the paper
+- Packages use different defaults: check yours and say which one you used
+- In Python: `sm.OLS(y, X).fit(cov_type="HAC", cov_kwds={"maxlags": q})`
+- Rule of thumb: $q$ should be "much smaller" than $T$
+
+. . .
+
+- Scores are an MDS under your null? Use White, not Newey-West
+- Example: testing for no serial correlation ([Hansen, Sec. 14.36]{.fgv})
+- Kernel choice matters much less than the choice of $q$ ([Andrews (1991)]{.fgv} compares several)
+
+## Takeaways
+
+::: {.thm .takeaway}
+::: {.thmhead}
+What to Remember
+:::
+
+- Asymptotic variance of $\sqrt{T}(\bar y_T - \mu)$: the long-run variance $\sum_h\gamma_h$, not $\gamma_0$
+- MDS scores: White's estimator. Serially correlated scores: Newey-West
+- Newey-West is positive semi-definite by construction. Choose $q \propto T^{1/3}$, and report it
+:::
+
+- Coming up in GMM: the efficient weighting matrix is the inverse of a long-run variance
+- We will estimate it exactly as today, with $\symbf{g}_t$ the moment functions
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+The End
+:::
+
+## References {visibility="uncounted"}
+
+- Chapter 7 of _Time Series Analysis_, by [James Hamilton (1994)]{.fgv}, for the LLN and the CLTs
+- Chapter 14 of _Econometrics_, by [Bruce Hansen (2022)]{.fgv}, for mixing, time-series regression and HAC
+- _Stochastic Limit Theory_, by [James Davidson (2021)]{.fgv}: the definitive treatment. Very dark magic!
+- [Newey and West (1987)](https://doi.org/10.2307/1913610), "A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix", _Econometrica_
+- [Andrews (1991)](https://doi.org/10.2307/2938229), "Heteroskedasticity and Autocorrelation Consistent Covariance Matrix Estimation", _Econometrica_
+
+# Appendix {visibility="uncounted"}
+
+## Proof: The Long-Run Variance Limit {#lrv-proof visibility="uncounted" .tightmath}
+
+- In proper EPGE style, let $\varepsilon > 0$, and pick $q$ such that $\sum_{h=q+1}^{\infty}|\gamma_h| < \varepsilon/4$
+- For $T > q$, subtract the [boxed formula](#summing-the-covariance-matrix) from $\omega^2 = \sum_h\gamma_h$:
+
+$$
+\begin{aligned}
+\left|\omega^2 - T\cdot\E\left(\bar y_T - \mu\right)^2\right| &= \Bigg|\sum_{|h| < T}\frac{|h|}{T}\gamma_h + \sum_{|h| \ge T}\gamma_h\Bigg| && \\
+&\le \sum_{h=1}^{q}\frac{2h}{T}|\gamma_h| + \sum_{h=q+1}^{\infty}2|\gamma_h| && (|\text{coefficients}| \le 1)\\
+&< \frac{2}{T}\sum_{h=1}^{q}h|\gamma_h| + \frac{\varepsilon}{2} && \text{(choice of } q)
+\end{aligned}
+$$
+
+- With $q$ fixed, the first term is below $\varepsilon/2$ for $T$ large enough. Hence $T\cdot\E\left(\bar y_T - \mu\right)^2 \to \omega^2$
+
+::: {.btnbar}
+[Back to the long-run variance](#long-run-variance){.gotobtn}
+:::
+
+## Proof: Newey-West Is Positive Semi-Definite {#nw-psd visibility="uncounted" .tightmath .sc96}
+
+- Set $\hat{\symbf{g}}_s = 0$ for $s \notin \{1, \ldots, T\}$, and add up blocks of $q+1$ periods: $\symbf{B}_t \equiv \sum_{s=t}^{t+q}\hat{\symbf{g}}_s$
+
+$$
+\begin{aligned}
+\sum_{t}\symbf{B}_t\symbf{B}_t' &= \sum_{s}\sum_{s'}\left(q + 1 - |s - s'|\right)_+\hat{\symbf{g}}_s\hat{\symbf{g}}_{s'}' && (s \text{ and } s' \text{ share this many blocks})\\
+&= \sum_{h=-q}^{q}\left(q + 1 - |h|\right)\sum_{s}\hat{\symbf{g}}_s\hat{\symbf{g}}_{s-h}' && (h = s - s')\\
+&= T\sum_{h=-q}^{q}\left(q + 1 - |h|\right)\hat{\symbf{\Gamma}}_h && \text{(definition of } \hat{\symbf{\Gamma}}_h)
+\end{aligned}
+$$
+
+$$
+\implies \hat{\symbf{\Omega}}_{NW} = \sum_{h=-q}^{q}\left(1 - \frac{|h|}{q+1}\right)\hat{\symbf{\Gamma}}_h = \frac{1}{T(q+1)}\sum_{t}\symbf{B}_t\symbf{B}_t' \succeq 0
+$$
+
+- Sums of outer products are PSD. Same weights as in $T\cdot\Var(\bar y_T)$, with $q+1$ in place of $T$
+
+::: {.btnbar}
+[Back to Newey-West](#newey-west){.gotobtn}
+:::
