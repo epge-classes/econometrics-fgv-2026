@@ -32,4 +32,4 @@ The repository's README explains how to clone it and push.
 - PDF: [`PS3/problem_set_3.pdf`](PS3/problem_set_3.pdf) ([LaTeX source](PS3/problem_set_3.tex))
 - Data: [`PS2/ipca_igpm.csv`](PS2/ipca_igpm.csv) (same as Problem Set 2)
 - Submit in: `Assignment-03`
-- Due date: TBA
+- Due date: 2026-11-06
