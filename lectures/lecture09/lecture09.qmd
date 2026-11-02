@@ -1,0 +1,904 @@
+---
+title: "Lecture 9: The GMM Estimator"
+talkdate: "November 2026"
+---
+
+# Introduction {visibility="uncounted"}
+
+## Where We Are
+
+- Lecture 6: (quasi-)MLE, with a sandwich variance. It starts from a full likelihood
+- Lecture 7: the long-run variance and Newey-West, for a generic vector $\symbf{g}_t$
+- You have seen GMM with i.i.d. data in another course
+
+. . .
+
+- Economic models typically restrict moments, not distributions. MLE requires _a lot_...
+- Today: GMM when the data are a time series
+- What changes? Less than you might fear, but it matters where it does
+
+## Today
+
+- The GMM estimator and its limit distribution under dependence
+- The optimal weighting matrix, and how to estimate it
+- Testing a model that has more moments than parameters
+- Building moments from conditional restrictions, and when you do _not_ need HAC
+- OLS, IV, GLS, NLS and MLE as special cases
+
+## Example: Consumption-Based Asset Pricing
+
+- A representative agent maximizes expected lifetime utility:
+
+$$
+\max_{\{C_t\}_{t}^{\infty}} \E_0\sum_{t=0}^{\infty}\beta^t u(C_t) \qquad \text{s.t.} \qquad A_{t+1} = R_{t+1}(A_t - C_t)
+$$
+
+- Endogenous variables: consumption $C_t$ and assets $A_t$
+- Exogenous variable: the gross return $R_{t+1}$, which we observe
+- Parameters: discount factor $\beta$ and risk aversion $\gamma$
+
+## Example: From the Euler Equation to a Moment
+
+- First-order condition (Euler equation):
+
+$$
+u'(C_t) = \beta\,\E_t\left[R_{t+1}\,u'(C_{t+1})\right]
+$$
+
+- With CRRA utility, $u'(C) = C^{-\gamma}$. Divide both sides by $C_t^{-\gamma}$:
+
+$$
+\E_t\Bigg[\underbrace{\beta R_{t+1}\left(\frac{C_{t+1}}{C_t}\right)^{-\gamma} - 1}_{\equiv\, h(\text{parameters, data})}\Bigg] = 0 \implies \E\left[h(\text{parameters, data})\right] = 0
+$$
+
+- No distribution assumed for consumption or returns. No need to solve the model!
+
+## The General Framework
+
+- Let $\symbf{w}_t$ be the $p\times 1$ vector of variables observed at time $t$
+- Let $\symbf{\theta}$ be the $a\times 1$ vector of parameters to be estimated
+- Let $\symbf{h}: \R^a\times\R^p\to\R^r$ be a **known** vector-valued function
+- We assume there is a true value $\symbf{\theta}_0$ such that:
+
+$$
+\E\left[\symbf{h}(\symbf{\theta}_0, \symbf{w}_t)\right] = \symbf{0}_{r\times 1}
+$$
+
+. . .
+
+- $\symbf{m}(\symbf{\theta}) \equiv \E\left[\symbf{h}(\symbf{\theta}, \symbf{w}_t)\right]$ is just a function of $\symbf{\theta}$
+- Idea: let's find a root of $\symbf{m}(\symbf{\theta})$! What are the problems with this idea?
+
+## Two Problems
+
+- We do not know how to compute that expectation
+- $\symbf{m}(\symbf{\theta}) = \symbf{0}$ may have no solution, or many: think about $a > r$, $a = r$ and $a < r$
+
+. . .
+
+- [Hansen (1982)]{.fgv} proposed a very clever way to deal with both
+- First: approximate the expectation by its sample analogue:
+
+$$
+\hat{\symbf{m}}_T(\symbf{\theta}) \equiv \frac{1}{T}\sum_{t=1}^{T}\symbf{h}(\symbf{\theta}, \symbf{w}_t)
+$$
+
+- This is where dependence will enter: an average of a dependent sequence
+
+## The GMM Estimator
+
+- Second: if we cannot make $\hat{\symbf{m}}_T$ equal to zero, let's minimize its distance to zero!
+- Let $\symbf{W}_T$ be an $r\times r$ positive definite matrix, and define:
+
+$$
+Q_T(\symbf{\theta}) \equiv \hat{\symbf{m}}_T(\symbf{\theta})'\,\symbf{W}_T\,\hat{\symbf{m}}_T(\symbf{\theta}) \ge 0
+$$
+
+- The GMM estimator is the minimizer of this criterion:
+
+$$
+\hat{\symbf{\theta}}_T \equiv \arg\min_{\symbf{\theta}\in\Theta} Q_T(\symbf{\theta})
+$$
+
+- The argmin depends on the weighting matrix $\symbf{W}_T$, by the way
+- Intuition: near $\symbf{\theta}_0$, $Q_T \approx 0$ by the LLN, if $\symbf{h}$ is smooth enough
+
+## The First-Order Conditions
+
+- Let $\hat{\symbf{D}}_T(\symbf{\theta}) \equiv \frac{\partial\hat{\symbf{m}}_T(\symbf{\theta})}{\partial\symbf{\theta}'} = \frac{1}{T}\sum_{t=1}^{T}\frac{\partial\symbf{h}(\symbf{\theta}, \symbf{w}_t)}{\partial\symbf{\theta}'}$, an $r\times a$ matrix
+- For a differentiable $\symbf{h}$, the FOC for the GMM estimator is:
+
+$$
+\frac{\partial Q_T(\hat{\symbf{\theta}}_T)}{\partial\symbf{\theta}} = 2\,\hat{\symbf{D}}_T(\hat{\symbf{\theta}}_T)'\,\symbf{W}_T\,\hat{\symbf{m}}_T(\hat{\symbf{\theta}}_T) = \symbf{0}_{a\times 1}
+$$
+
+. . .
+
+- Even for a fixed $\symbf{W}_T$, mild conditions guarantee a consistent estimator
+- The proofs are fairly similar to those for the ML estimator
+- See [Newey and McFadden (1994)]{.fgv} for all the details you would ever want to know
+- From here on, assume $\hat{\symbf{\theta}}_T \xrightarrow{p} \symbf{\theta}_0$, and let's study the asymptotic distribution
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# Asymptotic Theory {visibility="uncounted"}
+
+## Expanding the Sample Moments
+
+- Goal: the asymptotic distribution of $\hat{\symbf{\theta}}_T$
+- We haven't said anything about the sampling of $\symbf{w}_t$ yet!
+
+. . .
+
+- Assume each entry $\hat m_{i,T}$ of $\hat{\symbf{m}}_T$ is continuously differentiable in $\symbf{\theta}$
+- Apply the mean value theorem to each entry, with $\tilde{\symbf{\theta}}_{i,T}$ between $\hat{\symbf{\theta}}_T$ and $\symbf{\theta}_0$:
+
+$$
+\hat m_{i,T}(\hat{\symbf{\theta}}_T) = \hat m_{i,T}(\symbf{\theta}_0) + \frac{\partial\hat m_{i,T}(\tilde{\symbf{\theta}}_{i,T})}{\partial\symbf{\theta}'}\left(\hat{\symbf{\theta}}_T - \symbf{\theta}_0\right)
+$$
+
+## Stacking the Expansions
+
+- Stack the $r$ expansions:
+
+$$
+\hat{\symbf{m}}_T(\hat{\symbf{\theta}}_T) = \hat{\symbf{m}}_T(\symbf{\theta}_0) + \tilde{\symbf{D}}_T\left(\hat{\symbf{\theta}}_T - \symbf{\theta}_0\right), \qquad \tilde{\symbf{D}}_T \equiv \begin{bmatrix}\partial\hat m_{1,T}(\tilde{\symbf{\theta}}_{1,T})/\partial\symbf{\theta}' \\ \vdots \\ \partial\hat m_{r,T}(\tilde{\symbf{\theta}}_{r,T})/\partial\symbf{\theta}'\end{bmatrix}
+$$
+
+- In general, $\tilde{\symbf{D}}_T$ is **not** the Jacobian $\hat{\symbf{D}}_T(\hat{\symbf{\theta}}_T)$. Why?
+
+. . .
+
+- But every $\tilde{\symbf{\theta}}_{i,T}$ is squeezed between $\hat{\symbf{\theta}}_T$ and $\symbf{\theta}_0$, so $\tilde{\symbf{\theta}}_{i,T} \xrightarrow{p} \symbf{\theta}_0$ for all $i$
+- Assume uniform convergence, so that $\tilde{\symbf{D}}_T$ and $\hat{\symbf{D}}_T(\hat{\symbf{\theta}}_T)$ both tend to
+
+$$
+\symbf{D} \equiv \left.\frac{\partial\symbf{m}(\symbf{\theta})}{\partial\symbf{\theta}'}\right|_{\symbf{\theta}=\symbf{\theta}_0}, \qquad r\times a \text{ with full column rank}
+$$
+
+## Using the FOC
+
+- Write $\hat{\symbf{D}}_T \equiv \hat{\symbf{D}}_T(\hat{\symbf{\theta}}_T)$ and multiply the expansion by $\hat{\symbf{D}}_T'\symbf{W}_T$:
+
+$$
+\hat{\symbf{D}}_T'\symbf{W}_T\hat{\symbf{m}}_T(\hat{\symbf{\theta}}_T) = \hat{\symbf{D}}_T'\symbf{W}_T\hat{\symbf{m}}_T(\symbf{\theta}_0) + \hat{\symbf{D}}_T'\symbf{W}_T\tilde{\symbf{D}}_T\left(\hat{\symbf{\theta}}_T - \symbf{\theta}_0\right)
+$$
+
+. . .
+
+- But the LHS is zero by the FOC!!!
+- Rearrange and scale by $\sqrt{T}$:
+
+$$
+\sqrt{T}\left(\hat{\symbf{\theta}}_T - \symbf{\theta}_0\right) = -\left(\hat{\symbf{D}}_T'\symbf{W}_T\tilde{\symbf{D}}_T\right)^{-1}\hat{\symbf{D}}_T'\symbf{W}_T\cdot\sqrt{T}\,\hat{\symbf{m}}_T(\symbf{\theta}_0)
+$$
+
+. . .
+
+- Assume $\symbf{W}_T \xrightarrow{p} \symbf{W}$, positive definite. Then, by Slutsky:
+
+$$
+\hat{\symbf{D}}_T'\symbf{W}_T\tilde{\symbf{D}}_T \xrightarrow{p} \symbf{D}'\symbf{W}\symbf{D}
+$$
+
+## Where Dependence Enters {#where-dependence-enters}
+
+- We are left with $\sqrt{T}\,\hat{\symbf{m}}_T(\symbf{\theta}_0) = \frac{1}{\sqrt{T}}\sum_{t=1}^{T}\symbf{h}_t$, where $\symbf{h}_t \equiv \symbf{h}(\symbf{\theta}_0, \symbf{w}_t)$
+- It has mean zero. Why? This is exactly lecture 7 with $\symbf{g}_t = \symbf{h}_t$!
+
+. . .
+
+- Assume the conditions of one of our CLTs for dependent data. Then:
+
+$$
+\frac{1}{\sqrt{T}}\sum_{t=1}^{T}\symbf{h}_t \xrightarrow{d} N(\symbf{0}, \symbf{S}), \qquad \symbf{S} \equiv \sum_{j=-\infty}^{\infty}\E\left[\symbf{h}_t\symbf{h}_{t-j}'\right]
+$$
+
+- $\symbf{S}$ is the **long-run variance** $\symbf{\Omega}$ of lecture 7. I keep the letter that GMM people use
+
+. . .
+
+- $\symbf{h}_t$ i.i.d. or an MDS: only $j = 0$ survives, so $\symbf{S} = \E[\symbf{h}_t\symbf{h}_t']$, the formula you know
+- This is the only place in the argument where the sampling of $\symbf{w}_t$ matters
+
+## The Asymptotic Distribution
+
+::: {.thm}
+::: {.thmhead}
+Theorem (Asymptotic Distribution of GMM)
+:::
+Under the assumptions above,
+$$
+\sqrt{T}\left(\hat{\symbf{\theta}}_T - \symbf{\theta}_0\right) \xrightarrow{d} N\left(\symbf{0}, \symbf{V}\right), \qquad \symbf{V} \equiv \left(\symbf{D}'\symbf{W}\symbf{D}\right)^{-1}\symbf{D}'\symbf{W}\symbf{S}\symbf{W}\symbf{D}\left(\symbf{D}'\symbf{W}\symbf{D}\right)^{-1}
+$$
+:::
+
+- A sandwich again: bread from $\symbf{D}$ and $\symbf{W}$, meat from $\symbf{S}$
+- Very important: the asymptotic variance depends on the weighting matrix $\symbf{W}$!
+- Consistency holds for any positive definite $\symbf{W}$
+- If $r = a$, $\symbf{W}$ drops out: $\symbf{V} = \symbf{D}^{-1}\symbf{S}(\symbf{D}')^{-1}$
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# The Optimal Weighting Matrix {visibility="uncounted"}
+
+## A Thought Experiment
+
+- Suppose you want to know where an enemy plane is, and you have two radars
+- Both are consistent "estimators", but radar 1 is noisier than radar 2
+- What's the optimal thing to do? Use only radar 1? Only radar 2? Both?
+
+. . .
+
+- You'd probably use both, but give more weight to radar 2
+- This is exactly the idea behind the optimal weighting matrix in GMM!
+- How far each sample moment is from zero = your radar when looking for $\symbf{\theta}_0$
+- How you combine them = the weighting matrix $\symbf{W}$
+
+## How to Combine the Radars?
+
+- Intuition: give more weight to "more precise" moment conditions
+- How to measure precision? With the variance-covariance matrix of the moments
+- Uncorrelated moments: just use the inverse of the variances
+- Correlated moments: use the inverse of the variance-covariance matrix
+- This is exactly what [Hansen (1982)]{.fgv} proposed!
+
+. . .
+
+- Nothing in this intuition has to do with i.i.d. versus dependent data
+- The relevant variance is the one of $\sqrt{T}\,\hat{\symbf{m}}_T(\symbf{\theta}_0)$: that is why it is the **long-run** variance $\symbf{S}$
+
+## Let's Do the Math
+
+- The asymptotic variance of the GMM estimator is:
+
+$$
+\symbf{V} = \left(\symbf{D}'\symbf{W}\symbf{D}\right)^{-1}\symbf{D}'\symbf{W}\symbf{S}\symbf{W}\symbf{D}\left(\symbf{D}'\symbf{W}\symbf{D}\right)^{-1}
+$$
+
+- If $\symbf{W} = \symbf{S}^{-1}$, the sandwich collapses:
+
+$$
+\symbf{V}^* = \left(\symbf{D}'\symbf{S}^{-1}\symbf{D}\right)^{-1}\symbf{D}'\symbf{S}^{-1}\symbf{S}\symbf{S}^{-1}\symbf{D}\left(\symbf{D}'\symbf{S}^{-1}\symbf{D}\right)^{-1} = \left(\symbf{D}'\symbf{S}^{-1}\symbf{D}\right)^{-1}
+$$
+
+- How can we compare how "large" $\symbf{V}$ and $\symbf{V}^*$ are?
+
+. . .
+
+- We write $\symbf{V} \succeq \symbf{V}^*$ if, and only if, $\symbf{V} - \symbf{V}^*$ is positive semi-definite
+- Claim: $\symbf{V} \succeq \symbf{V}^*$ for every positive definite $\symbf{W}$
+
+## Factoring the Difference {.tightmath}
+
+- Pull out the bread on both sides:
+
+$$
+\symbf{V} - \symbf{V}^* = \left(\symbf{D}'\symbf{W}\symbf{D}\right)^{-1}\symbf{D}'\symbf{W}\left[\symbf{S} - \symbf{D}\left(\symbf{D}'\symbf{S}^{-1}\symbf{D}\right)^{-1}\symbf{D}'\right]\symbf{W}\symbf{D}\left(\symbf{D}'\symbf{W}\symbf{D}\right)^{-1}
+$$
+
+. . .
+
+- Write $\symbf{S} = \symbf{S}^{1/2}\symbf{S}^{1/2}$. Why is this well-defined?
+
+. . .
+
+- Define $\symbf{A} \equiv \left(\symbf{D}'\symbf{W}\symbf{D}\right)^{-1}\symbf{D}'\symbf{W}\symbf{S}^{1/2}$ and $\symbf{B} \equiv \symbf{S}^{-1/2}\symbf{D}\left(\symbf{D}'\symbf{S}^{-1}\symbf{D}\right)^{-1}\symbf{D}'\symbf{S}^{-1/2}$
+- Then factor $\symbf{S}^{1/2}$ out of the bracket on each side:
+
+$$
+\symbf{V} - \symbf{V}^* = \symbf{A}\left(\symbf{I}_r - \symbf{B}\right)\symbf{A}'
+$$
+
+## The Magic of Idempotent Matrices {#idempotent}
+
+- It is enough to show that $\symbf{I}_r - \symbf{B}$ is positive semi-definite
+
+. . .
+
+- $\symbf{B}$ is symmetric and idempotent: $\symbf{B}^2 = \symbf{B}$. What do we know about such matrices?
+
+. . .
+
+- All eigenvalues of an idempotent matrix are either 0 or 1
+- So all eigenvalues of $\symbf{I}_r - \symbf{B}$ are either 0 or 1, and it is positive semi-definite
+
+. . .
+
+- Equivalently: $\symbf{I}_r - \symbf{B} = (\symbf{I}_r - \symbf{B})(\symbf{I}_r - \symbf{B})'$
+
+::: {.thm}
+::: {.thmhead}
+Theorem (Optimal Weighting Matrix)
+:::
+$\symbf{V} - \symbf{V}^* = \symbf{A}(\symbf{I}_r - \symbf{B})\symbf{A}' \succeq 0$ for every positive definite $\symbf{W}$, so $\symbf{W} = \symbf{S}^{-1}$ is optimal: the inverse of the long-run variance of the moments.
+:::
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# Efficient GMM in Practice {visibility="uncounted"}
+
+## The Big Problem
+
+- We want $\symbf{W}_T \xrightarrow{p} \symbf{S}^{-1}$, but we do not observe $\symbf{S}$
+- Worse: $\symbf{S}$ depends on $\symbf{\theta}_0$, the object we want to estimate!
+
+. . .
+
+- Very important: consistency does **not** depend on using the optimal matrix
+- So start from any initial estimate and form the "residuals" $\hat{\symbf{h}}_t \equiv \symbf{h}(\hat{\symbf{\theta}}_T, \symbf{w}_t)$
+- Then estimate $\symbf{S}$ from them, exactly as in lecture 7
+
+## Estimating $\symbf{S}$ {#estimating-s}
+
+- $\symbf{h}_t$ i.i.d. or an MDS: use White's estimator
+
+$$
+\hat{\symbf{S}}_T = \frac{1}{T}\sum_{t=1}^{T}\hat{\symbf{h}}_t\hat{\symbf{h}}_t'
+$$
+
+- Serially correlated $\symbf{h}_t$: use [Newey-West](../lecture07/lecture07.html#/newey-west), with $\hat{\symbf{g}}_t = \hat{\symbf{h}}_t$
+
+$$
+\hat{\symbf{S}}_T = \hat{\symbf{\Gamma}}_0 + \sum_{j=1}^{q}\omega_j\left(\hat{\symbf{\Gamma}}_j + \hat{\symbf{\Gamma}}_j'\right), \qquad \omega_j = 1 - \frac{j}{q+1}, \qquad \hat{\symbf{\Gamma}}_j = \frac{1}{T}\sum_{t=j+1}^{T}\hat{\symbf{h}}_t\hat{\symbf{h}}_{t-j}'
+$$
+
+- Same advice as lecture 7: $q \propto T^{1/3}$, and report it
+- Now positive semi-definiteness really bites: we are about to **invert** this matrix
+
+## The Two-Step GMM Procedure
+
+- **Step 1:** pick any positive definite $\symbf{W}_T^{(1)}$, e.g., the identity matrix $\symbf{I}_r$
+
+$$
+\hat{\symbf{\theta}}^{(1)} = \arg\min_{\symbf{\theta}}\ \hat{\symbf{m}}_T(\symbf{\theta})'\,\symbf{W}_T^{(1)}\,\hat{\symbf{m}}_T(\symbf{\theta})
+$$
+
+. . .
+
+- **Step 2:** compute $\hat{\symbf{S}}_T$ from $\hat{\symbf{h}}_t = \symbf{h}(\hat{\symbf{\theta}}^{(1)}, \symbf{w}_t)$, by White or by Newey-West
+
+. . .
+
+- **Step 3:** set $\symbf{W}_T^{(2)} = \hat{\symbf{S}}_T^{-1}$ and minimize again:
+
+$$
+\hat{\symbf{\theta}}^{(2)} = \arg\min_{\symbf{\theta}}\ \hat{\symbf{m}}_T(\symbf{\theta})'\,\hat{\symbf{S}}_T^{-1}\,\hat{\symbf{m}}_T(\symbf{\theta})
+$$
+
+. . .
+
+- Result: $\hat{\symbf{\theta}}^{(2)}$ is asymptotically efficient!
+
+## Why Does Two-Step GMM Work?
+
+- Key insight: consistency of $\hat{\symbf{\theta}}^{(1)}$ does **not** require optimal weighting
+
+. . .
+
+- Since $\hat{\symbf{\theta}}^{(1)} \xrightarrow{p} \symbf{\theta}_0$, we have $\hat{\symbf{h}}_t \approx \symbf{h}_t$, and so $\hat{\symbf{S}}_T \xrightarrow{p} \symbf{S}$
+- By continuous mapping, $\symbf{W}_T^{(2)} = \hat{\symbf{S}}_T^{-1} \xrightarrow{p} \symbf{S}^{-1}$
+
+. . .
+
+- Our theorem only needs $\symbf{W}_T \xrightarrow{p} \symbf{W}$: the limit is all that matters
+- So $\hat{\symbf{\theta}}^{(2)}$ has asymptotic variance $\symbf{V}^*$
+- Estimating $\symbf{S}$ costs nothing in the limit. In finite samples, it does
+
+## Iterated GMM
+
+- Why stop at two steps? Keep iterating until convergence:
+- Start from $\hat{\symbf{\theta}}^{(1)}$. For $k = 2, 3, \ldots$:
+  1. Compute $\hat{\symbf{S}}_T^{(k)}$ using residuals from $\hat{\symbf{\theta}}^{(k-1)}$
+  2. Update: $\hat{\symbf{\theta}}^{(k)} = \arg\min_{\symbf{\theta}}\ \hat{\symbf{m}}_T(\symbf{\theta})'\left(\hat{\symbf{S}}_T^{(k)}\right)^{-1}\hat{\symbf{m}}_T(\symbf{\theta})$
+  3. Stop when $\|\hat{\symbf{\theta}}^{(k)} - \hat{\symbf{\theta}}^{(k-1)}\| < \epsilon$, where you pick $\epsilon$
+
+. . .
+
+- Same asymptotic distribution as two-step GMM
+- Potential finite-sample improvements, but results are mixed in the literature
+- Computationally more expensive
+
+## Continuously-Updated GMM (CUE)
+
+- Alternative: update the weighting matrix at **each function evaluation**:
+
+$$
+\hat{\symbf{\theta}}^{CUE} = \arg\min_{\symbf{\theta}}\ \hat{\symbf{m}}_T(\symbf{\theta})'\,\hat{\symbf{S}}_T(\symbf{\theta})^{-1}\,\hat{\symbf{m}}_T(\symbf{\theta})
+$$
+
+- Same asymptotic distribution as two-step and iterated GMM. So why bother?
+
+. . .
+
+::: {.signlist}
+- [●]{.good} No first step: no arbitrary initial weighting matrix to choose
+- [●]{.good} Invariant to linear transformations of the moments: units do not matter
+- [●]{.good} Less finite-sample bias ([Hansen, Heaton and Yaron (1996)]{.fgv})
+- [●]{.good} Objective at $\symbf{\theta}_0$, times $T$: $\chi^2_r$ even if identification is weak ([Stock and Wright (2000)]{.fgv})
+- [●]{.bad} Fat tails: it can lack finite moments ([Hausman et al. (2011)]{.fgv})
+- [●]{.bad} Computationally intensive, and optimizers can miss the global minimum
+:::
+
+- Linear IV: the global minimum comes from polynomial roots ([Moreira et al. (2026)]{.fgv})
+
+## Standard Errors
+
+- Estimate $\symbf{D}$ by the sample Jacobian at the estimate: $\hat{\symbf{D}}_T = \hat{\symbf{D}}_T(\hat{\symbf{\theta}}_T)$
+- Estimate $\symbf{S}$ by $\hat{\symbf{S}}_T$, from residuals at $\hat{\symbf{\theta}}_T$
+- Efficient GMM:
+
+$$
+\hat{\symbf{V}}^* = \left(\hat{\symbf{D}}_T'\hat{\symbf{S}}_T^{-1}\hat{\symbf{D}}_T\right)^{-1}, \qquad \text{standard errors: square roots of the diagonal of } \hat{\symbf{V}}^*/T
+$$
+
+. . .
+
+- Any other $\symbf{W}_T$ (e.g., your first step): the full sandwich!
+
+$$
+\hat{\symbf{V}} = \left(\hat{\symbf{D}}_T'\symbf{W}_T\hat{\symbf{D}}_T\right)^{-1}\hat{\symbf{D}}_T'\symbf{W}_T\hat{\symbf{S}}_T\symbf{W}_T\hat{\symbf{D}}_T\left(\hat{\symbf{D}}_T'\symbf{W}_T\hat{\symbf{D}}_T\right)^{-1}
+$$
+
+- Usual $t$-tests and Wald tests are valid
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# The J-Test {visibility="uncounted"}
+
+## Testing the Model
+
+- GMM allows $r > a$, more moments than parameters: **overidentification**
+- If the model is correct, all $r$ sample moments should be "close to zero"
+- But we can only set $a$ linear combinations of them to zero through $\hat{\symbf{\theta}}_T$
+- That leaves $r - a$ overidentifying restrictions
+
+. . .
+
+- Idea: test whether the criterion at the minimum is "too large"
+- Correct model: it should be small
+- Wrong model: the moments are incompatible, and it will be large
+
+## The J-Statistic {#j-statistic}
+
+::: {.thm}
+::: {.thmhead}
+Theorem (Hansen's J-Test)
+:::
+Let $\hat{\symbf{\theta}}_T^*$ be the efficient GMM estimator, with $\symbf{W}_T = \hat{\symbf{S}}_T^{-1}$ and $\hat{\symbf{S}}_T \xrightarrow{p} \symbf{S}$. If the $r$ moment conditions hold,
+$$
+J_T \equiv T\cdot\hat{\symbf{m}}_T(\hat{\symbf{\theta}}_T^*)'\,\hat{\symbf{S}}_T^{-1}\,\hat{\symbf{m}}_T(\hat{\symbf{\theta}}_T^*) \xrightarrow{d} \chi^2_{r-a}
+$$
+:::
+
+- Degrees of freedom: the number of overidentifying restrictions
+- **Reject** the model if $J_T$ exceeds the $1-\alpha$ quantile of $\chi^2_{r-a}$: a right-tail test
+- You must use the efficient weighting matrix for the $\chi^2$ result to hold!
+- If $r = a$, then $J_T = 0$: there is nothing to test
+- Proof in the [appendix](#j-proof): the same idempotent matrix as in the efficiency proof
+
+## What If We Reject?
+
+- Rejection means: the moment conditions are incompatible with the data
+- Possible interpretations:
+  - The model is misspecified (wrong functional form, missing variables)
+  - Some moment conditions are invalid
+  - Finite-sample issues: the test can over-reject in small samples
+
+. . .
+
+- Important caveats:
+  - It is an omnibus test: many different violations can trigger a rejection
+  - It is **not diagnostic**: it does not tell you _which_ moment condition is wrong
+  - You need economic theory or additional tests to diagnose the problem
+  - Failing to reject does **not** prove the model is correct!
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# Conditional Moments and Instruments {visibility="uncounted"}
+
+## Revisiting the Consumption Model
+
+- The Euler equation is a **conditional** moment restriction:
+
+$$
+\E\left[\beta R_{t+1}\left(\frac{C_{t+1}}{C_t}\right)^{-\gamma} - 1 \,\middle|\, \mathcal{F}_t\right] = 0
+$$
+
+- Define the moment function, with $\symbf{\theta} = (\beta, \gamma)'$:
+
+$$
+h_{t+1}(\symbf{\theta}) \equiv \beta R_{t+1}\left(\frac{C_{t+1}}{C_t}\right)^{-\gamma} - 1
+$$
+
+. . .
+
+- This says: "given what we know at $t$, the expected value of $h_{t+1}(\symbf{\theta}_0)$ is zero"
+- One equation, two parameters. Is that a problem?
+
+## From Conditional to Unconditional Moments
+
+- The law of iterated expectations tells us something powerful:
+
+$$
+\E\left[h_{t+1}(\symbf{\theta}_0)\mid\mathcal{F}_t\right] = 0 \implies \E\left[z_t\,h_{t+1}(\symbf{\theta}_0)\right] = 0
+$$
+
+for **any** variable $z_t$ known at time $t$ (that is, $\mathcal{F}_t$-measurable, with the moments existing)
+
+. . .
+
+- Why? Pull out what is known at $t$:
+
+$$
+\E\left[z_t\,h_{t+1}(\symbf{\theta}_0)\right] = \E\Big[\E\left[z_t\,h_{t+1}(\symbf{\theta}_0)\mid\mathcal{F}_t\right]\Big] = \E\Big[z_t\underbrace{\E\left[h_{t+1}(\symbf{\theta}_0)\mid\mathcal{F}_t\right]}_{=\,0}\Big] = 0
+$$
+
+. . .
+
+- We can create **many** unconditional moments from one conditional restriction!
+- The $z_t$ are called _instruments_
+
+## Examples of Valid Instruments
+
+- In the consumption model, $\mathcal{F}_t$ includes past consumption, returns and other observables
+- All of these are valid moment conditions:
+  - $\E\left[1\cdot h_{t+1}(\symbf{\theta}_0)\right] = 0$
+  - $\E\left[(C_t/C_{t-1})\,h_{t+1}(\symbf{\theta}_0)\right] = 0$
+  - $\E\left[R_t\,h_{t+1}(\symbf{\theta}_0)\right] = 0$
+  - $\E\left[R_t^2\,h_{t+1}(\symbf{\theta}_0)\right] = 0$
+
+. . .
+
+- With $\ell$ instruments: $r = \ell$ moments for $a = 2$ parameters
+- Exactly identified if $\ell = 2$, overidentified if $\ell > 2$ (we can use the J-test!)
+- $C_t$ in levels? Valid by the LIE, but it trends: no LLN or CLT from lecture 7 applies
+
+## General Framework
+
+- Many models specify, with $\symbf{h}$ a $k\times 1$ vector (e.g., one Euler equation per asset):
+
+$$
+\E\left[\symbf{h}(\symbf{\theta}_0, \symbf{w}_{t+1})\mid\mathcal{F}_t\right] = \symbf{0}
+$$
+
+- Let $\symbf{z}_t$ be an $\ell\times 1$ vector of variables known at $t$. By the LIE:
+
+$$
+\E\left[\symbf{z}_t\otimes\symbf{h}(\symbf{\theta}_0, \symbf{w}_{t+1})\right] = \symbf{0}
+$$
+
+- The Kronecker product creates all interactions, so $r = \ell\cdot k$ moments:
+
+$$
+\symbf{z}_t\otimes\symbf{h}_{t+1} = \begin{bmatrix} z_{1,t}\,\symbf{h}_{t+1} \\ \vdots \\ z_{\ell,t}\,\symbf{h}_{t+1}\end{bmatrix}
+$$
+
+## Do We Even Need HAC? {#do-we-need-hac}
+
+- Let $\symbf{g}_{t+1} \equiv \symbf{z}_t\otimes\symbf{h}(\symbf{\theta}_0, \symbf{w}_{t+1})$, the moments at the true parameter
+- Since $\symbf{z}_t$ is known at $t$:
+
+$$
+\E\left[\symbf{g}_{t+1}\mid\mathcal{F}_t\right] = \symbf{z}_t\otimes\E\left[\symbf{h}(\symbf{\theta}_0, \symbf{w}_{t+1})\mid\mathcal{F}_t\right] = \symbf{0}
+$$
+
+. . .
+
+- So $\{\symbf{g}_{t+1}\}$ is an **MDS**: every autocovariance is zero, and $\symbf{S} = \E\left[\symbf{g}_{t+1}\symbf{g}_{t+1}'\right]$
+- The model itself tells you: White's estimator is enough!
+- This is the _Scores are an MDS under your null_ advice from lecture 7
+
+. . .
+
+- Newey-West stays consistent here too: cheap insurance, at the cost of some noise
+
+## When Do We Need HAC?
+
+- Overlapping horizons. Take the $n$-period version of the Euler equation:
+
+$$
+\E\left[\beta^n R_{t,t+n}\left(\frac{C_{t+n}}{C_t}\right)^{-\gamma} - 1 \,\middle|\, \mathcal{F}_t\right] = 0
+$$
+
+- Here $R_{t,t+n}$ is the $n$-period gross return
+
+. . .
+
+- Now $\symbf{g}_{t+n}$ is known at $t+n$, and it has mean zero given $\mathcal{F}_t$
+- So $\symbf{\Gamma}_j = \symbf{0}$ for $j \ge n$, but lags $1, \ldots, n-1$ survive ([Hansen and Hodrick (1980)]{.fgv})
+- Moments with no conditional structure: no MDS to lean on
+- In both cases: Newey-West, with the same $\hat{\symbf{S}}_T$ as before
+
+## The Instruments Trade-Off
+
+More instruments (larger $\ell$):
+
+::: {.signlist}
+- [●]{.good} More information, and potentially more efficient estimates
+- [●]{.good} More overidentifying restrictions to test
+- [●]{.bad} A larger $\hat{\symbf{S}}_T$ to invert
+- [●]{.bad} Weak or irrelevant instruments can screw up everything!
+:::
+
+. . .
+
+Fewer instruments (smaller $\ell$):
+
+::: {.signlist}
+- [●]{.good} Simpler estimation, and less finite-sample bias
+- [●]{.good} Focus on the strongest moment conditions
+- [●]{.bad} Less efficient asymptotically
+- [●]{.bad} Cannot test overidentification if $r = a$
+:::
+
+## Practical Guidance
+
+How to choose which functions of $\mathcal{F}_t$ to use?
+
+- **Theory first:** use economic theory to guide which variables should be relevant
+- **Parsimony:** start with a small set of the most relevant instruments
+- **Balance:** enough moments to test, but not so many that bias becomes severe
+- **Robustness:** check sensitivity to different instrument sets
+
+. . .
+
+Example from the consumption model:
+
+- Conservative: a constant and $C_t/C_{t-1}$. Exactly identified: nothing to test
+- Moderate: add $R_t$ and a lag of each. Overidentified, so we can test!
+- Aggressive: many lags and transformations. Beware of finite-sample issues
+
+## Chamberlain's Efficiency Bound
+
+- Is $\symbf{V}^*$ the best we can do? A fundamental result by [Chamberlain (1987)]{.fgv}:
+- With i.i.d. data, $\symbf{V}^*$ is the **semiparametric efficiency bound**
+- No _regular_ estimator using only these moments has a smaller asymptotic variance
+
+. . .
+
+- Regular: small changes in the true distribution do not change its limit distribution
+- That rules out tricks that beat the bound at a single parameter value
+
+. . .
+
+- To do better, you need **stronger assumptions**: with a full likelihood, MLE might beat GMM
+- If you only trust your moment conditions, efficient GMM is optimal!
+
+## Is GMM Still the Best with Time Series?
+
+- Chamberlain assumes i.i.d. data. What if today's data depend on yesterday's?
+
+. . .
+
+- Good news: $\symbf{S}^{-1}$ is still the best weighting matrix. Our proof never used independence
+- Back to the radars: this is the best way to combine the radars you **already own**
+
+. . .
+
+- But you choose the radars! Each instrument in $\symbf{z}_t$ is one more radar
+- Different $\symbf{z}_t$, different $\symbf{V}^*$. So also ask: which radars should we get?
+- [Hansen (1985)]{.fgv}, [Hansen, Heaton and Ogaki (1988)]{.fgv}: how low can $\symbf{V}^*$ go across all $\symbf{z}_t$?
+
+. . .
+
+- Could a totally different estimator beat GMM with the best radars?
+- If only today matters for tomorrow (Markov data), no ([Carrasco and Florens (2014)]{.fgv})
+- The catch: getting there may take infinitely many moments
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# Classical Estimators as GMM {visibility="uncounted"}
+
+## A Unifying Framework
+
+- Many familiar estimators are special cases of GMM
+- We will see OLS, IV/2SLS, GLS, NLS and MLE
+
+. . .
+
+- In each case, ask what the moment function is
+- Most of them are exactly identified. So $\symbf{W}$ is irrelevant, and:
+
+$$
+\symbf{V} = \symbf{D}^{-1}\symbf{S}\left(\symbf{D}'\right)^{-1}
+$$
+
+- Asymptotic variance for free, with dependence handled by $\symbf{S}$
+- It also suggests robustness checks: e.g., change the weighting matrix
+
+## OLS as GMM
+
+- Linear model: $y_t = \symbf{x}_t'\symbf{\beta}_0 + u_t$ with $\E[\symbf{x}_t u_t] = \symbf{0}$
+- Moment function: $\symbf{h}(\symbf{\beta}, \symbf{w}_t) = \symbf{x}_t(y_t - \symbf{x}_t'\symbf{\beta})$
+- $r = a = \dim(\symbf{x}_t)$: exactly identified, so the weighting matrix doesn't matter!
+
+. . .
+
+- Set the sample moment to zero:
+
+$$
+\sum_{t=1}^{T}\symbf{x}_t\left(y_t - \symbf{x}_t'\hat{\symbf{\beta}}\right) = \symbf{0} \implies \hat{\symbf{\beta}}_{OLS} = \left(\symbf{X}'\symbf{X}\right)^{-1}\symbf{X}'\symbf{y}
+$$
+
+. . .
+
+- $\symbf{D} = -\E[\symbf{x}_t\symbf{x}_t'] = -\symbf{Q}$, and $\symbf{S}$ is the long-run variance of the scores $\symbf{x}_t u_t$
+- So $\symbf{V} = \symbf{Q}^{-1}\symbf{S}\symbf{Q}^{-1}$: the HAC formula from lecture 7
+
+## IV and 2SLS as GMM
+
+- Linear model with instruments: $y_t = \symbf{x}_t'\symbf{\beta}_0 + u_t$ with $\E[\symbf{z}_t u_t] = \symbf{0}$ and $\symbf{z}_t \in \R^\ell$
+- Moment function: $\symbf{h}(\symbf{\beta}, \symbf{w}_t) = \symbf{z}_t(y_t - \symbf{x}_t'\symbf{\beta})$
+
+. . .
+
+- Exactly identified, $\ell = \dim(\symbf{x}_t)$: any $\symbf{W}_T$ gives $\hat{\symbf{\beta}}_{IV} = (\symbf{Z}'\symbf{X})^{-1}\symbf{Z}'\symbf{y}$
+
+. . .
+
+- Overidentified, $\ell > \dim(\symbf{x}_t)$: the choice $\symbf{W}_T = \left(\frac{1}{T}\sum_t\symbf{z}_t\symbf{z}_t'\right)^{-1}$ gives **2SLS**, in one step
+- With $\symbf{P}_{\symbf{Z}} \equiv \symbf{Z}(\symbf{Z}'\symbf{Z})^{-1}\symbf{Z}'$: $\ \hat{\symbf{\beta}}_{2SLS} = \left(\symbf{X}'\symbf{P}_{\symbf{Z}}\symbf{X}\right)^{-1}\symbf{X}'\symbf{P}_{\symbf{Z}}\symbf{y}$
+
+. . .
+
+- Scores an MDS and homoskedastic? $\symbf{S} = \sigma^2\E[\symbf{z}_t\symbf{z}_t']$, so 2SLS **is** efficient GMM
+- Otherwise, two-step GMM with White or Newey-West beats 2SLS
+
+## GLS as GMM
+
+- Linear model with known $\E[\symbf{u}\symbf{u}'\mid\symbf{X}] = \symbf{\Omega}$ and $\E[\symbf{u}\mid\symbf{X}] = \symbf{0}$
+- Careful: $\symbf{X}'(\symbf{y} - \symbf{X}\symbf{\beta})$ is exactly identified, so it gives OLS for **every** weighting matrix!
+
+. . .
+
+- The efficiency gain comes from changing the _moments_, not the weights
+- $\E[\symbf{u}\mid\symbf{X}] = \symbf{0}$ makes any function of $\symbf{X}$ a valid instrument. Take $\symbf{\Omega}^{-1}\symbf{X}$:
+
+$$
+\symbf{X}'\symbf{\Omega}^{-1}\left(\symbf{y} - \symbf{X}\hat{\symbf{\beta}}\right) = \symbf{0} \implies \hat{\symbf{\beta}}_{GLS} = \left(\symbf{X}'\symbf{\Omega}^{-1}\symbf{X}\right)^{-1}\symbf{X}'\symbf{\Omega}^{-1}\symbf{y}
+$$
+
+- Estimated $\hat{\symbf{\Omega}}$ in place of $\symbf{\Omega}$: **FGLS**
+
+. . .
+
+- With serial correlation, these moments mix $\symbf{x}_s$ and $u_t$ across dates
+- So GLS needs strict exogeneity, which fails with lagged dependent variables
+
+## NLS as GMM
+
+- Nonlinear regression: $y_t = g(\symbf{x}_t, \symbf{\beta}_0) + u_t$ with $\E[u_t\mid\symbf{x}_t] = 0$
+- NLS minimizes $\sum_t\left(y_t - g(\symbf{x}_t, \symbf{\beta})\right)^2$. Its first-order condition is a moment condition!
+- Moment function, with $\symbf{g}_{\symbf{\beta}}(\symbf{x}_t, \symbf{\beta}) \equiv \partial g(\symbf{x}_t, \symbf{\beta})/\partial\symbf{\beta}$:
+
+$$
+\symbf{h}(\symbf{\beta}, \symbf{w}_t) = \symbf{g}_{\symbf{\beta}}(\symbf{x}_t, \symbf{\beta})\left(y_t - g(\symbf{x}_t, \symbf{\beta})\right)
+$$
+
+- Exactly identified: $r = a = \dim(\symbf{\beta})$. Valid because $\E[u_t\mid\symbf{x}_t] = 0$, by the LIE
+- $\E[\symbf{x}_t u_t] = \symbf{0}$ alone does **not** give NLS: that is a different moment function
+
+. . .
+
+- $\symbf{D} = -\E\left[\symbf{g}_{\symbf{\beta}}\symbf{g}_{\symbf{\beta}}'\right]$ at $\symbf{\beta}_0$. The variance comes directly from GMM theory
+
+## MLE as GMM
+
+- Let $\symbf{s}_t(\symbf{\theta}) \equiv \partial\log f_t(\symbf{\theta})/\partial\symbf{\theta}$ be the score of observation $t$
+- The MLE solves $\sum_t\symbf{s}_t(\hat{\symbf{\theta}}) = \symbf{0}$: exactly identified GMM with $\symbf{h} = \symbf{s}_t$!
+
+. . .
+
+- $\symbf{D}$ is the expected Hessian: the bread of lecture 6's sandwich
+- $\symbf{S}$ is the long-run variance of the scores: the meat
+- Scores an MDS? Then $\symbf{S}$ is the outer product of the score, as in lecture 6
+- Serially correlated scores in a quasi-MLE? Use Newey-West for the meat
+
+. . .
+
+- So MLE is GMM with moments chosen by a fully specified model
+- Correct likelihood: the score is the best moment function you could pick
+
+## Takeaways
+
+::: {.thm .takeaway}
+::: {.thmhead}
+What to Remember
+:::
+
+- GMM minimizes a quadratic form in sample moments. Any $\symbf{W} \succ 0$ gives consistency
+- Under dependence, $\symbf{S}$ is a long-run variance. The optimal weighting matrix is $\symbf{S}^{-1}$
+- Two-step GMM is efficient: estimate $\symbf{S}$ with White or Newey-West, then re-minimize
+- With $r > a$, the J-test checks the model: $J_T \xrightarrow{d} \chi^2_{r-a}$
+- Conditional moments create instruments, and their one-step moments are an MDS
+:::
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+The End -- Thanks for the ride!
+
+🤟 🤠
+:::
+
+## References {visibility="uncounted" .sc84}
+
+- Chapter 14 of _Time Series Analysis_, by [James Hamilton (1994)]{.fgv}
+- Chapter 13 of _Econometrics_, by [Bruce Hansen (2022)]{.fgv}
+- [Hansen (1982)](https://doi.org/10.2307/1912775), "Large Sample Properties of Generalized Method of Moments Estimators", _Econometrica_
+- [Hansen and Singleton (1982)](https://doi.org/10.2307/1911873), "Generalized Instrumental Variables Estimation of Nonlinear Rational Expectations Models", _Econometrica_
+- [Hansen and Hodrick (1980)](https://doi.org/10.1086/260910), "Forward Exchange Rates as Optimal Predictors of Future Spot Rates", _Journal of Political Economy_
+- [Chamberlain (1987)](https://doi.org/10.1016/0304-4076(87)90015-7), "Asymptotic Efficiency in Estimation with Conditional Moment Restrictions", _Journal of Econometrics_
+- [Hansen (1985)](https://doi.org/10.1016/0304-4076(85)90138-1), "A Method for Calculating Bounds on the Asymptotic Covariance Matrices of Generalized Method of Moments Estimators", _Journal of Econometrics_
+- [Hansen, Heaton and Ogaki (1988)](https://doi.org/10.1080/01621459.1988.10478675), "Efficiency Bounds Implied by Multiperiod Conditional Moment Restrictions", _Journal of the American Statistical Association_
+- [Carrasco and Florens (2014)](https://doi.org/10.1017/S0266466613000340), "On the Asymptotic Efficiency of GMM", _Econometric Theory_
+
+## References (Continued) {visibility="uncounted" .sc84}
+
+- [Newey and McFadden (1994)](https://doi.org/10.1016/S1573-4412(05)80005-4), "Large Sample Estimation and Hypothesis Testing", _Handbook of Econometrics_
+- [Newey and West (1987)](https://doi.org/10.2307/1913610), "A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix", _Econometrica_
+- [Hansen, Heaton and Yaron (1996)](https://doi.org/10.1080/07350015.1996.10524656), "Finite-Sample Properties of Some Alternative GMM Estimators", _Journal of Business & Economic Statistics_
+- [Stock and Wright (2000)](https://doi.org/10.1111/1468-0262.00151), "GMM with Weak Identification", _Econometrica_
+- [Hausman, Lewis, Menzel and Newey (2011)](https://doi.org/10.1016/j.jeconom.2011.05.005), "Properties of the CUE Estimator and a Modification with Moments", _Journal of Econometrics_
+- [Moreira, Newey and Sharifvaghefi (2026)](https://arxiv.org/abs/2609.36445), "Continuously Updating GMM in Linear IV Models: A Polynomial Approach", arXiv working paper
+
+# Appendix {visibility="uncounted"}
+
+## Proof: The Limit of the J-Statistic {#j-proof visibility="uncounted" .tightmath .sc96}
+
+- Plug $\sqrt{T}(\hat{\symbf{\theta}}_T^* - \symbf{\theta}_0)$, with $\symbf{W} = \symbf{S}^{-1}$, into the expansion of $\hat{\symbf{m}}_T$:
+
+$$
+\sqrt{T}\,\hat{\symbf{m}}_T(\hat{\symbf{\theta}}_T^*) = \left[\symbf{I}_r - \symbf{D}\left(\symbf{D}'\symbf{S}^{-1}\symbf{D}\right)^{-1}\symbf{D}'\symbf{S}^{-1}\right]\sqrt{T}\,\hat{\symbf{m}}_T(\symbf{\theta}_0) + o_p(1)
+$$
+
+. . .
+
+- Premultiply by $\symbf{S}^{-1/2}$, and insert $\symbf{S}^{1/2}\symbf{S}^{-1/2}$ before $\sqrt{T}\,\hat{\symbf{m}}_T(\symbf{\theta}_0)$:
+
+$$
+\symbf{S}^{-1/2}\sqrt{T}\,\hat{\symbf{m}}_T(\hat{\symbf{\theta}}_T^*) = \left(\symbf{I}_r - \symbf{B}\right)\symbf{Z}_T + o_p(1), \qquad \symbf{Z}_T \equiv \symbf{S}^{-1/2}\sqrt{T}\,\hat{\symbf{m}}_T(\symbf{\theta}_0) \xrightarrow{d} N(\symbf{0}, \symbf{I}_r)
+$$
+
+- $\symbf{B}$ is the [idempotent matrix](#idempotent) from the efficiency proof. Then, by Slutsky:
+
+$$
+J_T = \symbf{Z}_T'\left(\symbf{I}_r - \symbf{B}\right)\symbf{Z}_T + o_p(1) \xrightarrow{d} \chi^2_{\operatorname{tr}(\symbf{I}_r - \symbf{B})} = \chi^2_{r-a}
+$$
+
+- $\operatorname{tr}(\symbf{B}) = \operatorname{tr}\left[(\symbf{D}'\symbf{S}^{-1}\symbf{D})^{-1}\symbf{D}'\symbf{S}^{-1}\symbf{D}\right] = \operatorname{tr}(\symbf{I}_a) = a$
+
+::: {.btnbar}
+[Back to the J-statistic](#j-statistic){.gotobtn}
+:::
