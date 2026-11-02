@@ -27,7 +27,7 @@ lectures/                 Quarto project; its contents become the site root
     mathjax-font.html     forces the Computer Modern MathJax font (slides only)
     macros.html           shared math macros: \E \Var \Cov \Corr \Pr \R \N \plim \iid \symbf
   index.qmd               landing page (plain HTML): links + one row per lecture
-  lectureNN/lectureNN.qmd one deck per folder, zero-padded 00..10
+  lectureNN/lectureNN.qmd one deck per folder, zero-padded 00..09
 problem_sets/             LaTeX problem sets, browsed on GitHub (not on Pages)
   README.md               student-facing index: how to submit, then per set: PDF, source, data, folder, due date
   _template/problem_set_template.tex   the fixed preamble and title block

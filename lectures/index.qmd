@@ -36,8 +36,7 @@ format:
 - [06]{.num} [Estimation of ARMA Models]{.ttl} [[Slides](lecture06/lecture06.html){.pill} [PDF](lecture06/lecture06.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 - [07]{.num} [LLN and CLTs for Time Series]{.ttl} [[Slides](lecture07/lecture07.html){.pill} [PDF](lecture07/lecture07.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 - [08]{.num} [Unit Roots, AR-DL Models, and Granger Causality]{.ttl} [coming soon]{.soon}
-- [09]{.num} [The GMM Estimator - Part I]{.ttl} [coming soon]{.soon}
-- [10]{.num} [The GMM Estimator - Part II]{.ttl} [coming soon]{.soon}
+- [09]{.num} [The GMM Estimator]{.ttl} [[Slides](lecture09/lecture09.html){.pill} [PDF](lecture09/lecture09.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 :::
 
 ::: {.pdfnote}

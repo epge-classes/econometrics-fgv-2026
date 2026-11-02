@@ -27,8 +27,8 @@ By the end of Week 5, you should be able to:
 | 1 | Non-parametric estimation + (i.i.d.) Bootstrap |
 | 2 | Time series building blocks + Lag operator, AR and MA models |
 | 3 | ARMA models, Wold's decomposition, estimation |
-| 4 | LLN and CLTs for dependent data + Intro to GMM |
-| 5 | GMM asymptotic theory + HAC estimation |
+| 4 | LLN and CLTs for dependent data + HAC estimation |
+| 5 | Unit roots, AR-DL models, and Granger causality + GMM for time series |
 
 ## Materials
 

@@ -64,10 +64,10 @@ After the first half of the course, you should be able to:
     - Estimation of ARMA Models
 - **Week 4:**
     - LLN and CLTs for dependent data -- focus on using the results rather than proving every single little thing
-    - Intro to GMM
+    - HAC estimation
 - **Week 5:**
-    - GMM asymptotic theory + HAC estimation
-    - GMM and HAC estimation + numerical pitfalls
+    - Unit roots, AR-DL models and Granger causality
+    - GMM for time series
 
 *Note: subject to change.*
 

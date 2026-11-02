@@ -15,8 +15,7 @@ How to port a lecture from `../econometrics-fgv-2025` (read-only) into this repo
 | `lectures/lecture6/lecture6.qmd` | `lecture06/` | Python cells; TikZ figure; `likelihood_concentration.png` |
 | `lectures/lecture7/lecture7.qmd` | `lecture07/` | No code |
 | `lectures/lecture8/lecture8.qmd` | `lecture08/` | Python cells; `distributions.png`, `brazil_macro_data.csv`, `download_macro_data_lecture8.py` |
-| `lectures/lecture9/lecture9.qmd` | `lecture09/` | No code |
-| `lectures/lecture10/lecture10.qmd` | `lecture10/` | No code |
+| `lectures/lecture9/lecture9.qmd`, `lectures/lecture10/lecture10.qmd` | `lecture09/` | Done. Both merged into one GMM deck. |
 
 The 2025 `.qmd` files render to Beamer, so they mix Markdown with raw LaTeX. Each source folder also holds the rendered 2025 PDF. Use it to see the intended look, and never render inside the 2025 folder.
 
