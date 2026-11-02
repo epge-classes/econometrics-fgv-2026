@@ -1,0 +1,955 @@
+---
+title: "Lecture 8: Unit Roots and AR-DL Models"
+talkdate: "November 2026"
+jupyter: python3
+---
+
+```{python}
+#| include: false
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+from scipy import stats
+from statsmodels.tsa.stattools import adfuller
+
+plt.rcParams['font.family'] = 'Arial'
+blue, orange, slate = '#0072BC', '#EB811B', '#2D3E50'
+```
+
+# Introduction {visibility="uncounted"}
+
+## Where We Are
+
+- We modeled dependence through ARMA models, one variable $y_t$ at a time
+- Lecture 7: LLNs, CLTs and OLS, all under stationarity
+- Lecture 4 warned us: with $\phi_1 = 1$, stationarity is gone
+
+. . .
+
+- In reality, several variables interact over time, often with trends
+- Causality here is super hard: no hope for experiments
+- An estimator can never ensure causality. Only careful design can
+
+## Today
+
+- What happens if we regress one non-stationary series on another?
+- How do we tell a unit root from a very persistent series?
+- How do we model the dynamic effect of $x_t$ on $y_t$? AR-DL models
+
+. . .
+
+- Spoiler: nonsense regressions; non-normal limits; long-run multipliers
+- We will sketch the proofs: the full theory is second-year material
+
+# Spurious Regressions {visibility="uncounted"}
+
+## A Quick Experiment
+
+- Let $u_t$ and $v_t$ be two independent sequences of i.i.d. $N(0,1)$ draws
+- Let $y_t = y_{t-1} + u_t$ and $x_t = x_{t-1} + v_t$, starting from $y_0 = x_0 = 0$
+- Both are random walks, _completely independent_ of each other
+- Both are integrated of order one, $I(1)$: non-stationary, but the differences are stationary
+
+. . .
+
+- But let's say you do not know that, and you run
+
+$$
+y_t = \alpha + \beta x_t + e_t
+$$
+
+- What is the truth about $\beta$? What do you expect from $\hat\beta$ and its $t$-statistic?
+
+## See It Happen
+
+Two independent random walks. Left: both series. Right: the regression of $y_t$ on $x_t$
+
+```{ojs}
+//| echo: false
+viewof spu = Inputs.form({
+  T: Inputs.range([50, 5000], {value: 200, step: 1, transform: Math.log, label: "T"}),
+  seed: Inputs.button("Draw new pair", {value: 1, reduce: v => v + 1})
+}, {template: ({T, seed}) => {
+  T.style.setProperty("--input-width", "340px")
+  T.style.setProperty("--label-width", "30px")
+  T.style.maxWidth = "none"
+  return html`<div style="display: flex; justify-content: center; align-items: center; column-gap: 30px">${T}${seed}</div>`
+}})
+```
+
+```{ojs}
+//| echo: false
+// Mixes the click count, so that "Draw new" really changes the first draws
+hashSeed = k => {
+  let x = Math.imul(k ^ (k >>> 16), 0x85ebca6b)
+  x = Math.imul(x ^ (x >>> 13), 0xc2b2ae35)
+  return ((x ^ (x >>> 16)) >>> 0) / 4294967296
+}
+
+spuMaxT = 5000
+spuShocks = {
+  const draw = d3.randomNormal.source(d3.randomLcg(hashSeed(8198 + spu.seed)))(0, 1)
+  return Float64Array.from({length: 2 * spuMaxT}, draw)
+}
+
+spuPath = {
+  const T = spu.T, out = new Array(T)
+  let y = 0, x = 0
+  for (let t = 0; t < T; t++) {
+    y += spuShocks[2 * t]
+    x += spuShocks[2 * t + 1]
+    out[t] = {t: t + 1, y, x}
+  }
+  return out
+}
+
+spuFit = {
+  const T = spu.T
+  const my = d3.mean(spuPath, d => d.y), mx = d3.mean(spuPath, d => d.x)
+  let sxx = 0, sxy = 0, syy = 0
+  for (const d of spuPath) {
+    sxx += (d.x - mx) ** 2
+    sxy += (d.x - mx) * (d.y - my)
+    syy += (d.y - my) ** 2
+  }
+  const b = sxy / sxx, a = my - b * mx
+  const ssr = syy - b * sxy
+  return {a, b, r2: 1 - ssr / syy, t: b / Math.sqrt(ssr / (T - 2) / sxx)}
+}
+
+spuLine = d3.extent(spuPath, d => d.x).map(x => ({x, y: spuFit.a + spuFit.b * x}))
+
+html`<div style="display: flex; gap: 20px; justify-content: center; font-size: 19px">
+<div>
+  <div style="text-align: center"><span style="color: #0072BC">y<sub>t</sub></span> and <span style="color: #EB811B">x<sub>t</sub></span> over time</div>
+  ${Plot.plot({
+    width: 590, height: 420, marginLeft: 55, marginBottom: 45,
+    style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
+    x: {label: "t", labelAnchor: "center", labelArrow: "none", ticks: 5},
+    y: {label: null, ticks: 5},
+    grid: true,
+    marks: [
+      Plot.ruleY([0], {stroke: "black", strokeDasharray: "5,4"}),
+      Plot.line(spuPath, {x: "t", y: "y", stroke: "#0072BC", strokeWidth: 1.8}),
+      Plot.line(spuPath, {x: "t", y: "x", stroke: "#EB811B", strokeWidth: 1.8})
+    ]
+  })}
+</div>
+<div>
+  <div style="text-align: center">β̂ = ${spuFit.b.toFixed(2)}, <span style="color: #EB811B; font-weight: bold"><i>t</i> = ${spuFit.t.toFixed(1)}</span>, R² = ${spuFit.r2.toFixed(2)}</div>
+  ${Plot.plot({
+    width: 590, height: 420, marginLeft: 55, marginBottom: 45,
+    style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
+    x: {label: "x", labelAnchor: "center", labelArrow: "none", ticks: 5},
+    y: {label: "y", labelArrow: "none", ticks: 5},
+    grid: true,
+    marks: [
+      Plot.dot(spuPath, {x: "x", y: "y", r: 2, fill: "#2D3E50", fillOpacity: 0.45}),
+      Plot.line(spuLine, {x: "x", y: "y", stroke: "#EB811B", strokeWidth: 3})
+    ]
+  })}
+</div>
+</div>`
+```
+
+## A Monte Carlo Experiment
+
+- For each $T$, simulate 2,000 independent pairs of paths $(y_t, x_t)$
+- In each sample, estimate three regressions by OLS:
+
+$$
+\begin{aligned}
+\text{Static:} \quad & y_t = \alpha + \beta x_t + e_t \\
+\text{Lagged } y\text{:} \quad & y_t = \alpha + \beta x_t + \gamma y_{t-1} + e_t \\
+\text{Lagged } y \text{ and } x\text{:} \quad & y_t = \alpha + \beta x_t + \delta x_{t-1} + \gamma y_{t-1} + e_t
+\end{aligned}
+$$
+
+. . .
+
+- In each one, run the usual $t$-test of $H_0: \beta = 0$ at the 5% level
+- The null is true, so we should reject 5% of the time
+- Would you find stars in your regression table?
+
+## Rejection Rates for $\beta$ at the 5% Level
+
+```{python}
+#| fig-align: center
+#| fig-alt: "Bar chart of rejection rates by sample size. The static regression rejects far more often as T grows, the regression with lagged y stays near 17 percent, and the regression with lags of y and x stays near 5 percent."
+def t_stat(y, X, k):
+    XtX_inv = np.linalg.inv(X.T @ X)
+    b = XtX_inv @ (X.T @ y)
+    e = y - X @ b
+    s2 = e @ e / (len(y) - X.shape[1])
+    return b[k] / np.sqrt(s2 * XtX_inv[k, k])
+
+def rejection_rates(T, reps, rng):
+    hits = np.zeros(3)
+    for _ in range(reps):
+        y = np.cumsum(rng.standard_normal(T))
+        x = np.cumsum(rng.standard_normal(T))
+        one = np.ones(T - 1)
+        hits += np.abs([
+            t_stat(y, np.c_[np.ones(T), x], 1),
+            t_stat(y[1:], np.c_[one, x[1:], y[:-1]], 1),
+            t_stat(y[1:], np.c_[one, x[1:], x[:-1], y[:-1]], 1),
+        ]) > 1.96
+    return hits / reps
+
+rng = np.random.default_rng(2026)
+sizes = [50, 100, 500, 1000, 10000]
+rates = np.array([rejection_rates(T, 2000, rng) for T in sizes])
+
+labels = [r'Static', r'Lagged $y$', r'Lagged $y$ and $x$']
+colors = [blue, orange, slate]
+pos = np.arange(len(sizes))
+width = 0.27
+
+fig, ax = plt.subplots(figsize=(10, 4.7))
+for k in range(3):
+    bars = ax.bar(pos + (k - 1) * width, rates[:, k], width, label=labels[k], color=colors[k], ec='k', lw=0.5)
+    ax.bar_label(bars, fmt='%.2f', padding=2, fontsize=11)
+ax.axhline(0.05, color='k', ls='--', label='5% nominal level')
+ax.set_xticks(pos, [f'{T:,}' for T in sizes])
+ax.set_xlabel('Sample size T')
+ax.set_ylabel('Rejection rate')
+ax.set_ylim(0, 1.1)
+ax.legend(loc='upper left', ncol=4, fontsize=11, frameon=False)
+ax.grid(axis='y', alpha=0.3)
+ax.set_axisbelow(True)
+plt.tight_layout()
+```
+
+## What Is Going On?
+
+- In all three regressions, the true $\beta$ is zero
+- Lagged $y$ regressions are correctly specified, with $\gamma = 1$ and $e_t = u_t$
+- The static one is not: with $\beta = 0$, its error is $y_t - \alpha$, a random walk!
+
+. . .
+
+- And the regressors are not stationary. With $x_0 = 0$:
+
+$$
+\Var(x_t) = \Var\left(\sum_{s=1}^{t} v_s\right) = t
+\quad\Longrightarrow\quad
+\E\left[\frac{1}{T}\sum_{t=1}^{T}x_t^2\right] = \frac{1}{T}\sum_{t=1}^{T} t = \frac{T+1}{2} \to \infty
+$$
+
+- There is no constant $\symbf{Q}$ for the sample second moments to converge to
+- So the ergodic theorem and the CLTs of Lecture 7 are all off the table
+
+## Why the Static $t$-Statistic Explodes {.tightmath .sc94}
+
+Orders of magnitude in the static regression [(Phillips, 1986)]{.fgv}
+
+$$
+\begin{aligned}
+\hat\beta &= O_p(1) && \text{converges to a random variable, not to zero} \\
+\sum_{t=1}^{T}(x_t - \bar x)^2 &= O_p(T^2) && \text{each term is of order } t \\
+s^2 = \frac{1}{T}\sum_{t=1}^{T}\hat e_t^2 &= O_p(T) && \text{the residuals inherit the random walk} \\
+\text{se}(\hat\beta) = \frac{s}{\sqrt{\sum_t (x_t - \bar x)^2}} &= O_p\left(T^{-1/2}\right) && \text{a standard error that vanishes...} \\
+t = \hat\beta / \text{se}(\hat\beta) &= O_p\left(T^{1/2}\right) && \text{...around a slope that does not}
+\end{aligned}
+$$
+
+- More data makes things worse: rejection rates go to one
+- $R^2$ does not vanish: median about 0.17 at any $T$, above 0.5 in 1 of 6 samples
+- [Granger and Newbold (1974)]{.fgv}: at $T = 50$, 76% rejections and an average $R^2$ of 0.26
+
+## Why Lags Help
+
+- Lagged $y$: the error is i.i.d. and $\hat\beta \xrightarrow{p} 0$, yet the rejection rate gets stuck near 17%
+- $x_t$ is $I(1)$, so the $t$-statistic has a non-standard limit, even in a correct model
+
+. . .
+
+- Lagged $y$ and $x$: rewrite the two terms in $x$ as
+
+$$
+\beta x_t + \delta x_{t-1} = \beta\,\Delta x_t + (\beta + \delta)\,x_{t-1}
+$$
+
+- Now $\beta$ is the coefficient on a stationary, mean-zero regressor
+- Such coefficients have standard limits [(Sims, Stock and Watson, 1990)]{.fgv}
+
+. . .
+
+- But not all of them: a joint test of $\beta = \delta = 0$ is still non-standard
+- Regressing $\Delta y_t$ on $\Delta x_t$ also fixes the problem: back to Lecture 7
+
+## Empirical Takeaway
+
+::: {.thm .takeaway}
+::: {.thmhead}
+What to Remember
+:::
+
+- Correlation does not imply causation, _especially_ in time series
+- A static regression of $I(1)$ on $I(1)$ can be pure nonsense, whatever $t$ and $R^2$ say
+- Dynamic specification or differencing can restore standard inference
+:::
+
+- One context makes static levels regressions meaningful: cointegration
+- Lecture 7 does not apply to non-stationary data: we need new theorems
+- These are one order of magnitude more sophisticated
+- Good stuff for a second-year class, right? 😉
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# Testing for a Unit Root {visibility="uncounted"}
+
+## Persistent or Unit Root?
+
+- You want to know whether $y_t$ is stationary, and you estimate an AR(1):
+
+$$
+y_t = \rho y_{t-1} + \varepsilon_t, \qquad \varepsilon_t \iid N(0, \sigma^2), \quad y_0 = 0
+$$
+
+- The OLS estimator is
+
+$$
+\hat{\rho} = \frac{\sum_{t=1}^{T}y_ty_{t-1}}{\sum_{t=1}^{T}y_{t-1}^2} = \rho + \frac{\sum_{t=1}^{T}y_{t-1}\varepsilon_t}{\sum_{t=1}^{T}y_{t-1}^2}
+$$
+
+. . .
+
+- Let's say you get $\hat\rho = 0.96$. A very persistent series, or a non-stationary one?
+- If $|\rho| < 1$, we know that $\sqrt{T}(\hat{\rho} - \rho) \xrightarrow{d} N\left(0, 1 - \rho^2\right)$
+- Can we just use this and a $t$-test of $H_0: \rho = 1$?
+
+## What Breaks as $\rho \to 1$
+
+AR(1) with a fitted intercept, $y_0 = 0$, 2,000 samples. The usual $t$-statistic for the true $\rho$
+
+```{ojs}
+//| echo: false
+viewof brk = Inputs.form({
+  rho: Inputs.range([0.5, 1], {value: 0.5, step: 0.01, label: "ρ"}),
+  T: Inputs.range([50, 1000], {value: 100, step: 1, transform: Math.log, label: "T"}),
+  seed: Inputs.button("Draw new samples", {value: 1, reduce: v => v + 1})
+}, {template: ({rho, T, seed}) => {
+  for (const f of [rho, T]) {
+    f.style.setProperty("--input-width", "300px")
+    f.style.setProperty("--label-width", "30px")
+    f.style.maxWidth = "none"
+  }
+  return html`<div style="display: flex; justify-content: center; align-items: center; column-gap: 30px">${rho}${T}${seed}</div>`
+}})
+```
+
+```{ojs}
+//| echo: false
+// The shocks depend on the seed only: moving the sliders reuses them
+brkR = 2000
+brkMaxT = 1000
+brkShocks = {
+  const draw = d3.randomNormal.source(d3.randomLcg(hashSeed(5519 + brk.seed)))(0, 1)
+  return Float32Array.from({length: brkR * brkMaxT}, draw)
+}
+
+brkStats = {
+  const {rho, T} = brk
+  const est = new Float64Array(brkR), tst = new Float64Array(brkR)
+  for (let r = 0; r < brkR; r++) {
+    const base = r * brkMaxT
+    let prev = 0, sx = 0, sy = 0, sxx = 0, sxy = 0, syy = 0
+    for (let t = 0; t < T; t++) {
+      const y = rho * prev + brkShocks[base + t]
+      sx += prev; sy += y
+      sxx += prev * prev; sxy += prev * y; syy += y * y
+      prev = y
+    }
+    const Sxx = sxx - sx * sx / T, Sxy = sxy - sx * sy / T, Syy = syy - sy * sy / T
+    const b = Sxy / Sxx
+    est[r] = b
+    tst[r] = (b - rho) / Math.sqrt((Syy - b * Sxy) / (T - 2) / Sxx)
+  }
+  return {est, tst}
+}
+
+brkLeft = d3.mean(brkStats.tst, v => v < -1.645 ? 1 : 0)
+brkNormal = d3.range(-6, 4.01, 0.05).map(x => ({x, f: Math.exp(-x * x / 2) / Math.sqrt(2 * Math.PI) * 0.25}))
+brkDomain = [d3.quantile(Array.from(brkStats.est).sort(d3.ascending), 0.002), Math.max(brk.rho, d3.quantile(Array.from(brkStats.est).sort(d3.ascending), 0.998))]
+
+html`<div style="display: flex; gap: 20px; justify-content: center; font-size: 19px">
+<div>
+  <div style="text-align: center"><i>t</i> vs. <span style="color: #0072BC">N(0,1)</span>. P(<i>t</i> < −1.645) = <span style="color: #EB811B; font-weight: bold">${(100 * brkLeft).toFixed(0)}%</span>, not 5%</div>
+  ${Plot.plot({
+    width: 590, height: 390, marginLeft: 55, marginBottom: 45,
+    style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
+    x: {label: null, domain: [-6, 4], ticks: 6},
+    y: {label: null, ticks: 4, domain: [0, 0.14]},
+    grid: true,
+    marks: [
+      Plot.rectY(brkStats.tst, Plot.binX({y: "proportion"}, {x: d => d, thresholds: d3.range(-6, 4.01, 0.25), fill: "#2D3E50", fillOpacity: 0.25, inset: 0.5})),
+      Plot.line(brkNormal, {x: "x", y: "f", stroke: "#0072BC", strokeWidth: 3}),
+      Plot.ruleY([0])
+    ]
+  })}
+</div>
+<div>
+  <div style="text-align: center">ρ̂ across samples: <span style="color: #EB811B">true ρ = ${brk.rho.toFixed(2)}</span>, mean ρ̂ = ${d3.mean(brkStats.est).toFixed(3)}</div>
+  ${Plot.plot({
+    width: 590, height: 390, marginLeft: 55, marginBottom: 45,
+    style: {fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"},
+    x: {label: null, domain: brkDomain, ticks: 6},
+    y: {label: null, ticks: 4},
+    grid: true,
+    marks: [
+      Plot.rectY(brkStats.est, Plot.binX({y: "proportion"}, {x: {value: d => d, domain: brkDomain, thresholds: 40}, fill: "#2D3E50", fillOpacity: 0.25, inset: 0.5})),
+      Plot.ruleX([brk.rho], {stroke: "#EB811B", strokeWidth: 3}),
+      Plot.ruleY([0])
+    ]
+  })}
+</div>
+</div>`
+```
+
+## The Numerator When $\rho = 1$ {.tightmath}
+
+- Now $y_t \sim N(0, \sigma^2 t)$. Squaring $y_t = y_{t-1} + \varepsilon_t$ gives $y_{t-1}\varepsilon_t = \frac{1}{2}\left(y_t^2 - y_{t-1}^2 - \varepsilon_t^2\right)$
+- Sum over $t$. The sum telescopes, and $y_0 = 0$:
+
+$$
+\frac{1}{\sigma^2 T}\sum_{t=1}^{T}y_{t-1}\varepsilon_t = \frac{1}{2}\left(\frac{y_T^2}{\sigma^2 T} - \frac{1}{\sigma^2 T}\sum_{t=1}^{T}\varepsilon_t^2\right)
+$$
+
+. . .
+
+- First term: $y_T / (\sigma\sqrt{T}) \sim N(0,1)$, so it is a $\chi^2_1$. Second term: goes to 1 by the LLN
+- By Slutsky:
+
+$$
+\boxed{\frac{1}{\sigma^2 T}\sum_{t=1}^{T}y_{t-1}\varepsilon_t \xrightarrow{d} \frac{1}{2}\left(\chi^2_{1} - 1\right)}
+$$
+
+- The numerator is $O_p(T)$, and its limit is not normal
+
+## The Denominator and the Right Rate {.tightmath}
+
+$$
+\E\left[\sum_{t=1}^{T}y_{t-1}^2\right] = \sigma^2\sum_{t=1}^{T}(t-1) = \sigma^2\,\frac{T(T-1)}{2} \approx \sigma^2\,\frac{T^2}{2}
+$$
+
+- The denominator is $O_p(T^2)$, so the right rate is $T$, not $\sqrt{T}$:
+
+$$
+T(\hat{\rho} - 1) = \frac{\frac{1}{T}\sum_{t=1}^{T}y_{t-1}\varepsilon_t}{\frac{1}{T^2}\sum_{t=1}^{T}y_{t-1}^2}
+$$
+
+. . .
+
+- This explains why $N(0, 1 - \rho^2)$ collapses to a point at $\rho = 1$: $\sqrt{T}$ is too slow
+- The scaled denominator stays random: no LLN here, so no Slutsky
+- To get the limit, we need a tool for the whole path of $y_t$
+
+## The Dickey-Fuller Distributions
+
+::: {.thm}
+::: {.thmhead}
+Theorem (Functional CLT)
+:::
+If $\rho = 1$, then $\frac{y_{\lfloor rT \rfloor}}{\sigma\sqrt{T}} \Rightarrow W(r)$ on $[0,1]$, where $W$ is a standard Brownian motion.
+:::
+
+- So $\frac{1}{\sigma^2 T^2}\sum_t y_{t-1}^2 \xrightarrow{d} \int_0^1 W(r)^2\,dr$, with the same $W$ as in $W(1)^2 \sim \chi^2_1$ above
+
+. . .
+
+::: {.thm}
+::: {.thmhead}
+Theorem ([Dickey and Fuller, 1979]{.fgv}; [Hansen, Thms. 16.9-16.10]{.fgv})
+:::
+With $\hat s_T = s\,/\sqrt{\sum_t y_{t-1}^2}$ and $s^2 = \frac{1}{T}\sum_t\hat\varepsilon_t^2$, if $\rho = 1$:
+
+$$
+T(\hat\rho - 1) \xrightarrow{d} \frac{\frac{1}{2}\left(W(1)^2 - 1\right)}{\int_0^1 W(r)^2\,dr}
+\qquad\text{and}\qquad
+t = \frac{\hat\rho - 1}{\hat s_T} \xrightarrow{d} \frac{\frac{1}{2}\left(W(1)^2 - 1\right)}{\left(\int_0^1 W(r)^2\,dr\right)^{1/2}}
+$$
+:::
+
+- No unknown parameters: simulate them with any precision you want
+
+## Constants and Trends {.sc92}
+
+- Even under the null, the limit of $t$ depends on the true drift and on what you fit:
+
+| True process | Fitted regression | Limit of $t$ | 5% critical value |
+|:---|:---|:---|:---|
+| No drift | Nothing | Dickey-Fuller | $-1.9$ |
+| No drift | Constant | Dickey-Fuller, demeaned | $-2.9$ |
+| Drift | Constant | $N(0,1)$ [(West, 1988)]{.fgv} | $-1.6$ |
+| Drift | Constant and trend | Dickey-Fuller, detrended | $-3.4$ |
+
+. . .
+
+- Drift: $y_t = \mu + y_{t-1} + \varepsilon_t$. With $y_0 = 0$, it implies a trend: $y_t = \mu t + \sum_{s=1}^{t}\varepsilon_s$
+- Rule: match the alternative. Add a trend if the series trends
+
+## The Distributions Are Far From Normal
+
+```{python}
+#| fig-align: center
+#| fig-alt: "Two panels of simulated densities under a unit root, with no deterministic terms, a constant, and a constant and trend. Left: T times rho-hat minus one, skewed to the left. Right: the t-statistic, shifted left of the standard normal."
+# Under the null: Frisch-Waugh removes the fitted deterministic terms from y_{t-1} and from dy_t
+rng = np.random.default_rng(1979)
+n_T, n_reps = 500, 20000
+y = np.cumsum(rng.standard_normal((n_reps, n_T + 1)), axis=1)
+dy, ylag = np.diff(y, axis=1), y[:, :-1]
+grid = np.arange(n_T) / n_T
+
+def df_stats(Z):
+    if Z is None:
+        a, b = ylag, dy
+    else:
+        M = Z @ np.linalg.inv(Z.T @ Z) @ Z.T
+        a, b = ylag - ylag @ M, dy - dy @ M
+    slope = (a * b).sum(axis=1) / (a * a).sum(axis=1)
+    resid = b - slope[:, None] * a
+    dof = n_T - (1 if Z is None else Z.shape[1] + 1)
+    s2 = (resid ** 2).sum(axis=1) / dof
+    return n_T * slope, slope / np.sqrt(s2 / (a * a).sum(axis=1))
+
+specs = [
+    ('No constant or trend', None, blue, '-'),
+    ('Constant', np.ones((n_T, 1)), orange, '-'),
+    ('Constant and trend', np.c_[np.ones(n_T), grid], slate, '-'),
+]
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.8))
+xgrid = [np.linspace(-32, 6, 400), np.linspace(-5.5, 4, 400)]
+for label, Z, color, ls in specs:
+    results = df_stats(Z)
+    for ax, x, stat in zip(axes, xgrid, results):
+        ax.plot(x, stats.gaussian_kde(stat)(x), color=color, ls=ls, lw=2.2, label=label)
+axes[1].plot(xgrid[1], stats.norm.pdf(xgrid[1]), color='k', ls='--', lw=1.8, label='$N(0,1)$')
+axes[0].set_title(r'$T(\hat\rho - 1)$')
+axes[1].set_title(r'$t$-statistic')
+for ax in axes:
+    ax.set_ylim(bottom=0)
+    ax.grid(alpha=0.3)
+    ax.set_axisbelow(True)
+    ax.legend(fontsize=11, frameon=False, loc='upper left')
+plt.tight_layout()
+```
+
+## Back to $\hat\rho = 0.96$
+
+- Fit an AR(1) with a constant, and suppose the truth is a random walk
+- Then $T(\hat\rho - 1)$ has median around $-4.4$ and 5% quantile around $-13.8$
+
+. . .
+
+- With $T = 100$: $T(\hat\rho - 1) = -4$. That's the _median_ outcome under a unit root!
+- With $T = 1{,}000$: $T(\hat\rho - 1) = -40$. A clear rejection
+
+. . .
+
+- OLS is biased downward here: a random walk looks mean-reverting in sample
+- The same $\hat\rho$ means very different things at different $T$
+
+## AR($p$) and Unit Roots
+
+- What if the true process is an AR($p$)?
+
+$$
+y_t = \phi_1 y_{t-1} + \phi_2 y_{t-2} + \ldots + \phi_p y_{t-p} + \varepsilon_t
+$$
+
+- $z = 1$ is a root of the AR polynomial if and only if $\phi_1 + \ldots + \phi_p = 1$
+- Let all other roots be outside the unit circle, so $\Delta y_t$ is stationary
+- Rewrite the model in terms of one level and $p - 1$ differences ([appendix](#ar-p-proof)):
+
+$$
+y_t = \rho y_{t-1} + \beta_1 \Delta y_{t-1} + \ldots + \beta_{p-1} \Delta y_{t-p+1} + \varepsilon_t, \qquad \rho = \sum_{i=1}^{p}\phi_i
+$$
+
+. . .
+
+- Under $H_0: \rho = 1$ ([Hansen, Thm. 16.13]{.fgv}): $\sqrt{T}(\hat\beta - \beta) \xrightarrow{d} N(0, \symbf{V})$ is standard
+- $T(\hat\rho - 1)$ goes to $\left(1 - \sum_j \beta_j\right)$ times the Dickey-Fuller limit: a nuisance parameter
+
+## The Augmented Dickey-Fuller (ADF) Test
+
+- The $t$-statistic of $\hat\rho$ is free of that nuisance parameter:
+
+$$
+t_{ADF} \equiv \frac{\hat{\rho} - 1}{\hat{s}_T}, \qquad \hat s_T \text{ is the usual OLS standard error of } \hat\rho
+$$
+
+- Same limit as in the AR(1), so same critical values ([Hansen, Thm. 16.14]{.fgv})
+- Reject the unit root if $t_{ADF} < c_\alpha$: only large _negative_ values count
+- Software runs $\Delta y_t = \pi y_{t-1} + \ldots$ with $\pi = \rho - 1$. Same $t$-statistic
+
+. . .
+
+- Lag length: too few distorts the size, too many costs power
+- Reasonable default: pick $p$ by AIC. ARMA errors: let $p$ grow with $T$ [(Said and Dickey, 1984)]{.fgv}
+
+## Rejecting Is Hard
+
+Share of rejections of the ADF test at 5%, with a constant and no extra lags (5,000 samples)
+
+```{python}
+#| output: asis
+# Stationary start for rho < 1, y_0 = 0 for the random walk
+def adf_power(rho, T, reps, rng):
+    y = np.zeros((reps, T + 1))
+    if rho < 1:
+        y[:, 0] = rng.standard_normal(reps) / np.sqrt(1 - rho ** 2)
+    for t in range(1, T + 1):
+        y[:, t] = rho * y[:, t - 1] + rng.standard_normal(reps)
+    a = y[:, :-1] - y[:, :-1].mean(axis=1, keepdims=True)
+    b = np.diff(y, axis=1)
+    b = b - b.mean(axis=1, keepdims=True)
+    slope = (a * b).sum(axis=1) / (a * a).sum(axis=1)
+    s2 = ((b - slope[:, None] * a) ** 2).sum(axis=1) / (T - 2)
+    return np.mean(slope / np.sqrt(s2 / (a * a).sum(axis=1)) < -2.86)
+
+rng = np.random.default_rng(1984)
+horizons = [100, 300, 1000]
+rows = []
+for rho in [1.00, 0.99, 0.97, 0.95, 0.90]:
+    row = {r'True $\rho$': f'{rho:.2f}'}
+    for T in horizons:
+        row[f'$T = {T:,}$'.replace(',', '{,}')] = f'{adf_power(rho, T, 5000, rng):.2f}'
+    rows.append(row)
+print(pd.DataFrame(rows).to_markdown(index=False, disable_numparse=True))
+```
+
+- $T = 100$ is 25 years of quarterly data: $\rho = 0.95$ is rejected only about 13% of the time
+- Stationary but persistent series usually survive the test
+
+## Other Tests
+
+- [Phillips and Perron (1988)]{.fgv}: same hypotheses as the ADF test
+- Run the Dickey-Fuller regression with no extra lags
+- Then correct $t$ for serial correlation using a long-run variance: Lecture 7!
+- No lag length $p$ to choose, but a bandwidth $q$ instead
+
+. . .
+
+- [KPSS (1992)]{.fgv} flips the hypotheses: $H_0$: stationary vs. $H_1$: unit root
+- Regress $y_t$ on a constant, and maybe a trend. Partial sums of residuals should stay small
+- Scale them by a long-run variance. Reject for large values
+
+. . .
+
+- ADF does not reject and KPSS rejects: evidence for a unit root
+- ADF rejects and KPSS does not: evidence for stationarity
+- Both reject or neither does: the data are not telling you much
+
+## Using Unit Root Tests
+
+- "We cannot reject" does not mean "we found a unit root"
+- "Levels if ADF rejects, differences if not" asks the test a question it was not built for
+- Start from economics: should this series be mean-reverting? Then look at the evidence
+
+. . .
+
+- One-off structural breaks can look like unit roots [(Perron, 1989)]{.fgv}
+- Think of Brazilian inflation before and after 1994
+- Also look at $\hat\rho$ and its magnitude, not only at the $p$-value ([Hansen, Sec. 16.13]{.fgv})
+
+## The Bayesian Critique
+
+- As a function of $\rho$, the Gaussian likelihood given $y_0$ (and $\sigma^2$) is always the same shape:
+
+$$
+L(\rho) \propto \exp\left(-\frac{\sum_t y_{t-1}^2}{2\sigma^2}\left(\rho - \hat\rho\right)^2\right)
+$$
+
+- With a flat prior, $\rho \mid \text{data} \sim N\left(\hat\rho,\ \sigma^2 / \sum_t y_{t-1}^2\right)$: symmetric, and nothing special at $\rho = 1$
+
+. . .
+
+- Frequentist object: $\hat\rho$ given $\rho$. Skewed, and the theory jumps at $\rho = 1$
+- Bayesian object: $\rho$ given $\hat\rho$. The same joint distribution, cut the other way
+- Very cool paper: _Understanding Unit Rooters: A Helicopter Tour_ [(Sims and Uhlig, 1991)]{.fgv}
+- You need no $\rho = 1$ vs. $\rho < 1$ decision, but the prior now matters
+- Super popular among the empirical macro and DSGE crowd! Second-year stuff, again
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# Empirical Illustration {visibility="uncounted"}
+
+## Take a Look at the Data
+
+```{python}
+#| fig-align: center
+#| fig-alt: "Three monthly time series for Brazil: IPCA inflation fluctuating around a mean, the log USD/BRL exchange rate wandering upward, and log M2 trending up."
+data = pd.read_csv("brazil_macro_data.csv", parse_dates=["Date"], index_col="Date")
+data["log_fx"] = np.log(data["usd_brl"])
+data["log_m2"] = np.log(data["m2"])
+
+panels = [
+    ("ipca", "IPCA inflation (% per month)", blue),
+    ("log_fx", "USD/BRL exchange rate (log)", orange),
+    ("log_m2", "M2 (log)", slate),
+]
+
+fig, axes = plt.subplots(1, 3, figsize=(12, 3.5))
+for ax, (col, title, color) in zip(axes, panels):
+    ax.plot(data[col], color=color)
+    ax.set_title(title, fontsize=13)
+    ax.grid(alpha=0.3)
+    ax.set_axisbelow(True)
+    ax.tick_params(axis='x', labelsize=10)
+plt.tight_layout()
+```
+
+- Monthly data from the Central Bank of Brazil, up to September 2026
+- $H_0$: each series is integrated. Which deterministic terms would you fit?
+- Which economic theories justify the presence (or lack) of a unit root here?
+
+## Running the ADF Test
+
+```{python}
+#| output: asis
+series_cfg = [("ipca", "IPCA"), ("log_fx", "USD/BRL (log)"), ("log_m2", "M2 (log)")]
+
+rows = []
+for col, title in series_cfg:
+    for reg, spec in [("c", "Constant"), ("ct", "Constant and trend")]:
+        stat, pvalue, lags, nobs, crit, _ = adfuller(data[col].dropna(), regression=reg, autolag="AIC")
+        rows.append({
+            "Series": title,
+            "Fitted terms": spec,
+            r"$t_{ADF}$": f"{stat:.2f}",
+            "5% critical value": f"{crit['5%']:.2f}",
+            "$p$-value": "< 0.01" if pvalue < 0.01 else f"{pvalue:.2f}",
+            "Lags": int(lags),
+            "$T$": int(nobs),
+        })
+
+print(pd.DataFrame(rows).to_markdown(index=False, disable_numparse=True))
+```
+
+- Inflation: we reject a unit root in both specifications
+- Exchange rate and M2: we cannot reject. Why does AIC pick 15 lags for M2?
+- In first differences, both reject at any usual level: they look $I(1)$
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+# AR-DL Models {visibility="uncounted"}
+
+## An Example of Monetary Policy Adjustment
+
+- Let $i_t$ be the nominal interest rate set by the central bank at time $t$
+- Let $\pi_t^e$ be the inflation expectation at $t$ for $t+1$
+- Let $r_t^* = \alpha + \symbf{x}_t'\symbf{\beta}$ be an equilibrium real rate
+- $\symbf{x}_t$: productivity growth, unemployment, foreign interest rates, risk premia, etc
+- Let $i_t^* = r_t^* + \pi_t^e$ be the "desired" nominal interest rate
+
+. . .
+
+- At time $t$, assume that the central bank dislikes missing $i_t^*$ and moving the rate:
+
+$$
+\min_{i_t} \ \left(i_t - i_t^*\right)^2 + \theta \left(i_t - i_{t-1}\right)^2
+$$
+
+## Can We Estimate This Rule? {.tightmath}
+
+- The solution is a weighted average of the target and the past rate:
+
+$$
+i_t = \frac{1}{1+\theta}\,i_t^* + \frac{\theta}{1+\theta}\,i_{t-1} = \frac{1}{1+\theta}\left(\alpha + \symbf{x}_t'\symbf{\beta} + \pi_t^e\right) + \frac{\theta}{1+\theta}\,i_{t-1}
+$$
+
+. . .
+
+- Add a policy shock $\varepsilon_t$ and run:
+
+$$
+i_t = a_0 + a_1 i_{t-1} + \symbf{x}_t'\symbf{\delta} + \gamma \pi_t^e + \varepsilon_t
+$$
+
+- Then $\theta = a_1 / (1 - a_1)$, and the model implies $a_1 + \gamma = 1$
+- [Exercise: How would you test this restriction? With which standard errors?]{.alert}
+
+. . .
+
+- Under what conditions on $(\symbf{x}_t, \pi_t^e)$ and $\varepsilon_t$ is OLS consistent here?
+- What if $i_t$ also moves $\symbf{x}_t$? And $\pi_t^e$? How do we interpret the coefficients then?
+
+## The AR-DL Model
+
+- You just saw an **AR-DL($p,q$)**, also known as ADL($p,q$):
+
+$$
+y_t = \alpha + \sum_{i=1}^{p}\phi_i\,y_{t-i} + \sum_{j=0}^{q}\symbf{\beta}_j'\,\symbf{x}_{t-j} + \varepsilon_t
+$$
+
+- With $p = 0$: a **distributed lag** model, DL($q$)
+- Estimate by OLS. If $(y_t, \symbf{x}_t)$ is stationary, Lecture 7 applies
+- Useful for forecasting. On its own, it is silent about causality
+
+. . .
+
+- Enough lags, so $\varepsilon_t$ is unforecastable: scores are an MDS. Use White
+- DL model or too few lags: $\varepsilon_t$ is autocorrelated. Use Newey-West
+- With $y_{t-1}$ on the right, autocorrelated $\varepsilon_t$ means $\E[y_{t-1}\varepsilon_t] \neq 0$: only a projection survives
+
+## Interpreting the Coefficients
+
+- Take a scalar $x_t$ and a DL($q$): a change in $x_t$ moves $y_t, y_{t+1}, \ldots, y_{t+q}$ directly
+- $\beta_0$: impact effect. $\beta_0 + \ldots + \beta_h$: cumulative effect after $h$ periods
+- $\beta_0 + \ldots + \beta_q$: the **long-run multiplier**
+
+. . .
+
+- With lags of $y_t$, effects also propagate through the AR part. Set $y_t = y^*$ and $x_t = x^*$:
+
+$$
+y^* = \alpha + \sum_{i=1}^{p}\phi_i\,y^* + \sum_{j=0}^{q}\beta_j\,x^*
+\quad\Longrightarrow\quad
+\boxed{\frac{\partial y^*}{\partial x^*} = \frac{\sum_{j=0}^{q}\beta_j}{1 - \sum_{i=1}^{p}\phi_i}}
+$$
+
+- Standard error: delta method. Testing whether it is zero: just test $\sum_j \beta_j = 0$
+
+. . .
+
+- Careful: $x_t$ may also induce changes in $x_{t+1}, x_{t+2}$, etc
+- Without a full model, read the $\beta_j$'s as partial correlations
+
+## Illustration: Exchange Rate Pass-Through
+
+```{python}
+#| output: asis
+pi = data["ipca"]
+ds = 100 * data["log_fx"].diff()
+
+q = 6
+X = pd.DataFrame({"pi1": pi.shift(1)} | {f"ds{j}": ds.shift(j) for j in range(1, q + 1)})
+sample = pd.concat([pi.rename("y"), sm.add_constant(X)], axis=1).dropna()
+fit = sm.OLS(sample["y"], sample.drop(columns="y")).fit(cov_type="HC1")
+
+names = list(fit.params.index)
+betas = [f"ds{j}" for j in range(1, q + 1)]
+sum_beta, phi = fit.params[betas].sum(), fit.params["pi1"]
+lr = sum_beta / (1 - phi)
+
+# Delta method for the sum of the betas and for the long-run multiplier
+def delta_se(grad):
+    return np.sqrt(grad @ fit.cov_params().values @ grad)
+
+grad_sum = np.zeros(len(names))
+grad_sum[[names.index(b) for b in betas]] = 1
+grad_lr = grad_sum / (1 - phi)
+grad_lr[names.index("pi1")] = sum_beta / (1 - phi) ** 2
+
+table = pd.DataFrame([
+    {"Quantity": r"AR coefficient $\hat\phi_1$", "Estimate": f"{phi:.2f}", "White s.e.": f"({fit.bse['pi1']:.2f})"},
+    {"Quantity": r"Sum of distributed lags $\sum_j \hat\beta_j$", "Estimate": f"{sum_beta:.3f}", "White s.e.": f"({delta_se(grad_sum):.3f})"},
+    {"Quantity": r"Long-run multiplier", "Estimate": f"{lr:.3f}", "White s.e.": f"({delta_se(grad_lr):.3f})"},
+])
+print(table.to_markdown(index=False, disable_numparse=True))
+```
+
+- $\pi_t$: IPCA inflation. $\Delta s_t$: depreciation. The ADF test rejects a unit root in both
+
+$$
+\pi_t = \alpha + \phi_1\pi_{t-1} + \sum_{j=1}^{6}\beta_j\,\Delta s_{t-j} + \varepsilon_t
+$$
+
+- A one-off 1% depreciation raises the price level by about 0.09% in the long run
+- Is this a causal pass-through? What else moves the exchange rate and prices together?
+
+## Can We Ever Hope to Get to Causality?
+
+- To get to causality, we typically need:
+  - Exogenous variation in $x_t$
+  - An explicit link of how $x_t$ affects $y_t$ over time
+
+. . .
+
+- There is a **huge** literature on this, and what people run is a VAR
+- A VAR($p$) is a system of AR-DL models treating $K$ variables symmetrically:
+
+$$
+\symbf{y}_t = \symbf{\alpha} + \sum_{i=1}^{p}\symbf{\Phi}_i\,\symbf{y}_{t-i} + \symbf{\varepsilon}_t, \qquad \symbf{y}_t \in \R^K, \quad \symbf{\Phi}_i \in \R^{K \times K}
+$$
+
+- Assumptions on shocks and parameters can deliver causal interpretations
+- Out of scope here, but very good stuff for a second-year class! 👀
+
+## Takeaways
+
+::: {.thm .takeaway}
+::: {.thmhead}
+What to Remember
+:::
+
+- Regressing $I(1)$ on $I(1)$ can produce nonsense: static $t$-statistics diverge
+- Under a unit root, the rate is $T$ and limits are non-normal: use ADF critical values
+- Unit root tests have low power: failing to reject is not finding a unit root
+- AR-DL models: read long-run multipliers, and check whether $\varepsilon_t$ is an MDS
+:::
+
+## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
+
+::: {.standout-body}
+Questions?
+:::
+
+## &nbsp; {.standout background-color="var(--slate)"}
+
+::: {.standout-body}
+The End
+:::
+
+## References {visibility="uncounted" .sc84}
+
+- Chapters 16 (unit roots, spurious regression) and 14 (Section 14.41) of _Econometrics_, by [Bruce Hansen (2022)]{.fgv}
+- Chapters 17 and 18 (unit roots, spurious regression) of _Time Series Analysis_, by [James Hamilton (1994)]{.fgv}
+- [Granger and Newbold (1974)](https://doi.org/10.1016/0304-4076(74)90034-7), "Spurious Regressions in Econometrics", _Journal of Econometrics_
+- [Phillips (1986)](https://doi.org/10.1016/0304-4076(86)90001-1), "Understanding Spurious Regressions in Econometrics", _Journal of Econometrics_
+- [Sims, Stock and Watson (1990)](https://doi.org/10.2307/2938337), "Inference in Linear Time Series Models with Some Unit Roots", _Econometrica_
+- [Dickey and Fuller (1979)](https://doi.org/10.1080/01621459.1979.10482531), "Distribution of the Estimators for Autoregressive Time Series with a Unit Root", _JASA_
+- [West (1988)](https://doi.org/10.2307/1913104), "Asymptotic Normality, When Regressors Have a Unit Root", _Econometrica_
+- [Said and Dickey (1984)](https://doi.org/10.1093/biomet/71.3.599), "Testing for Unit Roots in Autoregressive-Moving Average Models of Unknown Order", _Biometrika_
+- [Phillips and Perron (1988)](https://doi.org/10.1093/biomet/75.2.335), "Testing for a Unit Root in Time Series Regression", _Biometrika_
+- [Kwiatkowski, Phillips, Schmidt and Shin (1992)](https://doi.org/10.1016/0304-4076(92)90104-Y), "Testing the Null Hypothesis of Stationarity Against the Alternative of a Unit Root", _Journal of Econometrics_
+- [Perron (1989)](https://doi.org/10.2307/1913712), "The Great Crash, the Oil Price Shock, and the Unit Root Hypothesis", _Econometrica_
+- [Sims and Uhlig (1991)](https://doi.org/10.2307/2938280), "Understanding Unit Rooters: A Helicopter Tour", _Econometrica_
+
+# Appendix {visibility="uncounted"}
+
+## Proof: Rewriting an AR($p$) {#ar-p-proof visibility="uncounted" .tightmath}
+
+- Let $\symbf{y}_{t-1} = (y_{t-1}, \ldots, y_{t-p})'$ and consider the invertible $p \times p$ matrix
+
+$$
+\symbf{B} = \begin{bmatrix}
+1 & 0 & 0 & \cdots & 0\\
+1 & -1 & 0 & \cdots & 0\\
+0 & 1 & -1 & \cdots & 0\\
+\vdots & \vdots & \ddots & \ddots & \vdots\\
+0 & 0 & \cdots & 1 & -1
+\end{bmatrix}
+\quad\Longrightarrow\quad
+\symbf{B}\symbf{y}_{t-1} = \begin{bmatrix} y_{t-1} \\ \Delta y_{t-1} \\ \vdots \\ \Delta y_{t-p+1} \end{bmatrix}
+$$
+
+- Define $(\rho, \symbf{\beta}')'$ through $\symbf{\phi} = \symbf{B}'(\rho, \symbf{\beta}')'$. Then $\symbf{\phi}'\symbf{y}_{t-1} = (\rho, \symbf{\beta}')\symbf{B}\symbf{y}_{t-1}$, which is the rewritten model
+- Reading off the rows: $\phi_1 = \rho + \beta_1$, $\phi_i = \beta_i - \beta_{i-1}$ for $1 < i < p$, and $\phi_p = -\beta_{p-1}$
+- Summing them, the $\beta$'s telescope: $\sum_{i=1}^{p}\phi_i = \rho$
+- [Exercise: Show that $\beta_j = -\sum_{i=j+1}^{p}\phi_i$.]{.alert}
