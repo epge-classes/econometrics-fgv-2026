@@ -608,38 +608,13 @@ $$
 <h1>Central Limit Theorems</h1>
 
 </section>
-<section id="martingale-difference-sequences" class="slide level2">
-<h2>Martingale Difference Sequences</h2>
-<ul>
-<li>Independence is one thing. Dependence comes in all shapes and forms!</li>
-<li>So there is no such thing as “<strong>the</strong> CLT for time series”</li>
-</ul>
-<div class="fragment">
-<div class="thm">
-<div class="thmhead">
-<p>Definition (Martingale Difference Sequence)</p>
-</div>
-<p><span class="math inline">\(\{y_t\}\)</span> is an MDS with respect to the information sets <span class="math inline">\(\{\mathcal{F}_t\}\)</span> if <span class="math inline">\(y_t\)</span> is known given <span class="math inline">\(\mathcal{F}_t\)</span>, <span class="math inline">\(\E|y_t| &lt; \infty\)</span>, and <span class="math inline">\(\E[y_t \mid \mathcal{F}_{t-1}] = 0\)</span> almost surely.</p>
-</div>
-<ul>
-<li>An MDS has mean zero and <span class="math inline">\(\gamma_h = 0\)</span> for <span class="math inline">\(h \neq 0\)</span>: uncorrelated, yet possibly dependent</li>
-</ul>
-</div>
-<div class="fragment">
-<ul>
-<li>Example: <span class="math inline">\(y_t = e_t e_{t-1}\)</span> with <span class="math inline">\(e_t\)</span> i.i.d., mean zero, variance <span class="math inline">\(\sigma^2\)</span>, and <span class="math inline">\(\mathcal{F}_t = \sigma(e_s : s \le t)\)</span></li>
-<li>MDS: <span class="math inline">\(\E[y_t \mid \mathcal{F}_{t-1}] = e_{t-1}\E[e_t] = 0\)</span></li>
-<li>Dependent: <span class="math inline">\(\Cov(y_t^2, y_{t-1}^2) = \sigma^4\left(\E[e_t^4] - \sigma^4\right) = \sigma^4\Var(e_t^2) &gt; 0\)</span> unless <span class="math inline">\(e_t^2\)</span> is constant</li>
-</ul>
-</div>
-</section>
 <section id="a-clt-for-mds" class="slide level2">
 <h2>A CLT for MDS</h2>
 <div class="thm">
 <div class="thmhead">
 <p>Theorem (MDS CLT, Hamilton, Prop. 7.8)</p>
 </div>
-<p>Let <span class="math inline">\(\{y_t\}\)</span> be a scalar MDS with <span class="math inline">\(\E[y_t^2] = \sigma_t^2 &gt; 0\)</span> such that:</p>
+<p>Let <span class="math inline">\((y_t, \mathcal{F}_t)\)</span> be a scalar MDS with <span class="math inline">\(\E[y_t^2] = \sigma_t^2 &gt; 0\)</span> such that:</p>
 <ul>
 <li><span class="math inline">\(\frac{1}{T}\sum_{t=1}^T\sigma_t^2 \to \sigma^2 &gt; 0\)</span></li>
 <li><span class="math inline">\(\E|y_t|^r &lt; \infty\)</span> for some <span class="math inline">\(r &gt; 2\)</span> and all <span class="math inline">\(t\)</span></li>
@@ -649,7 +624,7 @@ $$
 </div>
 <ul>
 <li>No autocovariances to add up: the long-run variance is just <span class="math inline">\(\sigma^2\)</span></li>
-<li>Strictly stationary and ergodic MDS: finite variance suffices (<span class="fgv">Hansen, Thm. 14.11</span>)</li>
+<li>Proof idea: Lindeberg’s argument, with iterated expectations replacing independence</li>
 <li>Extends to vectors (Cramér–Wold) and to triangular arrays</li>
 </ul>
 </section>
@@ -690,8 +665,9 @@ $$
 </div>
 <ul>
 <li>Trade-off: more finite moments (larger <span class="math inline">\(r\)</span>) allow slower mixing</li>
-<li>Linear processes <span class="math inline">\(y_t = \mu + \sum_j\psi_j e_{t-j}\)</span>, <span class="math inline">\(e_t\)</span> i.i.d., <span class="math inline">\(\sum_j|\psi_j| &lt; \infty\)</span>: no mixing needed</li>
+<li>Linear processes <span class="math inline">\(y_t = \mu + \sum_j\psi_j e_{t-j}\)</span>, <span class="math inline">\(e_t\)</span> i.i.d., <span class="math inline">\(\sum_j|\psi_j| &lt; \infty\)</span>, get a CLT without mixing</li>
 <li>For them, <span class="math inline">\(\sqrt{T}(\bar y_T - \mu) \xrightarrow{d} N(0, \omega^2)\)</span>, with <span class="math inline">\(\omega^2 = \sigma^2\left(\sum_j\psi_j\right)^2\)</span> (<span class="fgv">Hamilton, Prop. 7.11</span>)</li>
+<li>Mixing is not free: AR(1) with <span class="math inline">\(\phi = 0.5\)</span> and Bernoulli shocks is not mixing (<span class="fgv">Andrews (1984)</span>)</li>
 <li>The message is always the same: the asymptotic variance is the <strong>long-run variance</strong></li>
 </ul>
 </section>
@@ -743,29 +719,61 @@ $$
 </ul>
 </div>
 </section>
-<section id="when-are-the-scores-serially-correlated" class="slide level2 tightmath">
-<h2>When Are the Scores Serially Correlated?</h2>
-<p><strong>Too few lags.</strong> Inflation <span class="math inline">\(\pi_t\)</span> follows an AR(2), but we fit an AR(1):</p>
+<section id="example-too-few-lags" class="slide level2 tightmath">
+<h2>Example: Too Few Lags</h2>
+<ul>
+<li>Truth: inflation is an AR(2), written in deviations from its mean, <span class="math inline">\(\tilde\pi_t \equiv \pi_t - \mu\)</span></li>
+</ul>
 <p><span class="math display">\[
-\pi_t = \alpha + \rho\,\pi_{t-1} + u_t
+\tilde\pi_t = \rho_1\tilde\pi_{t-1} + \rho_2\tilde\pi_{t-2} + e_t, \qquad \E[e_t \mid \mathcal{F}_{t-1}] = 0
 \]</span></p>
 <ul>
-<li>The error absorbs the omitted lag: <span class="math inline">\(u_t\)</span> still depends on <span class="math inline">\(\pi_{t-2}\)</span>, which is known at <span class="math inline">\(t-1\)</span></li>
-<li>So <span class="math inline">\(\E[u_t \mid \mathcal{F}_{t-1}] \neq 0\)</span>, and the scores are not an MDS</li>
+<li>We fit an AR(1) by OLS, so <span class="math inline">\(\symbf{x}_t = (1, \pi_{t-1})'\)</span>. Its slope is <span class="math inline">\(b = \gamma_1/\gamma_0 = \rho_1/(1-\rho_2)\)</span></li>
 </ul>
 <div class="fragment">
-<p><strong>Overlapping horizons.</strong> Monthly data, 12-month stock returns on the dividend yield <span class="math inline">\(d_t\)</span>:</p>
+<ul>
+<li>Hence <span class="math inline">\(\rho_1 - b = -\rho_2 b\)</span>, and the AR(1) error absorbs the omitted lag:</li>
+</ul>
 <p><span class="math display">\[
-r_{t+1} + r_{t+2} + \cdots + r_{t+12} = \alpha + \beta\,d_t + u_{t+12}
+u_t = \tilde\pi_t - b\,\tilde\pi_{t-1} = e_t + \rho_2\left(\tilde\pi_{t-2} - b\,\tilde\pi_{t-1}\right)
+\]</span></p>
+</div>
+<div class="fragment">
+<ul>
+<li><span class="math inline">\(\E[u_t \mid \mathcal{F}_{t-1}] = \rho_2(\tilde\pi_{t-2} - b\,\tilde\pi_{t-1}) \neq 0\)</span>, so the scores are not an MDS</li>
+<li>The intercept’s score is <span class="math inline">\(u_t\)</span> itself, and it is serially correlated:</li>
+</ul>
+<p><span class="math display">\[
+\E[u_tu_{t-1}] = \rho_2\Big(\underbrace{\E[\tilde\pi_{t-2}u_{t-1}]}_{0\ \text{(OLS)}} - b\underbrace{\E[\tilde\pi_{t-1}u_{t-1}]}_{(1-b^2)\gamma_0}\Big) = -\rho_2\,b\,(1-b^2)\,\gamma_0 \neq 0
+\]</span></p>
+</div>
+</section>
+<section id="example-overlapping-horizons" class="slide level2 tightmath">
+<h2>Example: Overlapping Horizons</h2>
+<ul>
+<li>Regress 12-month stock returns on the dividend yield <span class="math inline">\(d_t\)</span></li>
+</ul>
+<p><span class="math display">\[
+r_{t+1} + \cdots + r_{t+12} = \alpha + \beta\,d_t + u_{t+12}, \qquad u_{t+12} = \varepsilon_{t+1} + \cdots + \varepsilon_{t+12}
 \]</span></p>
 <ul>
-<li>Errors one month apart share 11 of their 12 monthly returns</li>
-<li>Even if monthly returns are unforecastable, <span class="math inline">\(u_t\)</span> is an MA(11): <span class="math inline">\(\symbf{\Gamma}_h = 0\)</span> only for <span class="math inline">\(h \ge 12\)</span></li>
+<li>Unforecastable monthly returns: <span class="math inline">\(r_t = \mu + \varepsilon_t\)</span>, <span class="math inline">\(\varepsilon_t\)</span> an MDS with <span class="math inline">\(\E[\varepsilon_t^2 \mid \mathcal{F}_{t-1}] = \sigma^2\)</span></li>
+<li>Errors <span class="math inline">\(h\)</span> months apart share <span class="math inline">\(12 - |h|\)</span> shocks: an MA(11)</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Scores <span class="math inline">\(\symbf{x}_t u_{t+12}\)</span>, with <span class="math inline">\(\symbf{x}_t = (1, d_t)'\)</span>: only the shared shocks survive</li>
+</ul>
+<p><span class="math display">\[
+\symbf{\Gamma}_h = (12 - |h|)\,\sigma^2\,\E\left[\symbf{x}_t\symbf{x}_{t-h}'\right] \quad (|h| \le 11), \qquad \symbf{\Gamma}_h = 0 \quad (|h| \ge 12)
+\]</span></p>
+<ul>
+<li>Persistent <span class="math inline">\(d_t\)</span>: <span class="math inline">\(\symbf{\Omega} \approx 144\,\sigma^2\symbf{Q}\)</span>, but White only sees <span class="math inline">\(\symbf{\Gamma}_0 = 12\,\sigma^2\symbf{Q}\)</span></li>
 </ul>
 </div>
 </section>
-<section id="persistent-errors" class="slide level2 tightmath">
-<h2>Persistent Errors</h2>
+<section id="example-persistent-errors" class="slide level2 tightmath">
+<h2>Example: Persistent Errors</h2>
 <p><strong>Static regression.</strong> Aggregate consumption <span class="math inline">\(c_t\)</span> on income <span class="math inline">\(w_t\)</span>:</p>
 <p><span class="math display">\[
 c_t = \alpha + \beta\,w_t + u_t
@@ -835,24 +843,29 @@ c_t = \alpha + \beta\,w_t + u_t
 <section id="estimating-the-long-run-variance" class="slide level2">
 <h2>Estimating the Long-Run Variance</h2>
 <ul>
-<li>Write <span class="math inline">\(\hat{\symbf{g}}_t = \symbf{x}_t\hat u_t\)</span> and estimate each autocovariance matrix:</li>
+<li>Serially correlated scores? White’s <span class="math inline">\(\hat{\symbf{\Sigma}}\)</span> only targets <span class="math inline">\(\symbf{\Gamma}_0\)</span>, missing every <span class="math inline">\(\symbf{\Gamma}_h\)</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>With <span class="math inline">\(\hat{\symbf{g}}_t = \symbf{x}_t\hat u_t\)</span>, estimate each autocovariance matrix:</li>
 </ul>
 <p><span class="math display">\[
 \hat{\symbf{\Gamma}}_h = \frac{1}{T}\sum_{t=h+1}^T\hat{\symbf{g}}_t\hat{\symbf{g}}_{t-h}', \qquad \hat{\symbf{\Gamma}}_{-h} = \hat{\symbf{\Gamma}}_h'
 \]</span></p>
 <ul>
-<li>Infinitely many <span class="math inline">\(\symbf{\Gamma}_h\)</span>, but they <em>must</em> fade as <span class="math inline">\(h\)</span> grows. Far lags are estimated from few terms</li>
-</ul>
-<div class="fragment">
-<ul>
-<li>Idea: pick a truncation lag <span class="math inline">\(q\)</span> and drop the rest: <span class="math inline">\(\hat{\symbf{\Omega}}_q = \hat{\symbf{\Gamma}}_0 + \sum_{h=1}^{q}\left(\hat{\symbf{\Gamma}}_h + \hat{\symbf{\Gamma}}_h'\right)\)</span></li>
-<li>Fine if <span class="math inline">\(\symbf{\Gamma}_h = 0\)</span> beyond lag <span class="math inline">\(q\)</span>, e.g.&nbsp;overlapping forecasts (<span class="fgv">Hansen and Hodrick (1980)</span>)</li>
+<li>Infinitely many <span class="math inline">\(\symbf{\Gamma}_h\)</span>, but they <em>must</em> fade. Far lags rest on few terms</li>
 </ul>
 </div>
 <div class="fragment">
 <ul>
-<li>Two problems: <span class="math inline">\(\hat{\symbf{\Omega}}_q\)</span> jumps around as <span class="math inline">\(q\)</span> changes, and it need not be positive semi-definite</li>
-<li>In the scalar case, it can even be negative: a negative variance! 🙃</li>
+<li>Idea: truncate at lag <span class="math inline">\(q\)</span>: <span class="math inline">\(\hat{\symbf{\Omega}}_q = \hat{\symbf{\Gamma}}_0 + \sum_{h=1}^{q}\left(\hat{\symbf{\Gamma}}_h + \hat{\symbf{\Gamma}}_h'\right)\)</span></li>
+<li>Fine if <span class="math inline">\(\symbf{\Gamma}_h = 0\)</span> beyond <span class="math inline">\(q\)</span>: overlapping forecasts (<span class="fgv">Hansen and Hodrick (1980)</span>)</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Problems: <span class="math inline">\(\hat{\symbf{\Omega}}_q\)</span> jumps with <span class="math inline">\(q\)</span> and need not be positive semi-definite</li>
+<li>Even in the scalar case it can be negative: a negative variance! 🙃</li>
 </ul>
 </div>
 </section>
@@ -899,20 +912,20 @@ y_t = e_t - e_{t-1}: \qquad \gamma_0 = 2\sigma^2, \quad \gamma_1 = -\sigma^2, \q
 </section>
 <section id="newey-west-in-action" class="slide level2">
 <h2>Newey-West in Action</h2>
-<p>One AR(1) path with <span class="math inline">\(\sigma^2 = 1\)</span>; <span class="math inline">\(\hat g_t = y_t - \bar y_T\)</span>. Estimates of <span class="math inline">\(\omega^2 = 1/(1-\phi)^2\)</span> against the lag <span class="math inline">\(q\)</span></p>
+<p>One AR(1) path with <span class="math inline">\(\sigma^2 = 1\)</span>; <span class="math inline">\(\hat g_t = y_t - \bar y_T\)</span>. Estimates of <span class="math inline">\(\omega^2 = 1/(1-\phi)^2\)</span> against <span class="math inline">\(q\)</span></p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb3" data-startfrom="506" data-source-offset="0"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 505;"><span id="cb3-506"><a href="" aria-label="506"></a>viewof nw <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">form</span>({</span>
-<span id="cb3-507"><a href="" aria-label="507"></a>  <span class="dt">phi</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="op">-</span><span class="fl">0.9</span><span class="op">,</span> <span class="fl">0.95</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span> <span class="dt">step</span><span class="op">:</span> <span class="fl">0.05</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"φ"</span>})<span class="op">,</span></span>
-<span id="cb3-508"><a href="" aria-label="508"></a>  <span class="dt">T</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="dv">50</span><span class="op">,</span> <span class="dv">5000</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">200</span><span class="op">,</span> <span class="dt">step</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">transform</span><span class="op">:</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">log</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"T"</span>})<span class="op">,</span></span>
-<span id="cb3-509"><a href="" aria-label="509"></a>  <span class="dt">seed</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">button</span>(<span class="st">"Draw a new path"</span><span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">reduce</span><span class="op">:</span> v <span class="kw">=&gt;</span> v <span class="op">+</span> <span class="dv">1</span>})</span>
-<span id="cb3-510"><a href="" aria-label="510"></a>}<span class="op">,</span> {<span class="dt">template</span><span class="op">:</span> ({phi<span class="op">,</span> T<span class="op">,</span> seed}) <span class="kw">=&gt;</span> {</span>
-<span id="cb3-511"><a href="" aria-label="511"></a>  <span class="cf">for</span> (<span class="kw">const</span> f <span class="kw">of</span> [phi<span class="op">,</span> T]) {</span>
-<span id="cb3-512"><a href="" aria-label="512"></a>    f<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="fu">setProperty</span>(<span class="st">"--input-width"</span><span class="op">,</span> <span class="st">"300px"</span>)</span>
-<span id="cb3-513"><a href="" aria-label="513"></a>    f<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="fu">setProperty</span>(<span class="st">"--label-width"</span><span class="op">,</span> <span class="st">"30px"</span>)</span>
-<span id="cb3-514"><a href="" aria-label="514"></a>    f<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">maxWidth</span> <span class="op">=</span> <span class="st">"none"</span></span>
-<span id="cb3-515"><a href="" aria-label="515"></a>  }</span>
-<span id="cb3-516"><a href="" aria-label="516"></a>  <span class="cf">return</span> <span class="fu">html</span><span class="vs">`&lt;div style="display: flex; justify-content: center; align-items: center; column-gap: 30px"&gt;</span><span class="sc">${</span>phi<span class="sc">}${</span>T<span class="sc">}${</span>seed<span class="sc">}</span><span class="vs">&lt;/div&gt;`</span></span>
-<span id="cb3-517"><a href="" aria-label="517"></a>}})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb3" data-startfrom="515" data-source-offset="0"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 514;"><span id="cb3-515"><a href="" aria-label="515"></a>viewof nw <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">form</span>({</span>
+<span id="cb3-516"><a href="" aria-label="516"></a>  <span class="dt">phi</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="op">-</span><span class="fl">0.9</span><span class="op">,</span> <span class="fl">0.95</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span> <span class="dt">step</span><span class="op">:</span> <span class="fl">0.05</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"φ"</span>})<span class="op">,</span></span>
+<span id="cb3-517"><a href="" aria-label="517"></a>  <span class="dt">T</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="dv">50</span><span class="op">,</span> <span class="dv">5000</span>]<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">200</span><span class="op">,</span> <span class="dt">step</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">transform</span><span class="op">:</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">log</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"T"</span>})<span class="op">,</span></span>
+<span id="cb3-518"><a href="" aria-label="518"></a>  <span class="dt">seed</span><span class="op">:</span> Inputs<span class="op">.</span><span class="fu">button</span>(<span class="st">"Draw a new path"</span><span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">reduce</span><span class="op">:</span> v <span class="kw">=&gt;</span> v <span class="op">+</span> <span class="dv">1</span>})</span>
+<span id="cb3-519"><a href="" aria-label="519"></a>}<span class="op">,</span> {<span class="dt">template</span><span class="op">:</span> ({phi<span class="op">,</span> T<span class="op">,</span> seed}) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-520"><a href="" aria-label="520"></a>  <span class="cf">for</span> (<span class="kw">const</span> f <span class="kw">of</span> [phi<span class="op">,</span> T]) {</span>
+<span id="cb3-521"><a href="" aria-label="521"></a>    f<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="fu">setProperty</span>(<span class="st">"--input-width"</span><span class="op">,</span> <span class="st">"300px"</span>)</span>
+<span id="cb3-522"><a href="" aria-label="522"></a>    f<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="fu">setProperty</span>(<span class="st">"--label-width"</span><span class="op">,</span> <span class="st">"30px"</span>)</span>
+<span id="cb3-523"><a href="" aria-label="523"></a>    f<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">maxWidth</span> <span class="op">=</span> <span class="st">"none"</span></span>
+<span id="cb3-524"><a href="" aria-label="524"></a>  }</span>
+<span id="cb3-525"><a href="" aria-label="525"></a>  <span class="cf">return</span> <span class="fu">html</span><span class="vs">`&lt;div style="display: flex; justify-content: center; align-items: center; column-gap: 30px"&gt;</span><span class="sc">${</span>phi<span class="sc">}${</span>T<span class="sc">}${</span>seed<span class="sc">}</span><span class="vs">&lt;/div&gt;`</span></span>
+<span id="cb3-526"><a href="" aria-label="526"></a>}})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div id="ojs-cell-3" data-nodetype="declaration">
 
@@ -920,54 +933,54 @@ y_t = e_t - e_{t-1}: \qquad \gamma_0 = 2\sigma^2, \quad \gamma_1 = -\sigma^2, \q
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb4" data-startfrom="525" data-source-offset="-122"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 524;"><span id="cb4-525"><a href="" aria-label="525"></a>nwMaxT <span class="op">=</span> <span class="dv">5000</span></span>
-<span id="cb4-526"><a href="" aria-label="526"></a>nwMaxQ <span class="op">=</span> <span class="dv">30</span></span>
-<span id="cb4-527"><a href="" aria-label="527"></a>nwSeed <span class="op">=</span> k <span class="kw">=&gt;</span> {</span>
-<span id="cb4-528"><a href="" aria-label="528"></a>  <span class="kw">let</span> x <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">imul</span>(k <span class="op">^</span> (k <span class="op">&gt;&gt;&gt;</span> <span class="dv">16</span>)<span class="op">,</span> <span class="bn">0x85ebca6b</span>)</span>
-<span id="cb4-529"><a href="" aria-label="529"></a>  x <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">imul</span>(x <span class="op">^</span> (x <span class="op">&gt;&gt;&gt;</span> <span class="dv">13</span>)<span class="op">,</span> <span class="bn">0xc2b2ae35</span>)</span>
-<span id="cb4-530"><a href="" aria-label="530"></a>  <span class="cf">return</span> ((x <span class="op">^</span> (x <span class="op">&gt;&gt;&gt;</span> <span class="dv">16</span>)) <span class="op">&gt;&gt;&gt;</span> <span class="dv">0</span>) <span class="op">/</span> <span class="dv">4294967296</span></span>
-<span id="cb4-531"><a href="" aria-label="531"></a>}</span>
-<span id="cb4-532"><a href="" aria-label="532"></a>nwShocks <span class="op">=</span> {</span>
-<span id="cb4-533"><a href="" aria-label="533"></a>  <span class="kw">const</span> draw <span class="op">=</span> d3<span class="op">.</span><span class="at">randomNormal</span><span class="op">.</span><span class="fu">source</span>(d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="fu">nwSeed</span>(<span class="dv">4111</span> <span class="op">+</span> nw<span class="op">.</span><span class="at">seed</span>)))(<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>)</span>
-<span id="cb4-534"><a href="" aria-label="534"></a>  <span class="cf">return</span> <span class="bu">Float64Array</span><span class="op">.</span><span class="fu">from</span>({<span class="dt">length</span><span class="op">:</span> nwMaxT <span class="op">+</span> <span class="dv">1</span>}<span class="op">,</span> draw)</span>
-<span id="cb4-535"><a href="" aria-label="535"></a>}</span>
-<span id="cb4-536"><a href="" aria-label="536"></a>nwOmega2 <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">-</span> nw<span class="op">.</span><span class="at">phi</span>) <span class="op">**</span> <span class="dv">2</span></span>
-<span id="cb4-537"><a href="" aria-label="537"></a></span>
-<span id="cb4-538"><a href="" aria-label="538"></a><span class="co">// Demeaned path, sample autocovariances, and both estimators for q = 0, ..., 30</span></span>
-<span id="cb4-539"><a href="" aria-label="539"></a>nwEst <span class="op">=</span> {</span>
-<span id="cb4-540"><a href="" aria-label="540"></a>  <span class="kw">const</span> {phi<span class="op">,</span> T} <span class="op">=</span> nw</span>
-<span id="cb4-541"><a href="" aria-label="541"></a>  <span class="kw">const</span> y <span class="op">=</span> <span class="kw">new</span> <span class="bu">Float64Array</span>(T)</span>
-<span id="cb4-542"><a href="" aria-label="542"></a>  <span class="kw">let</span> prev <span class="op">=</span> nwShocks[<span class="dv">0</span>] <span class="op">/</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(<span class="dv">1</span> <span class="op">-</span> phi <span class="op">**</span> <span class="dv">2</span>)</span>
-<span id="cb4-543"><a href="" aria-label="543"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> T<span class="op">;</span> t<span class="op">++</span>) { prev <span class="op">=</span> phi <span class="op">*</span> prev <span class="op">+</span> nwShocks[t <span class="op">+</span> <span class="dv">1</span>]<span class="op">;</span> y[t] <span class="op">=</span> prev }</span>
-<span id="cb4-544"><a href="" aria-label="544"></a>  <span class="kw">const</span> m <span class="op">=</span> d3<span class="op">.</span><span class="fu">mean</span>(y)</span>
-<span id="cb4-545"><a href="" aria-label="545"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> T<span class="op">;</span> t<span class="op">++</span>) y[t] <span class="op">-=</span> m</span>
-<span id="cb4-546"><a href="" aria-label="546"></a>  <span class="kw">const</span> H <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(nwMaxQ<span class="op">,</span> T <span class="op">-</span> <span class="dv">1</span>)</span>
-<span id="cb4-547"><a href="" aria-label="547"></a>  <span class="kw">const</span> g <span class="op">=</span> d3<span class="op">.</span><span class="fu">range</span>(H <span class="op">+</span> <span class="dv">1</span>)<span class="op">.</span><span class="fu">map</span>(h <span class="kw">=&gt;</span> {</span>
-<span id="cb4-548"><a href="" aria-label="548"></a>    <span class="kw">let</span> s <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb4-549"><a href="" aria-label="549"></a>    <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> h<span class="op">;</span> t <span class="op">&lt;</span> T<span class="op">;</span> t<span class="op">++</span>) s <span class="op">+=</span> y[t] <span class="op">*</span> y[t <span class="op">-</span> h]</span>
-<span id="cb4-550"><a href="" aria-label="550"></a>    <span class="cf">return</span> s <span class="op">/</span> T</span>
-<span id="cb4-551"><a href="" aria-label="551"></a>  })</span>
-<span id="cb4-552"><a href="" aria-label="552"></a>  <span class="cf">return</span> d3<span class="op">.</span><span class="fu">range</span>(H <span class="op">+</span> <span class="dv">1</span>)<span class="op">.</span><span class="fu">map</span>(q <span class="kw">=&gt;</span> ({</span>
-<span id="cb4-553"><a href="" aria-label="553"></a>    q<span class="op">,</span></span>
-<span id="cb4-554"><a href="" aria-label="554"></a>    <span class="dt">trunc</span><span class="op">:</span> g[<span class="dv">0</span>] <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> d3<span class="op">.</span><span class="fu">sum</span>(d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">1</span><span class="op">,</span> q <span class="op">+</span> <span class="dv">1</span>)<span class="op">,</span> h <span class="kw">=&gt;</span> g[h])<span class="op">,</span></span>
-<span id="cb4-555"><a href="" aria-label="555"></a>    <span class="dt">nw</span><span class="op">:</span> g[<span class="dv">0</span>] <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> d3<span class="op">.</span><span class="fu">sum</span>(d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">1</span><span class="op">,</span> q <span class="op">+</span> <span class="dv">1</span>)<span class="op">,</span> h <span class="kw">=&gt;</span> (<span class="dv">1</span> <span class="op">-</span> h <span class="op">/</span> (q <span class="op">+</span> <span class="dv">1</span>)) <span class="op">*</span> g[h])</span>
-<span id="cb4-556"><a href="" aria-label="556"></a>  }))</span>
-<span id="cb4-557"><a href="" aria-label="557"></a>}</span>
-<span id="cb4-558"><a href="" aria-label="558"></a></span>
-<span id="cb4-559"><a href="" aria-label="559"></a><span class="co">// Rule of thumb from Andrews (1991) with rho = 0.25</span></span>
-<span id="cb4-560"><a href="" aria-label="560"></a>nwRule <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>(<span class="fl">0.75</span> <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">cbrt</span>(nw<span class="op">.</span><span class="at">T</span>))</span>
-<span id="cb4-561"><a href="" aria-label="561"></a>nwAtRule <span class="op">=</span> nwEst[<span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(nwRule<span class="op">,</span> nwEst<span class="op">.</span><span class="at">length</span> <span class="op">-</span> <span class="dv">1</span>)]<span class="op">.</span><span class="at">nw</span></span>
-<span id="cb4-562"><a href="" aria-label="562"></a></span>
-<span id="cb4-563"><a href="" aria-label="563"></a>nwDomain <span class="op">=</span> {</span>
-<span id="cb4-564"><a href="" aria-label="564"></a>  <span class="kw">const</span> vals <span class="op">=</span> [nwOmega2<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="op">...</span>nwEst<span class="op">.</span><span class="fu">flatMap</span>(d <span class="kw">=&gt;</span> [d<span class="op">.</span><span class="at">trunc</span><span class="op">,</span> d<span class="op">.</span><span class="at">nw</span>])]</span>
-<span id="cb4-565"><a href="" aria-label="565"></a>  <span class="kw">const</span> lo <span class="op">=</span> d3<span class="op">.</span><span class="fu">min</span>(vals)<span class="op">,</span> hi <span class="op">=</span> d3<span class="op">.</span><span class="fu">max</span>(vals)</span>
-<span id="cb4-566"><a href="" aria-label="566"></a>  <span class="cf">return</span> [lo <span class="op">-</span> <span class="fl">0.06</span> <span class="op">*</span> (hi <span class="op">-</span> lo)<span class="op">,</span> hi <span class="op">+</span> <span class="fl">0.06</span> <span class="op">*</span> (hi <span class="op">-</span> lo)]</span>
-<span id="cb4-567"><a href="" aria-label="567"></a>}</span>
-<span id="cb4-568"><a href="" aria-label="568"></a></span>
-<span id="cb4-569"><a href="" aria-label="569"></a><span class="fu">html</span><span class="vs">`&lt;div style="text-align: center; font-size: 19px"&gt;</span></span>
-<span id="cb4-570"><a href="" aria-label="570"></a><span class="vs">  &lt;span style="color: #0072BC"&gt;Newey-West&lt;/span&gt;, &lt;span style="color: #EB811B"&gt;plain truncation&lt;/span&gt;, truth ω² = </span><span class="sc">${</span>nwOmega2<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs"> (dashed).</span></span>
-<span id="cb4-571"><a href="" aria-label="571"></a><span class="vs">  At the rule of thumb &lt;i&gt;q&lt;/i&gt; = 0.75 &lt;i&gt;T&lt;/i&gt;&lt;sup&gt;1/3&lt;/sup&gt; ≈ </span><span class="sc">${</span>nwRule<span class="sc">}</span><span class="vs">: Newey-West = </span><span class="sc">${</span>nwAtRule<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span></span>
-<span id="cb4-572"><a href="" aria-label="572"></a><span class="vs">&lt;/div&gt;`</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb4" data-startfrom="534" data-source-offset="-122"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 533;"><span id="cb4-534"><a href="" aria-label="534"></a>nwMaxT <span class="op">=</span> <span class="dv">5000</span></span>
+<span id="cb4-535"><a href="" aria-label="535"></a>nwMaxQ <span class="op">=</span> <span class="dv">30</span></span>
+<span id="cb4-536"><a href="" aria-label="536"></a>nwSeed <span class="op">=</span> k <span class="kw">=&gt;</span> {</span>
+<span id="cb4-537"><a href="" aria-label="537"></a>  <span class="kw">let</span> x <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">imul</span>(k <span class="op">^</span> (k <span class="op">&gt;&gt;&gt;</span> <span class="dv">16</span>)<span class="op">,</span> <span class="bn">0x85ebca6b</span>)</span>
+<span id="cb4-538"><a href="" aria-label="538"></a>  x <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">imul</span>(x <span class="op">^</span> (x <span class="op">&gt;&gt;&gt;</span> <span class="dv">13</span>)<span class="op">,</span> <span class="bn">0xc2b2ae35</span>)</span>
+<span id="cb4-539"><a href="" aria-label="539"></a>  <span class="cf">return</span> ((x <span class="op">^</span> (x <span class="op">&gt;&gt;&gt;</span> <span class="dv">16</span>)) <span class="op">&gt;&gt;&gt;</span> <span class="dv">0</span>) <span class="op">/</span> <span class="dv">4294967296</span></span>
+<span id="cb4-540"><a href="" aria-label="540"></a>}</span>
+<span id="cb4-541"><a href="" aria-label="541"></a>nwShocks <span class="op">=</span> {</span>
+<span id="cb4-542"><a href="" aria-label="542"></a>  <span class="kw">const</span> draw <span class="op">=</span> d3<span class="op">.</span><span class="at">randomNormal</span><span class="op">.</span><span class="fu">source</span>(d3<span class="op">.</span><span class="fu">randomLcg</span>(<span class="fu">nwSeed</span>(<span class="dv">4111</span> <span class="op">+</span> nw<span class="op">.</span><span class="at">seed</span>)))(<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>)</span>
+<span id="cb4-543"><a href="" aria-label="543"></a>  <span class="cf">return</span> <span class="bu">Float64Array</span><span class="op">.</span><span class="fu">from</span>({<span class="dt">length</span><span class="op">:</span> nwMaxT <span class="op">+</span> <span class="dv">1</span>}<span class="op">,</span> draw)</span>
+<span id="cb4-544"><a href="" aria-label="544"></a>}</span>
+<span id="cb4-545"><a href="" aria-label="545"></a>nwOmega2 <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">-</span> nw<span class="op">.</span><span class="at">phi</span>) <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb4-546"><a href="" aria-label="546"></a></span>
+<span id="cb4-547"><a href="" aria-label="547"></a><span class="co">// Demeaned path, sample autocovariances, and both estimators for q = 0, ..., 30</span></span>
+<span id="cb4-548"><a href="" aria-label="548"></a>nwEst <span class="op">=</span> {</span>
+<span id="cb4-549"><a href="" aria-label="549"></a>  <span class="kw">const</span> {phi<span class="op">,</span> T} <span class="op">=</span> nw</span>
+<span id="cb4-550"><a href="" aria-label="550"></a>  <span class="kw">const</span> y <span class="op">=</span> <span class="kw">new</span> <span class="bu">Float64Array</span>(T)</span>
+<span id="cb4-551"><a href="" aria-label="551"></a>  <span class="kw">let</span> prev <span class="op">=</span> nwShocks[<span class="dv">0</span>] <span class="op">/</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(<span class="dv">1</span> <span class="op">-</span> phi <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb4-552"><a href="" aria-label="552"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> T<span class="op">;</span> t<span class="op">++</span>) { prev <span class="op">=</span> phi <span class="op">*</span> prev <span class="op">+</span> nwShocks[t <span class="op">+</span> <span class="dv">1</span>]<span class="op">;</span> y[t] <span class="op">=</span> prev }</span>
+<span id="cb4-553"><a href="" aria-label="553"></a>  <span class="kw">const</span> m <span class="op">=</span> d3<span class="op">.</span><span class="fu">mean</span>(y)</span>
+<span id="cb4-554"><a href="" aria-label="554"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> T<span class="op">;</span> t<span class="op">++</span>) y[t] <span class="op">-=</span> m</span>
+<span id="cb4-555"><a href="" aria-label="555"></a>  <span class="kw">const</span> H <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(nwMaxQ<span class="op">,</span> T <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb4-556"><a href="" aria-label="556"></a>  <span class="kw">const</span> g <span class="op">=</span> d3<span class="op">.</span><span class="fu">range</span>(H <span class="op">+</span> <span class="dv">1</span>)<span class="op">.</span><span class="fu">map</span>(h <span class="kw">=&gt;</span> {</span>
+<span id="cb4-557"><a href="" aria-label="557"></a>    <span class="kw">let</span> s <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-558"><a href="" aria-label="558"></a>    <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> h<span class="op">;</span> t <span class="op">&lt;</span> T<span class="op">;</span> t<span class="op">++</span>) s <span class="op">+=</span> y[t] <span class="op">*</span> y[t <span class="op">-</span> h]</span>
+<span id="cb4-559"><a href="" aria-label="559"></a>    <span class="cf">return</span> s <span class="op">/</span> T</span>
+<span id="cb4-560"><a href="" aria-label="560"></a>  })</span>
+<span id="cb4-561"><a href="" aria-label="561"></a>  <span class="cf">return</span> d3<span class="op">.</span><span class="fu">range</span>(H <span class="op">+</span> <span class="dv">1</span>)<span class="op">.</span><span class="fu">map</span>(q <span class="kw">=&gt;</span> ({</span>
+<span id="cb4-562"><a href="" aria-label="562"></a>    q<span class="op">,</span></span>
+<span id="cb4-563"><a href="" aria-label="563"></a>    <span class="dt">trunc</span><span class="op">:</span> g[<span class="dv">0</span>] <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> d3<span class="op">.</span><span class="fu">sum</span>(d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">1</span><span class="op">,</span> q <span class="op">+</span> <span class="dv">1</span>)<span class="op">,</span> h <span class="kw">=&gt;</span> g[h])<span class="op">,</span></span>
+<span id="cb4-564"><a href="" aria-label="564"></a>    <span class="dt">nw</span><span class="op">:</span> g[<span class="dv">0</span>] <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> d3<span class="op">.</span><span class="fu">sum</span>(d3<span class="op">.</span><span class="fu">range</span>(<span class="dv">1</span><span class="op">,</span> q <span class="op">+</span> <span class="dv">1</span>)<span class="op">,</span> h <span class="kw">=&gt;</span> (<span class="dv">1</span> <span class="op">-</span> h <span class="op">/</span> (q <span class="op">+</span> <span class="dv">1</span>)) <span class="op">*</span> g[h])</span>
+<span id="cb4-565"><a href="" aria-label="565"></a>  }))</span>
+<span id="cb4-566"><a href="" aria-label="566"></a>}</span>
+<span id="cb4-567"><a href="" aria-label="567"></a></span>
+<span id="cb4-568"><a href="" aria-label="568"></a><span class="co">// Rule of thumb from Andrews (1991) with rho = 0.25</span></span>
+<span id="cb4-569"><a href="" aria-label="569"></a>nwRule <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>(<span class="fl">0.75</span> <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">cbrt</span>(nw<span class="op">.</span><span class="at">T</span>))</span>
+<span id="cb4-570"><a href="" aria-label="570"></a>nwAtRule <span class="op">=</span> nwEst[<span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(nwRule<span class="op">,</span> nwEst<span class="op">.</span><span class="at">length</span> <span class="op">-</span> <span class="dv">1</span>)]<span class="op">.</span><span class="at">nw</span></span>
+<span id="cb4-571"><a href="" aria-label="571"></a></span>
+<span id="cb4-572"><a href="" aria-label="572"></a>nwDomain <span class="op">=</span> {</span>
+<span id="cb4-573"><a href="" aria-label="573"></a>  <span class="kw">const</span> vals <span class="op">=</span> [nwOmega2<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="op">...</span>nwEst<span class="op">.</span><span class="fu">flatMap</span>(d <span class="kw">=&gt;</span> [d<span class="op">.</span><span class="at">trunc</span><span class="op">,</span> d<span class="op">.</span><span class="at">nw</span>])]</span>
+<span id="cb4-574"><a href="" aria-label="574"></a>  <span class="kw">const</span> lo <span class="op">=</span> d3<span class="op">.</span><span class="fu">min</span>(vals)<span class="op">,</span> hi <span class="op">=</span> d3<span class="op">.</span><span class="fu">max</span>(vals)</span>
+<span id="cb4-575"><a href="" aria-label="575"></a>  <span class="cf">return</span> [lo <span class="op">-</span> <span class="fl">0.06</span> <span class="op">*</span> (hi <span class="op">-</span> lo)<span class="op">,</span> hi <span class="op">+</span> <span class="fl">0.06</span> <span class="op">*</span> (hi <span class="op">-</span> lo)]</span>
+<span id="cb4-576"><a href="" aria-label="576"></a>}</span>
+<span id="cb4-577"><a href="" aria-label="577"></a></span>
+<span id="cb4-578"><a href="" aria-label="578"></a><span class="fu">html</span><span class="vs">`&lt;div style="text-align: center; font-size: 19px"&gt;</span></span>
+<span id="cb4-579"><a href="" aria-label="579"></a><span class="vs">  &lt;span style="color: #0072BC"&gt;Newey-West&lt;/span&gt;, &lt;span style="color: #EB811B"&gt;plain truncation&lt;/span&gt;, truth ω² = </span><span class="sc">${</span>nwOmega2<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs"> (dashed).</span></span>
+<span id="cb4-580"><a href="" aria-label="580"></a><span class="vs">  At the rule of thumb &lt;i&gt;q&lt;/i&gt; = 0.75 &lt;i&gt;T&lt;/i&gt;&lt;sup&gt;1/3&lt;/sup&gt; ≈ </span><span class="sc">${</span>nwRule<span class="sc">}</span><span class="vs">: Newey-West = </span><span class="sc">${</span>nwAtRule<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span></span>
+<span id="cb4-581"><a href="" aria-label="581"></a><span class="vs">&lt;/div&gt;`</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <div id="ojs-cell-4-1" data-nodetype="declaration">
@@ -1038,22 +1051,22 @@ y_t = e_t - e_{t-1}: \qquad \gamma_0 = 2\sigma^2, \quad \gamma_1 = -\sigma^2, \q
 </div>
 </div>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb5" data-startfrom="574" data-source-offset="-1851"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 573;"><span id="cb5-574"><a href="" aria-label="574"></a>Plot<span class="op">.</span><span class="fu">plot</span>({</span>
-<span id="cb5-575"><a href="" aria-label="575"></a>  <span class="dt">width</span><span class="op">:</span> <span class="dv">1150</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">420</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">60</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
-<span id="cb5-576"><a href="" aria-label="576"></a>  <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"18px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
-<span id="cb5-577"><a href="" aria-label="577"></a>  <span class="dt">x</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"Truncation lag q"</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> nwMaxQ]<span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
-<span id="cb5-578"><a href="" aria-label="578"></a>  <span class="dt">y</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> nwDomain<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> <span class="dv">6</span>}<span class="op">,</span></span>
-<span id="cb5-579"><a href="" aria-label="579"></a>  <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
-<span id="cb5-580"><a href="" aria-label="580"></a>  <span class="dt">marks</span><span class="op">:</span> [</span>
-<span id="cb5-581"><a href="" aria-label="581"></a>    Plot<span class="op">.</span><span class="fu">ruleY</span>([<span class="dv">0</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#C62828"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">1.5</span>})<span class="op">,</span></span>
-<span id="cb5-582"><a href="" aria-label="582"></a>    Plot<span class="op">.</span><span class="fu">ruleY</span>([nwOmega2]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"black"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"7,5"</span>})<span class="op">,</span></span>
-<span id="cb5-583"><a href="" aria-label="583"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([nwRule]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#2D3E50"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">1.5</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"3,4"</span>})<span class="op">,</span></span>
-<span id="cb5-584"><a href="" aria-label="584"></a>    Plot<span class="op">.</span><span class="fu">line</span>(nwEst<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"q"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"trunc"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">2.5</span>})<span class="op">,</span></span>
-<span id="cb5-585"><a href="" aria-label="585"></a>    Plot<span class="op">.</span><span class="fu">dot</span>(nwEst<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"q"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"trunc"</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">r</span><span class="op">:</span> <span class="dv">4</span>})<span class="op">,</span></span>
-<span id="cb5-586"><a href="" aria-label="586"></a>    Plot<span class="op">.</span><span class="fu">line</span>(nwEst<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"q"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"nw"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span>})<span class="op">,</span></span>
-<span id="cb5-587"><a href="" aria-label="587"></a>    Plot<span class="op">.</span><span class="fu">dot</span>(nwEst<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"q"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"nw"</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">r</span><span class="op">:</span> <span class="fl">4.5</span>})</span>
-<span id="cb5-588"><a href="" aria-label="588"></a>  ]</span>
-<span id="cb5-589"><a href="" aria-label="589"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb5" data-startfrom="583" data-source-offset="-1851"><pre class="sourceCode numberSource js number-lines code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 582;"><span id="cb5-583"><a href="" aria-label="583"></a>Plot<span class="op">.</span><span class="fu">plot</span>({</span>
+<span id="cb5-584"><a href="" aria-label="584"></a>  <span class="dt">width</span><span class="op">:</span> <span class="dv">1150</span><span class="op">,</span> <span class="dt">height</span><span class="op">:</span> <span class="dv">420</span><span class="op">,</span> <span class="dt">marginLeft</span><span class="op">:</span> <span class="dv">60</span><span class="op">,</span> <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">45</span><span class="op">,</span></span>
+<span id="cb5-585"><a href="" aria-label="585"></a>  <span class="dt">style</span><span class="op">:</span> {<span class="dt">fontSize</span><span class="op">:</span> <span class="st">"18px"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Arial, Arimo, sans-serif"</span>}<span class="op">,</span></span>
+<span id="cb5-586"><a href="" aria-label="586"></a>  <span class="dt">x</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"Truncation lag q"</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> nwMaxQ]<span class="op">,</span> <span class="dt">labelAnchor</span><span class="op">:</span> <span class="st">"center"</span><span class="op">,</span> <span class="dt">labelArrow</span><span class="op">:</span> <span class="st">"none"</span>}<span class="op">,</span></span>
+<span id="cb5-587"><a href="" aria-label="587"></a>  <span class="dt">y</span><span class="op">:</span> {<span class="dt">label</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> nwDomain<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> <span class="dv">6</span>}<span class="op">,</span></span>
+<span id="cb5-588"><a href="" aria-label="588"></a>  <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb5-589"><a href="" aria-label="589"></a>  <span class="dt">marks</span><span class="op">:</span> [</span>
+<span id="cb5-590"><a href="" aria-label="590"></a>    Plot<span class="op">.</span><span class="fu">ruleY</span>([<span class="dv">0</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#C62828"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">1.5</span>})<span class="op">,</span></span>
+<span id="cb5-591"><a href="" aria-label="591"></a>    Plot<span class="op">.</span><span class="fu">ruleY</span>([nwOmega2]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"black"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"7,5"</span>})<span class="op">,</span></span>
+<span id="cb5-592"><a href="" aria-label="592"></a>    Plot<span class="op">.</span><span class="fu">ruleX</span>([nwRule]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#2D3E50"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">1.5</span><span class="op">,</span> <span class="dt">strokeDasharray</span><span class="op">:</span> <span class="st">"3,4"</span>})<span class="op">,</span></span>
+<span id="cb5-593"><a href="" aria-label="593"></a>    Plot<span class="op">.</span><span class="fu">line</span>(nwEst<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"q"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"trunc"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="fl">2.5</span>})<span class="op">,</span></span>
+<span id="cb5-594"><a href="" aria-label="594"></a>    Plot<span class="op">.</span><span class="fu">dot</span>(nwEst<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"q"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"trunc"</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#EB811B"</span><span class="op">,</span> <span class="dt">r</span><span class="op">:</span> <span class="dv">4</span>})<span class="op">,</span></span>
+<span id="cb5-595"><a href="" aria-label="595"></a>    Plot<span class="op">.</span><span class="fu">line</span>(nwEst<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"q"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"nw"</span><span class="op">,</span> <span class="dt">stroke</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">strokeWidth</span><span class="op">:</span> <span class="dv">3</span>})<span class="op">,</span></span>
+<span id="cb5-596"><a href="" aria-label="596"></a>    Plot<span class="op">.</span><span class="fu">dot</span>(nwEst<span class="op">,</span> {<span class="dt">x</span><span class="op">:</span> <span class="st">"q"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="st">"nw"</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"#0072BC"</span><span class="op">,</span> <span class="dt">r</span><span class="op">:</span> <span class="fl">4.5</span>})</span>
+<span id="cb5-597"><a href="" aria-label="597"></a>  ]</span>
+<span id="cb5-598"><a href="" aria-label="598"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <div id="ojs-cell-4-11" data-nodetype="expression">
@@ -1092,13 +1105,49 @@ q = \left(\frac{6\rho^2}{(1 - \rho^2)^2}\right)^{1/3} T^{1/3}
 <li>If your main results swing with <span class="math inline">\(q\)</span>, that is a bad sign</li>
 <li>Report <span class="math inline">\(q\)</span> and keep it fixed throughout the paper</li>
 <li>Packages use different defaults: check yours and say which one you used</li>
-<li>In Python: <code>sm.OLS(y, X).fit(cov_type="HAC", cov_kwds={"maxlags": q})</code></li>
 <li>Rule of thumb: <span class="math inline">\(q\)</span> should be “much smaller” than <span class="math inline">\(T\)</span></li>
 </ul>
 <div class="fragment">
+<style>
+.dtree { width: 1100px; margin: 0.3em auto 0; }
+.dtree .dt-q { width: 540px; margin: 0 auto; padding: 8px 18px; text-align: center; background: var(--slate); color: #fff; border-radius: 12px; font-size: 0.78em; line-height: 1.25; }
+.dtree svg { display: block; width: 100%; height: 50px; overflow: visible; }
+.dtree .dt-leaves { display: flex; gap: 40px; }
+.dtree .dt-leaf { flex: 1; padding: 8px 20px; border-radius: 12px; border: 3px solid; font-size: 0.68em; line-height: 1.3; text-align: left; }
+.dtree .dt-leaf p { margin: 0.25em 0; }
+.dtree .dt-white { border-color: var(--slate); background: rgba(45, 62, 80, 0.07); }
+.dtree .dt-nw { border-color: #0072BC; background: rgba(0, 114, 188, 0.07); }
+.dtree .dt-white strong { color: var(--slate); }
+.dtree .dt-nw strong { color: #0072BC; }
+</style>
+<div class="dtree">
+<div class="dt-q">
+<p>Are the scores <span class="math inline">\(\symbf{x}_t u_t\)</span> an MDS under your null?</p>
+</div>
+<svg viewbox="0 0 1100 50" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="dt-arrow-w" viewbox="0 0 10 10" refx="8" refy="5" markerwidth="7" markerheight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#2D3E50"></path></marker>
+    <marker id="dt-arrow-n" viewbox="0 0 10 10" refx="8" refy="5" markerwidth="7" markerheight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0072BC"></path></marker>
+  </defs>
+  <path d="M550 0 V16 H275 V48" fill="none" stroke="#2D3E50" stroke-width="4" marker-end="url(#dt-arrow-w)"></path>
+  <path d="M550 0 V16 H825 V48" fill="none" stroke="#0072BC" stroke-width="4" marker-end="url(#dt-arrow-n)"></path>
+  <text x="306" y="38" font-size="24" font-weight="bold" fill="#2E7D32">Yes</text>
+  <text x="856" y="38" font-size="24" font-weight="bold" fill="#C62828">No</text>
+</svg>
+<div class="dt-leaves">
+<div class="dt-leaf dt-white">
+<p><strong>White</strong>, as in the cross section</p>
+<p><span class="math inline">\(\hat{\symbf{\Sigma}} = \frac{1}{T}\sum_t\symbf{x}_t\symbf{x}_t'\hat u_t^2\)</span></p>
+<p>E.g. testing for no serial correlation (<span class="fgv">Hansen, Sec. 14.36</span>)</p>
+</div>
+<div class="dt-leaf dt-nw">
+<p><strong>Newey-West</strong>, HAC</p>
+<p><span class="math inline">\(\hat{\symbf{\Omega}}_{NW}\)</span> with <span class="math inline">\(q \approx 0.75\,T^{1/3}\)</span>. Report <span class="math inline">\(q\)</span></p>
+<p>E.g. overlapping horizons, omitted lags, persistent errors</p>
+</div>
+</div>
+</div>
 <ul>
-<li>Scores are an MDS under your null? Use White, not Newey-West</li>
-<li>Example: testing for no serial correlation (<span class="fgv">Hansen, Sec. 14.36</span>)</li>
 <li>Kernel choice matters much less than the choice of <span class="math inline">\(q\)</span> (<span class="fgv">Andrews (1991)</span> compares several)</li>
 </ul>
 </div>
@@ -1138,6 +1187,7 @@ q = \left(\frac{6\rho^2}{(1 - \rho^2)^2}\right)^{1/3} T^{1/3}
 <li>Chapter 7 of <em>Time Series Analysis</em>, by <span class="fgv">James Hamilton (1994)</span>, for the LLN and the CLTs</li>
 <li>Chapter 14 of <em>Econometrics</em>, by <span class="fgv">Bruce Hansen (2022)</span>, for mixing, time-series regression and HAC</li>
 <li><em>Stochastic Limit Theory</em>, by <span class="fgv">James Davidson (2021)</span>: the definitive treatment. Very dark magic!</li>
+<li><a href="https://doi.org/10.2307/3213710">Andrews (1984)</a>, “Non-Strong Mixing Autoregressive Processes”, <em>Journal of Applied Probability</em></li>
 <li><a href="https://doi.org/10.2307/1913610">Newey and West (1987)</a>, “A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix”, <em>Econometrica</em></li>
 <li><a href="https://doi.org/10.2307/2938229">Andrews (1991)</a>, “Heteroskedasticity and Autocorrelation Consistent Covariance Matrix Estimation”, <em>Econometrica</em></li>
 </ul>
