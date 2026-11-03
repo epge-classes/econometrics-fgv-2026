@@ -433,32 +433,11 @@ $$
 - [●]{.good} No first step: no arbitrary initial weighting matrix to choose
 - [●]{.good} Invariant to linear transformations of the moments: units do not matter
 - [●]{.good} Less finite-sample bias ([Hansen, Heaton and Yaron (1996)]{.fgv})
-- [●]{.good} Objective at $\symbf{\theta}_0$, times $T$: $\chi^2_r$ even if identification is weak ([Stock and Wright (2000)]{.fgv})
 - [●]{.bad} Fat tails: it can lack finite moments ([Hausman et al. (2011)]{.fgv})
 - [●]{.bad} Computationally intensive, and optimizers can miss the global minimum
 :::
 
 - Linear IV: the global minimum comes from polynomial roots ([Moreira et al. (2026)]{.fgv})
-
-## Standard Errors
-
-- Estimate $\symbf{D}$ by the sample Jacobian at the estimate: $\hat{\symbf{D}}_T = \hat{\symbf{D}}_T(\hat{\symbf{\theta}}_T)$
-- Estimate $\symbf{S}$ by $\hat{\symbf{S}}_T$, from residuals at $\hat{\symbf{\theta}}_T$
-- Efficient GMM:
-
-$$
-\hat{\symbf{V}}^* = \left(\hat{\symbf{D}}_T'\hat{\symbf{S}}_T^{-1}\hat{\symbf{D}}_T\right)^{-1}, \qquad \text{standard errors: square roots of the diagonal of } \hat{\symbf{V}}^*/T
-$$
-
-. . .
-
-- Any other $\symbf{W}_T$ (e.g., your first step): the full sandwich!
-
-$$
-\hat{\symbf{V}} = \left(\hat{\symbf{D}}_T'\symbf{W}_T\hat{\symbf{D}}_T\right)^{-1}\hat{\symbf{D}}_T'\symbf{W}_T\hat{\symbf{S}}_T\symbf{W}_T\hat{\symbf{D}}_T\left(\hat{\symbf{D}}_T'\symbf{W}_T\hat{\symbf{D}}_T\right)^{-1}
-$$
-
-- Usual $t$-tests and Wald tests are valid
 
 ## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 
@@ -667,14 +646,14 @@ x_{t+1} = 0.8\,x_t + \eta_{t+1}, \qquad \Delta c_{t+1} = \mu + x_t + \varepsilon
 $$
 
 - Normal shocks, with $\varepsilon$ and $u$ correlated. True values: $\beta_0 = 0.99$ and $\gamma_0 = 2$
-- $\kappa$ makes the Euler equation hold exactly
+- $\kappa$ is chosen to make the Euler equation hold exactly
 - Expected returns move $\gamma_0$-for-one with expected growth: that is what identifies $\gamma$
 
 . . .
 
 - Each lag of $\Delta c$ and $\log R$ is a noisy signal of $x_t$, and older lags say less
 - Instruments: a constant and $L$ lags of each, so $r = 2L + 1$ moments
-- Two-step GMM with White's $\hat{\symbf{S}}_T$. Asymptotically, more lags can never hurt
+- Two-step GMM with White's $\hat{\symbf{S}}_T$. Asymptotically, more lags can never hurt (why?)
 
 ## More Lags, Better Estimates?
 
@@ -861,23 +840,6 @@ html`<div style="display: flex; justify-content: center; gap: 20px">${eulerLeft}
   95% CIs cover γ₀ in ${Math.round(100 * eulerD.cover[eulerK])}% of samples · the J-test rejects the true model in ${Math.round(100 * eulerD.jRej[eulerK])}%
 </div>`
 ```
-
-## What Is Going On?
-
-- With $T = 240$, going from 1 to 12 lags cuts the asymptotic sd only from `{python} f"{eu240['asySd'][0]:.2f}"` to `{python} f"{eu240['asySd'][-1]:.2f}"`
-- But the median $\hat\gamma$ falls from `{python} f"{eu240['median'][0]:.2f}"` to `{python} f"{eu240['median'][-1]:.2f}"`
-- It heads to `{python} f"{ols_slope:.2f}"`, the OLS slope of $\log R_{t+1}$ on $\Delta c_{t+1}$
-
-. . .
-
-- Why? Many lags fit part of the _surprise_ in $\Delta c_{t+1}$, which moves with the error
-- With 12 lags, $\hat{\symbf{S}}_T$ has 325 distinct entries from `{python} 240 - Ls[-1]` observations. And we invert it!
-
-. . .
-
-- Standard errors are too small: 95% CIs cover $\gamma_0$ in only `{python} f"{100 * eu240['cover'][-1]:.0f}"`% of samples
-- The J-test rejects the true model `{python} f"{100 * eu240['jRej'][-1]:.0f}"`% of the time, not 5%
-- More data helps, slowly: at $T = 1{,}000$ (250 years!), 12 lags still cover only `{python} f"{100 * eu1000['cover'][-1]:.0f}"`%
 
 ## Practical Guidance
 
