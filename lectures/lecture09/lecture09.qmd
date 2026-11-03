@@ -1,7 +1,14 @@
 ---
 title: "Lecture 9: The GMM Estimator"
 talkdate: "November 2026"
+jupyter: python3
 ---
+
+```{python}
+#| include: false
+import numpy as np
+from scipy import stats
+```
 
 # Introduction {visibility="uncounted"}
 
@@ -23,7 +30,6 @@ talkdate: "November 2026"
 - The optimal weighting matrix, and how to estimate it
 - Testing a model that has more moments than parameters
 - Building moments from conditional restrictions, and when you do _not_ need HAC
-- OLS, IV, GLS, NLS and MLE as special cases
 
 ## Example: Consumption-Based Asset Pricing
 
@@ -652,6 +658,227 @@ Fewer instruments (smaller $\ell$):
 - [●]{.bad} Cannot test overidentification if $r = a$
 :::
 
+## A Simulated Economy
+
+- Let $\Delta c_{t+1} \equiv \log(C_{t+1}/C_t)$. Expected growth $x_t$ is an AR(1) that nobody observes:
+
+$$
+x_{t+1} = 0.8\,x_t + \eta_{t+1}, \qquad \Delta c_{t+1} = \mu + x_t + \varepsilon_{t+1}, \qquad \log R_{t+1} = \kappa + \gamma_0\,x_t + u_{t+1}
+$$
+
+- Normal shocks, with $\varepsilon$ and $u$ correlated. True values: $\beta_0 = 0.99$ and $\gamma_0 = 2$
+- $\kappa$ makes the Euler equation hold exactly
+- Expected returns move $\gamma_0$-for-one with expected growth: that is what identifies $\gamma$
+
+. . .
+
+- Each lag of $\Delta c$ and $\log R$ is a noisy signal of $x_t$, and older lags say less
+- Instruments: a constant and $L$ lags of each, so $r = 2L + 1$ moments
+- Two-step GMM with White's $\hat{\symbf{S}}_T$. Asymptotically, more lags can never hurt
+
+## More Lags, Better Estimates?
+
+Two-step GMM estimates of $\gamma$, 500 samples for each $T$
+
+```{python}
+# Simulated economy, quarterly. x_t: expected consumption growth, never observed
+beta0, gam0 = 0.99, 2.0
+mu, phi, sc, sr, rho = 0.005, 0.8, 0.005, 0.004, 0.3
+sx = 0.5 * sc * np.sqrt(1 - phi**2)                     # sd(x) is half the noise in dc
+v = sr**2 + gam0**2 * sc**2 - 2 * gam0 * rho * sr * sc
+kappa = -np.log(beta0) + gam0 * mu - v / 2              # makes the Euler equation hold exactly
+
+def simulate(T, rng, burn=200):
+    n = T + burn
+    ex, ec = rng.standard_normal(n), rng.standard_normal(n)
+    eu = rho * ec + np.sqrt(1 - rho**2) * rng.standard_normal(n)
+    x = np.zeros(n)
+    for t in range(1, n):
+        x[t] = phi * x[t - 1] + sx * ex[t]
+    dc = np.r_[mu, mu + x[:-1] + sc * ec[1:]]
+    lr = np.r_[kappa, kappa + gam0 * x[:-1] + sr * eu[1:]]
+    return dc[burn:], lr[burn:]
+
+def moments_data(dc, lr, L, Lmax):
+    # z_t = (1, L lags of dc and log R), dated t; outcomes dated t+1. Same rows for every L
+    idx = np.arange(Lmax - 1, len(dc) - 1)
+    lags = [s[idx - j] - c for j in range(L) for s, c in ((dc, mu), (lr, kappa))]
+    return np.column_stack([np.ones(len(idx))] + lags), dc[idx + 1], lr[idx + 1]
+
+def criterion(gs, Z, dcn, lrn, W):
+    # beta enters linearly, m = beta * A(gamma) - B, so concentrate it out
+    E = np.exp(lrn[None, :] - np.outer(gs, dcn))
+    A, B = E @ Z / len(lrn), Z.mean(0)
+    AW = A @ W
+    b = (AW @ B) / np.einsum("ij,ij->i", AW, A)
+    M = b[:, None] * A - B
+    return np.einsum("ij,jk,ik->i", M, W, M), b
+
+def gmm(Z, dcn, lrn, W):
+    gs = np.linspace(-10, 14, 121)
+    for _ in range(4):                                   # grid, then zoom in around the minimum
+        k = np.argmin(criterion(gs, Z, dcn, lrn, W)[0])
+        step = gs[1] - gs[0]
+        gs = np.linspace(gs[k] - step, gs[k] + step, 21)
+    k = np.argmin(criterion(gs, Z, dcn, lrn, W)[0])
+    return criterion(gs[k:k + 1], Z, dcn, lrn, W)[1][0], gs[k]
+
+def moments_D_S(Z, dcn, lrn, b, g):
+    e = np.exp(lrn - g * dcn)
+    h = Z * (b * e - 1)[:, None]
+    D = np.column_stack([Z.T @ e, -b * Z.T @ (e * dcn)]) / len(e)
+    return h, D, h.T @ h / len(e)                       # White: the moments are an MDS
+
+def two_step(Z, dcn, lrn):
+    b1, g1 = gmm(Z, dcn, lrn, np.linalg.inv(Z.T @ Z / len(lrn)))
+    b2, g2 = gmm(Z, dcn, lrn, np.linalg.inv(moments_D_S(Z, dcn, lrn, b1, g1)[2]))
+    h, D, S = moments_D_S(Z, dcn, lrn, b2, g2)
+    Sinv = np.linalg.inv(S)
+    m = h.mean(0)
+    se = np.sqrt(np.linalg.inv(D.T @ Sinv @ D)[1, 1] / len(lrn))
+    return g2, se, len(lrn) * m @ Sinv @ m
+
+Ls, Ts, reps = list(range(1, 13)), [120, 240, 1000], 500
+rng = np.random.default_rng(2026)
+
+# Asymptotic sd of gamma-hat: D and S at the truth, from one very long sample
+dc_long, lr_long = simulate(400_000, rng)
+asy_var = []
+for L in Ls:
+    _, D, S = moments_D_S(*moments_data(dc_long, lr_long, L, L), beta0, gam0)
+    asy_var.append(np.linalg.inv(D.T @ np.linalg.inv(S) @ D)[1, 1])
+ols_slope = np.polyfit(dc_long, lr_long, 1)[0]
+
+euler = {"Ls": Ls, "Ts": Ts, "truth": gam0, "ols": ols_slope, "byT": {}}
+for T in Ts:
+    out = np.empty((reps, len(Ls), 3))
+    for i in range(reps):
+        dc, lr = simulate(T, rng)
+        for k, L in enumerate(Ls):
+            out[i, k] = two_step(*moments_data(dc, lr, L, Ls[-1]))
+    g, se, J = out[..., 0], out[..., 1], out[..., 2]
+    euler["byT"][str(T)] = {
+        "draws": np.round(g.T, 3).tolist(),
+        "median": np.median(g, 0).tolist(),
+        "rmse": np.sqrt(((g - gam0) ** 2).mean(0)).tolist(),
+        "asySd": np.sqrt(np.array(asy_var) / (T - Ls[-1])).tolist(),
+        "cover": (np.abs(g - gam0) / se < 1.96).mean(0).tolist(),
+        "jRej": [float((J[:, k] > stats.chi2.ppf(0.95, 2 * L - 1)).mean()) for k, L in enumerate(Ls)],
+    }
+ojs_define(euler=euler)
+eu240, eu1000 = euler["byT"]["240"], euler["byT"]["1000"]
+```
+
+```{ojs}
+//| echo: false
+// Lags slider with a Play button that sweeps L upwards, plus the sample size
+viewof eulerCtl = {
+  const n = euler.Ls.length
+  const lag = Inputs.range([1, n], {value: 1, step: 1, label: "Lags L", width: 330})
+  lag.style.setProperty("--label-width", "70px")
+  lag.querySelector("input[type=number]").style.display = "none"
+  const sizes = Inputs.radio(euler.Ts, {value: 240, label: "Sample size T", format: d => d.toLocaleString("en-US")})
+  sizes.style.setProperty("--label-width", "130px")
+  sizes.style.maxWidth = "none"
+  const shown = html`<span style="display: inline-block; width: 190px; font-weight: bold"></span>`
+  const show = () => shown.textContent = `L = ${lag.value}: ${2 * lag.value + 1} moments`
+  show()
+  const button = html`<button style="font: inherit; padding: 2px 14px; cursor: pointer">▶ Play</button>`
+  const set = i => {
+    lag.value = i
+    lag.dispatchEvent(new Event("input", {bubbles: true}))
+  }
+  let timer
+  button.onclick = () => {
+    clearInterval(timer)
+    let i = 1
+    set(i)
+    timer = setInterval(() => (++i <= n ? set(i) : clearInterval(timer)), 600)
+  }
+  lag.addEventListener("input", show)
+  invalidation.then(() => clearInterval(timer))
+  return Inputs.form({L: lag, T: sizes}, {template: ({L, T}) => html`<div style="display: flex; justify-content: center; align-items: center; gap: 22px; font-size: 20px; margin-bottom: 6px">${L}${shown}${button}${T}</div>`})
+}
+```
+
+```{ojs}
+//| echo: false
+eulerStyle = ({fontSize: "18px", fontFamily: "Arial, Arimo, sans-serif"})
+eulerBins = d3.range(-1, 5.001, 0.2)
+
+// Histogram counts; draws outside [-1, 5] go to the edge bins
+eulerHist = draws => {
+  const lo = eulerBins[0], w = eulerBins[1] - eulerBins[0], nb = eulerBins.length - 1
+  const counts = new Array(nb).fill(0)
+  for (const g of draws) counts[Math.min(nb - 1, Math.max(0, Math.floor((g - lo) / w)))] += 1
+  return counts.map((c, i) => ({x0: eulerBins[i], x1: eulerBins[i + 1], n: c}))
+}
+
+eulerD = euler.byT[String(eulerCtl.T)]
+eulerK = eulerCtl.L - 1
+
+// One y-scale per T, so the histogram does not jump while L moves
+eulerHistMax = d3.max(eulerD.draws, d => d3.max(eulerHist(d), b => b.n))
+
+eulerLeft = Plot.plot({
+  width: 570, height: 440, marginLeft: 45, marginBottom: 45, marginTop: 30,
+  style: eulerStyle,
+  x: {label: "Estimate of γ", domain: [-1, 5], labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: [0, 1.08 * eulerHistMax], ticks: 4},
+  grid: true,
+  marks: [
+    Plot.rectY(eulerHist(eulerD.draws[eulerK]), {x1: "x0", x2: "x1", y: "n", fill: "#0072BC", fillOpacity: 0.4, inset: 0.5}),
+    Plot.ruleX([euler.truth], {stroke: "black", strokeWidth: 2.5, strokeDasharray: "7,5"}),
+    Plot.ruleX([euler.ols], {stroke: "#888888", strokeWidth: 2.5, strokeDasharray: "2,4"}),
+    Plot.text(["true γ₀"], {x: euler.truth, frameAnchor: "top", dy: -18, fill: "black", fontWeight: "bold"}),
+    Plot.text(["OLS slope"], {x: euler.ols, frameAnchor: "top", dy: -18, fill: "#888888", fontWeight: "bold"}),
+    Plot.text([`median estimate = ${eulerD.median[eulerK].toFixed(2)}`], {frameAnchor: "top-right", dx: -6, dy: 8, fill: "#0072BC", fontWeight: "bold", fontSize: 20, stroke: "white", strokeWidth: 6})
+  ]
+})
+
+eulerCurves = euler.Ls.map((L, i) => ({L, rmse: eulerD.rmse[i], asy: eulerD.asySd[i]}))
+eulerRmseMax = d3.max(eulerCurves, d => Math.max(d.rmse, d.asy))
+
+eulerRight = Plot.plot({
+  width: 570, height: 440, marginLeft: 50, marginBottom: 45, marginTop: 30,
+  style: eulerStyle,
+  x: {label: "Lags L", domain: [0.5, 12.5], ticks: euler.Ls, labelAnchor: "center", labelArrow: "none"},
+  y: {label: null, domain: [0, 1.15 * eulerRmseMax], ticks: 5},
+  grid: true,
+  marks: [
+    Plot.ruleX([eulerCtl.L], {stroke: "#EB811B", strokeWidth: 2, strokeOpacity: 0.6}),
+    Plot.line(eulerCurves, {x: "L", y: "asy", stroke: "#2D3E50", strokeWidth: 3, strokeDasharray: "7,5"}),
+    Plot.line(eulerCurves, {x: "L", y: "rmse", stroke: "#0072BC", strokeWidth: 3}),
+    Plot.dot(eulerCurves, {x: "L", y: "rmse", fill: "#0072BC", r: 4}),
+    Plot.dot([eulerCurves[eulerK]], {x: "L", y: "rmse", fill: "#EB811B", stroke: "white", r: 8}),
+    Plot.text(["RMSE (Monte Carlo)"], {frameAnchor: "top-left", dx: 8, dy: 8, fill: "#0072BC", fontWeight: "bold", textAnchor: "start", stroke: "white", strokeWidth: 6}),
+    Plot.text(["Asymptotic sd"], {frameAnchor: "top-left", dx: 8, dy: 32, fill: "#2D3E50", fontWeight: "bold", textAnchor: "start", stroke: "white", strokeWidth: 6})
+  ]
+})
+
+html`<div style="display: flex; justify-content: center; gap: 20px">${eulerLeft}${eulerRight}</div>
+<div style="text-align: center; font-size: 22px; font-weight: bold; color: #EB811B; margin-top: 4px">
+  95% CIs cover γ₀ in ${Math.round(100 * eulerD.cover[eulerK])}% of samples · the J-test rejects the true model in ${Math.round(100 * eulerD.jRej[eulerK])}%
+</div>`
+```
+
+## What Is Going On?
+
+- With $T = 240$, going from 1 to 12 lags cuts the asymptotic sd only from `{python} f"{eu240['asySd'][0]:.2f}"` to `{python} f"{eu240['asySd'][-1]:.2f}"`
+- But the median $\hat\gamma$ falls from `{python} f"{eu240['median'][0]:.2f}"` to `{python} f"{eu240['median'][-1]:.2f}"`
+- It heads to `{python} f"{ols_slope:.2f}"`, the OLS slope of $\log R_{t+1}$ on $\Delta c_{t+1}$
+
+. . .
+
+- Why? Many lags fit part of the _surprise_ in $\Delta c_{t+1}$, which moves with the error
+- With 12 lags, $\hat{\symbf{S}}_T$ has 325 distinct entries from `{python} 240 - Ls[-1]` observations. And we invert it!
+
+. . .
+
+- Standard errors are too small: 95% CIs cover $\gamma_0$ in only `{python} f"{100 * eu240['cover'][-1]:.0f}"`% of samples
+- The J-test rejects the true model `{python} f"{100 * eu240['jRej'][-1]:.0f}"`% of the time, not 5%
+- More data helps, slowly: at $T = 1{,}000$ (250 years!), 12 lags still cover only `{python} f"{100 * eu1000['cover'][-1]:.0f}"`%
+
 ## Practical Guidance
 
 How to choose which functions of $\mathcal{F}_t$ to use?
@@ -705,124 +932,6 @@ Example from the consumption model:
 - Could a totally different estimator beat GMM with the best radars?
 - If only today matters for tomorrow (Markov data), no ([Carrasco and Florens (2014)]{.fgv})
 - The catch: getting there may take infinitely many moments
-
-## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
-
-::: {.standout-body}
-Questions?
-:::
-
-# Classical Estimators as GMM {visibility="uncounted"}
-
-## A Unifying Framework
-
-- Many familiar estimators are special cases of GMM
-- We will see OLS, IV/2SLS, GLS, NLS and MLE
-
-. . .
-
-- In each case, ask what the moment function is
-- Most of them are exactly identified. So $\symbf{W}$ is irrelevant, and:
-
-$$
-\symbf{V} = \symbf{D}^{-1}\symbf{S}\left(\symbf{D}'\right)^{-1}
-$$
-
-- Asymptotic variance for free, with dependence handled by $\symbf{S}$
-- It also suggests robustness checks: e.g., change the weighting matrix
-
-## OLS as GMM
-
-- Linear model: $y_t = \symbf{x}_t'\symbf{\beta}_0 + u_t$ with $\E[\symbf{x}_t u_t] = \symbf{0}$
-- Moment function: $\symbf{h}(\symbf{\beta}, \symbf{w}_t) = \symbf{x}_t(y_t - \symbf{x}_t'\symbf{\beta})$
-- $r = a = \dim(\symbf{x}_t)$: exactly identified, so the weighting matrix doesn't matter!
-
-. . .
-
-- Set the sample moment to zero:
-
-$$
-\sum_{t=1}^{T}\symbf{x}_t\left(y_t - \symbf{x}_t'\hat{\symbf{\beta}}\right) = \symbf{0} \implies \hat{\symbf{\beta}}_{OLS} = \left(\symbf{X}'\symbf{X}\right)^{-1}\symbf{X}'\symbf{y}
-$$
-
-. . .
-
-- $\symbf{D} = -\E[\symbf{x}_t\symbf{x}_t'] = -\symbf{Q}$, and $\symbf{S}$ is the long-run variance of the scores $\symbf{x}_t u_t$
-- So $\symbf{V} = \symbf{Q}^{-1}\symbf{S}\symbf{Q}^{-1}$: the HAC formula from lecture 7
-
-## IV and 2SLS as GMM
-
-- Linear model with instruments: $y_t = \symbf{x}_t'\symbf{\beta}_0 + u_t$ with $\E[\symbf{z}_t u_t] = \symbf{0}$ and $\symbf{z}_t \in \R^\ell$
-- Moment function: $\symbf{h}(\symbf{\beta}, \symbf{w}_t) = \symbf{z}_t(y_t - \symbf{x}_t'\symbf{\beta})$
-
-. . .
-
-- Exactly identified, $\ell = \dim(\symbf{x}_t)$: any $\symbf{W}_T$ gives $\hat{\symbf{\beta}}_{IV} = (\symbf{Z}'\symbf{X})^{-1}\symbf{Z}'\symbf{y}$
-
-. . .
-
-- Overidentified, $\ell > \dim(\symbf{x}_t)$: the choice $\symbf{W}_T = \left(\frac{1}{T}\sum_t\symbf{z}_t\symbf{z}_t'\right)^{-1}$ gives **2SLS**, in one step
-- With $\symbf{P}_{\symbf{Z}} \equiv \symbf{Z}(\symbf{Z}'\symbf{Z})^{-1}\symbf{Z}'$: $\ \hat{\symbf{\beta}}_{2SLS} = \left(\symbf{X}'\symbf{P}_{\symbf{Z}}\symbf{X}\right)^{-1}\symbf{X}'\symbf{P}_{\symbf{Z}}\symbf{y}$
-
-. . .
-
-- Scores an MDS and homoskedastic? $\symbf{S} = \sigma^2\E[\symbf{z}_t\symbf{z}_t']$, so 2SLS **is** efficient GMM
-- Otherwise, two-step GMM with White or Newey-West beats 2SLS
-
-## GLS as GMM
-
-- Linear model with known $\E[\symbf{u}\symbf{u}'\mid\symbf{X}] = \symbf{\Omega}$ and $\E[\symbf{u}\mid\symbf{X}] = \symbf{0}$
-- Careful: $\symbf{X}'(\symbf{y} - \symbf{X}\symbf{\beta})$ is exactly identified, so it gives OLS for **every** weighting matrix!
-
-. . .
-
-- The efficiency gain comes from changing the _moments_, not the weights
-- $\E[\symbf{u}\mid\symbf{X}] = \symbf{0}$ makes any function of $\symbf{X}$ a valid instrument. Take $\symbf{\Omega}^{-1}\symbf{X}$:
-
-$$
-\symbf{X}'\symbf{\Omega}^{-1}\left(\symbf{y} - \symbf{X}\hat{\symbf{\beta}}\right) = \symbf{0} \implies \hat{\symbf{\beta}}_{GLS} = \left(\symbf{X}'\symbf{\Omega}^{-1}\symbf{X}\right)^{-1}\symbf{X}'\symbf{\Omega}^{-1}\symbf{y}
-$$
-
-- Estimated $\hat{\symbf{\Omega}}$ in place of $\symbf{\Omega}$: **FGLS**
-
-. . .
-
-- With serial correlation, these moments mix $\symbf{x}_s$ and $u_t$ across dates
-- So GLS needs strict exogeneity, which fails with lagged dependent variables
-
-## NLS as GMM
-
-- Nonlinear regression: $y_t = g(\symbf{x}_t, \symbf{\beta}_0) + u_t$ with $\E[u_t\mid\symbf{x}_t] = 0$
-- NLS minimizes $\sum_t\left(y_t - g(\symbf{x}_t, \symbf{\beta})\right)^2$. Its first-order condition is a moment condition!
-- Moment function, with $\symbf{g}_{\symbf{\beta}}(\symbf{x}_t, \symbf{\beta}) \equiv \partial g(\symbf{x}_t, \symbf{\beta})/\partial\symbf{\beta}$:
-
-$$
-\symbf{h}(\symbf{\beta}, \symbf{w}_t) = \symbf{g}_{\symbf{\beta}}(\symbf{x}_t, \symbf{\beta})\left(y_t - g(\symbf{x}_t, \symbf{\beta})\right)
-$$
-
-- Exactly identified: $r = a = \dim(\symbf{\beta})$. Valid because $\E[u_t\mid\symbf{x}_t] = 0$, by the LIE
-- $\E[\symbf{x}_t u_t] = \symbf{0}$ alone does **not** give NLS: that is a different moment function
-
-. . .
-
-- $\symbf{D} = -\E\left[\symbf{g}_{\symbf{\beta}}\symbf{g}_{\symbf{\beta}}'\right]$ at $\symbf{\beta}_0$. The variance comes directly from GMM theory
-
-## MLE as GMM
-
-- Let $\symbf{s}_t(\symbf{\theta}) \equiv \partial\log f_t(\symbf{\theta})/\partial\symbf{\theta}$ be the score of observation $t$
-- The MLE solves $\sum_t\symbf{s}_t(\hat{\symbf{\theta}}) = \symbf{0}$: exactly identified GMM with $\symbf{h} = \symbf{s}_t$!
-
-. . .
-
-- $\symbf{D}$ is the expected Hessian: the bread of lecture 6's sandwich
-- $\symbf{S}$ is the long-run variance of the scores: the meat
-- Scores an MDS? Then $\symbf{S}$ is the outer product of the score, as in lecture 6
-- Serially correlated scores in a quasi-MLE? Use Newey-West for the meat
-
-. . .
-
-- So MLE is GMM with moments chosen by a fully specified model
-- Correct likelihood: the score is the best moment function you could pick
 
 ## Takeaways
 
