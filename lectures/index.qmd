@@ -35,7 +35,7 @@ format:
 - [05]{.num} [ARMA Models and the Wold Decomposition]{.ttl} [[Slides](lecture05/lecture05.html){.pill} [PDF](lecture05/lecture05.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 - [06]{.num} [Estimation of ARMA Models]{.ttl} [[Slides](lecture06/lecture06.html){.pill} [PDF](lecture06/lecture06.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 - [07]{.num} [LLN, CLTs, and HAC Estimation for Time Series]{.ttl} [[Slides](lecture07/lecture07.html){.pill} [PDF](lecture07/lecture07.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
-- [08]{.num} [Unit Roots, AR-DL Models, and Granger Causality]{.ttl} [coming soon]{.soon}
+- [08]{.num} [Unit Roots and AR-DL Models]{.ttl} [[Slides](lecture08/lecture08.html){.pill} [PDF](lecture08/lecture08.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 - [09]{.num} [The GMM Estimator]{.ttl} [[Slides](lecture09/lecture09.html){.pill} [PDF](lecture09/lecture09.html?print-pdf "Print-ready view: use your browser's Print → Save as PDF"){.pill}]{.links}
 :::
 
