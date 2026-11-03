@@ -1,5 +1,5 @@
 ---
-title: "Lecture 7: LLN and CLTs for Time Series"
+title: "Lecture 7: LLN, CLTs, and HAC Estimation for Time Series"
 talkdate: "October 2026"
 ---
 
