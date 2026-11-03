@@ -689,15 +689,15 @@ Questions?
 
 ```{python}
 #| fig-align: center
-#| fig-alt: "Three monthly time series for Brazil: IPCA inflation fluctuating around a mean, the log USD/BRL exchange rate wandering upward, and log M2 trending up."
+#| fig-alt: "Three monthly time series for Brazil: IPCA inflation fluctuating around a mean, the log USD/BRL exchange rate wandering upward, and log currency held by the public trending up with December spikes."
 data = pd.read_csv("brazil_macro_data.csv", parse_dates=["Date"], index_col="Date")
 data["log_fx"] = np.log(data["usd_brl"])
-data["log_m2"] = np.log(data["m2"])
+data["log_cur"] = np.log(data["currency"])
 
 panels = [
     ("ipca", "IPCA inflation (% per month)", blue),
     ("log_fx", "USD/BRL exchange rate (log)", orange),
-    ("log_m2", "M2 (log)", slate),
+    ("log_cur", "Currency held by the public (log)", slate),
 ]
 
 fig, axes = plt.subplots(1, 3, figsize=(12, 3.5))
@@ -718,7 +718,7 @@ plt.tight_layout()
 
 ```{python}
 #| output: asis
-series_cfg = [("ipca", "IPCA"), ("log_fx", "USD/BRL (log)"), ("log_m2", "M2 (log)")]
+series_cfg = [("ipca", "IPCA"), ("log_fx", "USD/BRL (log)"), ("log_cur", "Currency (log)")]
 
 rows = []
 for col, title in series_cfg:
@@ -729,7 +729,7 @@ for col, title in series_cfg:
             "Fitted terms": spec,
             r"$t_{ADF}$": f"{stat:.2f}",
             "5% critical value": f"{crit['5%']:.2f}",
-            "$p$-value": "< 0.01" if pvalue < 0.01 else f"{pvalue:.2f}",
+            "$p$-value": "< 0.001" if pvalue < 0.001 else f"{pvalue:.3f}",
             "Lags": int(lags),
             "$T$": int(nobs),
         })
@@ -737,9 +737,35 @@ for col, title in series_cfg:
 print(pd.DataFrame(rows).to_markdown(index=False, disable_numparse=True))
 ```
 
-- Inflation: we reject a unit root in both specifications
-- Exchange rate and M2: we cannot reject. Why does AIC pick 15 lags for M2?
-- In first differences, both reject at any usual level: they look $I(1)$
+- Inflation: we reject a unit root in both specifications. Exchange rate: in neither
+- Currency: we reject with a constant only, but not with a trend. Which one do you believe?
+- Why does AIC pick 15 lags for currency? Look at the plot again
+
+## Constant or Trend? Ask the Economics
+
+$p$-values of the ADF test for log currency, with a fixed number of lags
+
+```{python}
+#| output: asis
+lag_grid = [1, 3, 6, 11, 12, 13, 14, 15]
+rows = []
+for reg, spec in [("c", "Constant"), ("ct", "Constant and trend")]:
+    row = {"Fitted terms": spec}
+    for lag in lag_grid:
+        pvalue = adfuller(data["log_cur"].dropna(), regression=reg, maxlag=lag, autolag=None)[1]
+        row[f"{lag} lags" if lag > 1 else "1 lag"] = "< 0.001" if pvalue < 0.001 else f"{pvalue:.3f}"
+    rows.append(row)
+print(pd.DataFrame(rows).to_markdown(index=False, disable_numparse=True))
+```
+
+- Currency demand grows with nominal GDP: the alternative must allow a trend
+- With a trend, the answer never changes: we cannot reject a unit root
+
+. . .
+
+- With a constant only, $p$ goes from below 0.01 to about 0.7 when we add one lag
+- Seasonality: currency jumps every December and falls back in January
+- Pick the deterministic terms from the economics, not from the $p$-value you like
 
 ## &nbsp; {.standout background-color="var(--slate)" visibility="uncounted"}
 

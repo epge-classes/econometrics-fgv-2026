@@ -1048,7 +1048,7 @@ L(\rho) \propto \exp\left(-\frac{\sum_t y_{t-1}^2}{2\sigma^2}\left(\rho - \hat\r
 <section id="take-a-look-at-the-data" class="slide level2">
 <h2>Take a Look at the Data</h2>
 
-<img data-src="lecture08_files/figure-revealjs/cell-6-output-1.svg" class="quarto-figure quarto-figure-center r-stretch" alt="Three monthly time series for Brazil: IPCA inflation fluctuating around a mean, the log USD/BRL exchange rate wandering upward, and log M2 trending up."><ul>
+<img data-src="lecture08_files/figure-revealjs/cell-6-output-1.svg" class="quarto-figure quarto-figure-center r-stretch" alt="Three monthly time series for Brazil: IPCA inflation fluctuating around a mean, the log USD/BRL exchange rate wandering upward, and log currency held by the public trending up with December spikes."><ul>
 <li>Monthly data from the Central Bank of Brazil, up to September 2026</li>
 <li><span class="math inline">\(H_0\)</span>: each series is integrated. Which deterministic terms would you fit?</li>
 <li>Which economic theories justify the presence (or lack) of a unit root here?</li>
@@ -1058,7 +1058,7 @@ L(\rho) \propto \exp\left(-\frac{\sum_t y_{t-1}^2}{2\sigma^2}\left(\rho - \hat\r
 <h2>Running the ADF Test</h2>
 <table class="caption-top">
 <colgroup>
-<col style="width: 15%">
+<col style="width: 16%">
 <col style="width: 20%">
 <col style="width: 13%">
 <col style="width: 21%">
@@ -1083,7 +1083,7 @@ L(\rho) \propto \exp\left(-\frac{\sum_t y_{t-1}^2}{2\sigma^2}\left(\rho - \hat\r
 <td style="text-align: left;">Constant</td>
 <td style="text-align: left;">-8.96</td>
 <td style="text-align: left;">-2.87</td>
-<td style="text-align: left;">&lt; 0.01</td>
+<td style="text-align: left;">&lt; 0.001</td>
 <td style="text-align: left;">0</td>
 <td style="text-align: left;">320</td>
 </tr>
@@ -1092,7 +1092,7 @@ L(\rho) \propto \exp\left(-\frac{\sum_t y_{t-1}^2}{2\sigma^2}\left(\rho - \hat\r
 <td style="text-align: left;">Constant and trend</td>
 <td style="text-align: left;">-9.07</td>
 <td style="text-align: left;">-3.42</td>
-<td style="text-align: left;">&lt; 0.01</td>
+<td style="text-align: left;">&lt; 0.001</td>
 <td style="text-align: left;">0</td>
 <td style="text-align: left;">320</td>
 </tr>
@@ -1101,7 +1101,7 @@ L(\rho) \propto \exp\left(-\frac{\sum_t y_{t-1}^2}{2\sigma^2}\left(\rho - \hat\r
 <td style="text-align: left;">Constant</td>
 <td style="text-align: left;">-1.13</td>
 <td style="text-align: left;">-2.87</td>
-<td style="text-align: left;">0.70</td>
+<td style="text-align: left;">0.702</td>
 <td style="text-align: left;">1</td>
 <td style="text-align: left;">319</td>
 </tr>
@@ -1110,35 +1110,100 @@ L(\rho) \propto \exp\left(-\frac{\sum_t y_{t-1}^2}{2\sigma^2}\left(\rho - \hat\r
 <td style="text-align: left;">Constant and trend</td>
 <td style="text-align: left;">-1.79</td>
 <td style="text-align: left;">-3.42</td>
-<td style="text-align: left;">0.71</td>
+<td style="text-align: left;">0.709</td>
 <td style="text-align: left;">1</td>
 <td style="text-align: left;">319</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">M2 (log)</td>
+<td style="text-align: left;">Currency (log)</td>
 <td style="text-align: left;">Constant</td>
-<td style="text-align: left;">-1.53</td>
+<td style="text-align: left;">-2.89</td>
 <td style="text-align: left;">-2.87</td>
-<td style="text-align: left;">0.52</td>
+<td style="text-align: left;">0.046</td>
 <td style="text-align: left;">15</td>
-<td style="text-align: left;">282</td>
+<td style="text-align: left;">281</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">M2 (log)</td>
+<td style="text-align: left;">Currency (log)</td>
 <td style="text-align: left;">Constant and trend</td>
-<td style="text-align: left;">-1.69</td>
+<td style="text-align: left;">-1.09</td>
 <td style="text-align: left;">-3.43</td>
-<td style="text-align: left;">0.76</td>
+<td style="text-align: left;">0.931</td>
 <td style="text-align: left;">15</td>
-<td style="text-align: left;">282</td>
+<td style="text-align: left;">281</td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li>Inflation: we reject a unit root in both specifications</li>
-<li>Exchange rate and M2: we cannot reject. Why does AIC pick 15 lags for M2?</li>
-<li>In first differences, both reject at any usual level: they look <span class="math inline">\(I(1)\)</span></li>
+<li>Inflation: we reject a unit root in both specifications. Exchange rate: in neither</li>
+<li>Currency: we reject with a constant only, but not with a trend. Which one do you believe?</li>
+<li>Why does AIC pick 15 lags for currency? Look at the plot again</li>
 </ul>
+</section>
+<section id="constant-or-trend-ask-the-economics" class="slide level2">
+<h2>Constant or Trend? Ask the Economics</h2>
+<p><span class="math inline">\(p\)</span>-values of the ADF test for log currency, with a fixed number of lags</p>
+<table class="caption-top" style="width:100%;">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Fitted terms</th>
+<th style="text-align: left;">1 lag</th>
+<th style="text-align: left;">3 lags</th>
+<th style="text-align: left;">6 lags</th>
+<th style="text-align: left;">11 lags</th>
+<th style="text-align: left;">12 lags</th>
+<th style="text-align: left;">13 lags</th>
+<th style="text-align: left;">14 lags</th>
+<th style="text-align: left;">15 lags</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Constant</td>
+<td style="text-align: left;">0.325</td>
+<td style="text-align: left;">0.204</td>
+<td style="text-align: left;">0.150</td>
+<td style="text-align: left;">&lt; 0.001</td>
+<td style="text-align: left;">0.689</td>
+<td style="text-align: left;">0.563</td>
+<td style="text-align: left;">0.235</td>
+<td style="text-align: left;">0.046</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Constant and trend</td>
+<td style="text-align: left;">0.352</td>
+<td style="text-align: left;">0.380</td>
+<td style="text-align: left;">0.639</td>
+<td style="text-align: left;">0.992</td>
+<td style="text-align: left;">0.849</td>
+<td style="text-align: left;">0.894</td>
+<td style="text-align: left;">0.793</td>
+<td style="text-align: left;">0.931</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Currency demand grows with nominal GDP: the alternative must allow a trend</li>
+<li>With a trend, the answer never changes: we cannot reject a unit root</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>With a constant only, <span class="math inline">\(p\)</span> goes from below 0.01 to about 0.7 when we add one lag</li>
+<li>Seasonality: currency jumps every December and falls back in January</li>
+<li>Pick the deterministic terms from the economics, not from the <span class="math inline">\(p\)</span>-value you like</li>
+</ul>
+</div>
 </section>
 <section id="section-2" class="slide level2 standout" data-background-color="var(--slate)" data-visibility="uncounted">
 <h2>&nbsp;</h2>

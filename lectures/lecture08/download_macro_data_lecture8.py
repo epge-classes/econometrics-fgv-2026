@@ -4,10 +4,10 @@ Download the macroeconomic series for Lecture 8 from the Brazilian Central Bank 
 Series downloaded (SGS codes):
     - ipca:    IPCA inflation, monthly % change (433)
     - usd_brl: USD/BRL exchange rate, monthly average of the PTAX sell rate (3698)
-    - m2:      M2, end-of-period balance, BRL thousands (27810)
+    - currency: currency held by the public, end-of-period balance, BRL thousands (27789)
 
-The 2025 version used code 27789 and called it M2. That code is currency held by the
-public: about BRL 0.3 trillion in 2025, against about BRL 7 trillion for M2.
+The 2025 version downloaded the same code 27789 but called it M2. M2 is code 27810:
+about BRL 7 trillion in 2025, against about BRL 0.3 trillion of currency.
 
 Usage:
     python download_macro_data_lecture8.py
@@ -44,7 +44,7 @@ def download_bcb_series(series_code, start_date='01/01/2000', end_date=None):
     return df.set_index('data')['valor'].sort_index()
 
 
-series = {'ipca': 433, 'usd_brl': 3698, 'm2': 27810}
+series = {'ipca': 433, 'usd_brl': 3698, 'currency': 27789}
 
 df = pd.DataFrame({name: download_bcb_series(code) for name, code in series.items()})
 df = df[df['ipca'].notna()]
