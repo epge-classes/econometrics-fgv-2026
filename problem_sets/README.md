@@ -33,3 +33,8 @@ The repository's README explains how to clone it and push.
 - Data: [`PS2/ipca_igpm.csv`](PS2/ipca_igpm.csv) (same as Problem Set 2)
 - Submit in: `Assignment-03`
 - Due date: 2026-11-06
+
+## Problem Set 4 (optional)
+
+- PDF: [`PS4/problem_set_4.pdf`](PS4/problem_set_4.pdf) ([LaTeX source](PS4/problem_set_4.tex))
+- Submission is optional. If you submit it, use `Assignment-04`.
